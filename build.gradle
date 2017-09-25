@@ -33,7 +33,7 @@ task clean(type: Delete) {
 // Define versions in a single place
 ext {
     // Sdk and tools
-    minSdkVersion = 14
+    minSdkVersion = 17
     targetSdkVersion = 26
     compileSdkVersion = 26
     buildToolsVersion = '26.0.1'
@@ -50,6 +50,9 @@ ext {
     espressoVersion = '3.0.0'
     daggerVersion = '2.11'
     dexmakerVersion = '1.2'
+    rxjavaVersion = '2.1.4'
+    rxandroidVersion = '2.0.1'
+    sqlbriteVersion = '2.0.0'
 }
 
 //When there is an error in code generation you will may see
