@@ -10,8 +10,9 @@
 		android:supportsRtl="true"
 		android:theme="@style/AppTheme">
 		<activity
-			android:name=".tracks.TrackListActivity"
+			android:name=".tripList.TripListActivity"
 			android:label="@string/app_name"
+			android:screenOrientation="portrait"
 			android:theme="@style/AppTheme.NoActionBar">
 			<intent-filter>
 				<action android:name="android.intent.action.MAIN"/>
@@ -20,13 +21,14 @@
 			</intent-filter>
 		</activity>
 		<activity
-			android:name=".tracks.TrackDetailActivity"
+			android:name=".tripDetails.TripDetailActivity"
 			android:label="@string/title_track_detail"
-			android:parentActivityName=".tracks.TrackListActivity"
+			android:parentActivityName=".tripList.TripListActivity"
+			android:screenOrientation="portrait"
 			android:theme="@style/AppTheme.NoActionBar">
 			<meta-data
 				android:name="android.support.PARENT_ACTIVITY"
-				android:value="eu.vmpay.drivestyle.tracks.TrackListActivity"/>
+				android:value="eu.vmpay.drivestyle.tripList.TripListActivity"/>
 		</activity>
 	</application>
 

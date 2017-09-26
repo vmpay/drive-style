@@ -23,7 +23,7 @@ public final class Trip
 	private final long mFinishTime;
 
 	@Nullable
-	private final double mMark;
+	private final Double mMark;
 
 	@NonNull
 	private final String mType;
@@ -31,7 +31,7 @@ public final class Trip
 	@NonNull
 	private final String mScenario;
 
-	public Trip(long mId, @NonNull String mTitle, @NonNull long mStartTime, @NonNull long mFinishTime, double mMark, @NonNull String mType, @NonNull String mScenario)
+	public Trip(long mId, @NonNull String mTitle, @NonNull long mStartTime, @NonNull long mFinishTime, Double mMark, @NonNull String mType, @NonNull String mScenario)
 	{
 		this.mId = mId;
 		this.mTitle = mTitle;
@@ -52,7 +52,7 @@ public final class Trip
 	 * @param mType
 	 * @param mScenario
 	 */
-	public Trip(@NonNull String mTitle, @NonNull long mStartTime, @NonNull long mFinishTime, double mMark, @NonNull String mType, @NonNull String mScenario)
+	public Trip(@NonNull String mTitle, @NonNull long mStartTime, @NonNull long mFinishTime, Double mMark, @NonNull String mType, @NonNull String mScenario)
 	{
 		this(-1, mTitle, mStartTime, mFinishTime, mMark, mType, mScenario);
 	}
@@ -78,6 +78,12 @@ public final class Trip
 		return mId;
 	}
 
+	@Nullable
+	public String getId()
+	{
+		return Long.toString(mId);
+	}
+
 	@NonNull
 	public String getmTitle()
 	{
@@ -97,7 +103,7 @@ public final class Trip
 	}
 
 	@Nullable
-	public double getmMark()
+	public Double getmMark()
 	{
 		return mMark;
 	}
@@ -122,10 +128,11 @@ public final class Trip
 
 		Trip trip = (Trip) o;
 
+		if(mId != trip.mId) return false;
 		if(mStartTime != trip.mStartTime) return false;
 		if(mFinishTime != trip.mFinishTime) return false;
-		if(Double.compare(trip.mMark, mMark) != 0) return false;
 		if(!mTitle.equals(trip.mTitle)) return false;
+		if(mMark != null ? !mMark.equals(trip.mMark) : trip.mMark != null) return false;
 		if(!mType.equals(trip.mType)) return false;
 		return mScenario.equals(trip.mScenario);
 
@@ -134,13 +141,11 @@ public final class Trip
 	@Override
 	public int hashCode()
 	{
-		int result;
-		long temp;
-		result = mTitle.hashCode();
+		int result = (int) (mId ^ (mId >>> 32));
+		result = 31 * result + mTitle.hashCode();
 		result = 31 * result + (int) (mStartTime ^ (mStartTime >>> 32));
 		result = 31 * result + (int) (mFinishTime ^ (mFinishTime >>> 32));
-		temp = Double.doubleToLongBits(mMark);
-		result = 31 * result + (int) (temp ^ (temp >>> 32));
+		result = 31 * result + (mMark != null ? mMark.hashCode() : 0);
 		result = 31 * result + mType.hashCode();
 		result = 31 * result + mScenario.hashCode();
 		return result;

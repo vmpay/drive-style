@@ -1,4 +1,5 @@
 <resources>
 	<string name="app_name">DriveStyle</string>
 	<string name="title_track_detail">Track Detail</string>
+	<string name="no_data">No data</string>
 </resources>

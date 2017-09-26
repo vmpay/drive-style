@@ -1,35 +1,42 @@
-package eu.vmpay.drivestyle.tracks;
+package eu.vmpay.drivestyle.tripDetails;
 
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
-import android.support.v7.widget.Toolbar;
-import android.view.View;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.app.ActionBar;
+import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
+import android.view.View;
 
+import javax.inject.Inject;
+
+import dagger.android.support.DaggerAppCompatActivity;
 import eu.vmpay.drivestyle.R;
+import eu.vmpay.drivestyle.tripList.TripListActivity;
+import eu.vmpay.drivestyle.utils.ActivityUtils;
 
 /**
  * An activity representing a single Track detail screen. This
  * activity is only used narrow width devices. On tablet-size devices,
  * item details are presented side-by-side with a list of items
- * in a {@link TrackListActivity}.
+ * in a {@link TripListActivity}.
  */
-public class TrackDetailActivity extends AppCompatActivity
+public class TripDetailActivity extends DaggerAppCompatActivity
 {
+	public static final String EXTRA_TRIP_ID = "TRIP_ID";
+	@Inject
+	TripDetailFragment injectedFragment;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
 	{
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_track_detail);
-		Toolbar toolbar = (Toolbar) findViewById(R.id.detail_toolbar);
+		Toolbar toolbar = findViewById(R.id.detail_toolbar);
 		setSupportActionBar(toolbar);
 
-		FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+		FloatingActionButton fab = findViewById(R.id.fab);
 		fab.setOnClickListener(new View.OnClickListener()
 		{
 			@Override
@@ -45,6 +52,7 @@ public class TrackDetailActivity extends AppCompatActivity
 		if(actionBar != null)
 		{
 			actionBar.setDisplayHomeAsUpEnabled(true);
+			actionBar.setDisplayShowHomeEnabled(true);
 		}
 
 		// savedInstanceState is non-null when there is fragment state
@@ -58,16 +66,25 @@ public class TrackDetailActivity extends AppCompatActivity
 		//
 		if(savedInstanceState == null)
 		{
-			// Create the detail fragment and add it to the activity
-			// using a fragment transaction.
-			Bundle arguments = new Bundle();
-			arguments.putString(TrackDetailFragment.ARG_ITEM_ID,
-					getIntent().getStringExtra(TrackDetailFragment.ARG_ITEM_ID));
-			TrackDetailFragment fragment = new TrackDetailFragment();
-			fragment.setArguments(arguments);
-			getSupportFragmentManager().beginTransaction()
-					.add(R.id.track_detail_container, fragment)
-					.commit();
+			TripDetailFragment fragment = (TripDetailFragment) getSupportFragmentManager()
+					.findFragmentById(R.id.track_detail_container);
+
+			if(fragment == null)
+			{
+				fragment = injectedFragment;
+				ActivityUtils.addFragmentToActivity(getSupportFragmentManager(),
+						fragment, R.id.track_detail_container);
+			}
+//			// Create the detail fragment and add it to the activity
+//			// using a fragment transaction.
+//			Bundle arguments = new Bundle();
+//			arguments.putString(TripDetailFragment.ARG_ITEM_ID,
+//					getIntent().getStringExtra(TripDetailFragment.ARG_ITEM_ID));
+//			TripDetailFragment fragment = new TripDetailFragment();
+//			fragment.setArguments(arguments);
+//			getSupportFragmentManager().beginTransaction()
+//					.add(R.id.track_detail_container, fragment)
+//					.commit();
 		}
 	}
 
@@ -83,9 +100,16 @@ public class TrackDetailActivity extends AppCompatActivity
 			//
 			// http://developer.android.com/design/patterns/navigation.html#up-vs-back
 			//
-			navigateUpTo(new Intent(this, TrackListActivity.class));
+			navigateUpTo(new Intent(this, TripListActivity.class));
 			return true;
 		}
 		return super.onOptionsItemSelected(item);
+	}
+
+	@Override
+	public boolean onSupportNavigateUp()
+	{
+		onBackPressed();
+		return true;
 	}
 }

@@ -1,4 +1,4 @@
-package eu.vmpay.drivestyle.tracks.dummy;
+package eu.vmpay.drivestyle.tripList.dummy;
 
 import java.util.ArrayList;
 import java.util.HashMap;
