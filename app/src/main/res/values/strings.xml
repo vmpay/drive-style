@@ -2,4 +2,21 @@
 	<string name="app_name">DriveStyle</string>
 	<string name="title_track_detail">Track Detail</string>
 	<string name="no_data">No data</string>
+	<string name="trip_list_title">Trips</string>
+	<string name="settings_title">Settings</string>
+	<string name="logout_title">Log out</string>
+	<string name="menu_filter">Filter</string>
+	<string name="menu_clear">Clear</string>
+	<string name="refresh">Refresh</string>
+	<string name="nav_all">All</string>
+	<string name="nav_brake">Braking</string>
+	<string name="nav_turn">Turn</string>
+	<string name="nav_lane_change">Lane change</string>
+	<string name="trips_cleared">Trips cleared</string>
+	<string name="loading_trips_error">Error while loading trips</string>
+	<string name="label_brake">Brake</string>
+	<string name="label_turn">Turn</string>
+	<string name="label_lane_change">Lane change</string>
+	<string name="label_all">All</string>
+	<string name="successfully_saved_trip_message">Trip saved</string>
 </resources>

@@ -25,19 +25,17 @@ public interface TripListContract
 
 		void showTripDetailsUi(String tripId);
 
-		void showTripMarkedComplete();
-
-		void showTripMarkedActive();
-
 		void showCompletedTripsCleared();
 
 		void showLoadingTripsError();
 
 		void showNoTrips();
 
-		void showActiveFilterLabel();
+		void showBrakeFilterLabel();
 
-		void showCompletedFilterLabel();
+		void showTurnFilterLabel();
+
+		void showLineChangeFilterLabel();
 
 		void showAllFilterLabel();
 

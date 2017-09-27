@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+	<item
+		android:id="@+id/all"
+		android:title="@string/nav_all"/>
+	<item
+		android:id="@+id/brake"
+		android:title="@string/nav_brake"/>
+	<item
+		android:id="@+id/turn"
+		android:title="@string/nav_turn"/>
+	<item
+		android:id="@+id/lane_change"
+		android:title="@string/nav_lane_change"/>
+</menu>

@@ -1,22 +1,16 @@
 package eu.vmpay.drivestyle.tripList;
 
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
+import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
-import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.TextView;
-
-import java.util.List;
 
 import javax.inject.Inject;
 
@@ -24,8 +18,6 @@ import dagger.Lazy;
 import dagger.android.support.DaggerAppCompatActivity;
 import eu.vmpay.drivestyle.R;
 import eu.vmpay.drivestyle.tripDetails.TripDetailActivity;
-import eu.vmpay.drivestyle.tripDetails.TripDetailFragment;
-import eu.vmpay.drivestyle.tripList.dummy.DummyContent;
 import eu.vmpay.drivestyle.utils.ActivityUtils;
 
 /**
@@ -88,126 +80,83 @@ public class TripListActivity extends DaggerAppCompatActivity
 			setupDrawerContent(navigationView);
 		}
 
-		TasksFragment tasksFragment =
-				(TasksFragment) getSupportFragmentManager().findFragmentById(R.id.contentFrame);
-		if(tasksFragment == null)
+		TripListFragment tripListFragment =
+				(TripListFragment) getSupportFragmentManager().findFragmentById(R.id.contentFrame);
+		if(tripListFragment == null)
 		{
 			// Get the fragment from dagger
-			tasksFragment = taskFragmentProvider.get();
+			tripListFragment = taskFragmentProvider.get();
 			ActivityUtils.addFragmentToActivity(
-					getSupportFragmentManager(), tasksFragment, R.id.contentFrame);
+					getSupportFragmentManager(), tripListFragment, R.id.contentFrame);
 		}
 
 
 		// Load previously saved state, if available.
 		if(savedInstanceState != null)
 		{
-			TasksFilterType currentFiltering =
-					(TasksFilterType) savedInstanceState.getSerializable(CURRENT_FILTERING_KEY);
-			mTasksPresenter.setFiltering(currentFiltering);
+			TripListFilterType currentFiltering =
+					(TripListFilterType) savedInstanceState.getSerializable(CURRENT_FILTERING_KEY);
+			mTripListPresenter.setFiltering(currentFiltering);
 		}
+
+
 		/**
-		 *
+		 * Move this stuff to a separate fragment
 		 */
 
-		View recyclerView = findViewById(R.id.track_list);
-		assert recyclerView != null;
-		setupRecyclerView((RecyclerView) recyclerView);
 
-		if(findViewById(R.id.track_detail_container) != null)
-		{
-			// The detail container view will be present only in the
-			// large-screen layouts (res/values-w900dp).
-			// If this view is present, then the
-			// activity should be in two-pane mode.
-			mTwoPane = true;
-		}
 	}
 
-	private void setupRecyclerView(@NonNull RecyclerView recyclerView)
+	@Override
+	public void onSaveInstanceState(Bundle outState)
 	{
-		recyclerView.setAdapter(new SimpleItemRecyclerViewAdapter(DummyContent.ITEMS));
+		outState.putSerializable(CURRENT_FILTERING_KEY, mTripListPresenter.getFiltering());
+
+		super.onSaveInstanceState(outState);
 	}
 
-	public class SimpleItemRecyclerViewAdapter
-			extends RecyclerView.Adapter<SimpleItemRecyclerViewAdapter.ViewHolder>
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item)
 	{
-
-		private final List<DummyContent.DummyItem> mValues;
-
-		public SimpleItemRecyclerViewAdapter(List<DummyContent.DummyItem> items)
+		switch(item.getItemId())
 		{
-			mValues = items;
+			case android.R.id.home:
+				// Open the navigation drawer when the home icon is selected from the toolbar.
+				mDrawerLayout.openDrawer(GravityCompat.START);
+				return true;
 		}
+		return super.onOptionsItemSelected(item);
+	}
 
-		@Override
-		public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType)
-		{
-			View view = LayoutInflater.from(parent.getContext())
-					.inflate(R.layout.track_list_content, parent, false);
-			return new ViewHolder(view);
-		}
-
-		@Override
-		public void onBindViewHolder(final ViewHolder holder, int position)
-		{
-			holder.mItem = mValues.get(position);
-			holder.mIdView.setText(mValues.get(position).id);
-			holder.mContentView.setText(mValues.get(position).content);
-
-			holder.mView.setOnClickListener(new View.OnClickListener()
-			{
-				@Override
-				public void onClick(View v)
+	private void setupDrawerContent(NavigationView navigationView)
+	{
+		navigationView.setNavigationItemSelectedListener(
+				new NavigationView.OnNavigationItemSelectedListener()
 				{
-					if(mTwoPane)
+					@Override
+					public boolean onNavigationItemSelected(MenuItem menuItem)
 					{
-						Bundle arguments = new Bundle();
-						arguments.putString(TripDetailFragment.ARG_ITEM_ID, holder.mItem.id);
-						TripDetailFragment fragment = new TripDetailFragment();
-						fragment.setArguments(arguments);
-						getSupportFragmentManager().beginTransaction()
-								.replace(R.id.track_detail_container, fragment)
-								.commit();
+						switch(menuItem.getItemId())
+						{
+							case R.id.list_navigation_menu_item:
+								// Do nothing, we're already on that screen
+								break;
+							case R.id.settings_navigation_menu_item:
+								Intent intent =
+										new Intent(TasksActivity.this, StatisticsActivity.class);
+								startActivity(intent);
+								break;
+							case R.id.logout_navigation_menu_item:
+								//TODO: log out
+								break;
+							default:
+								break;
+						}
+						// Close the navigation drawer when an item is selected.
+						menuItem.setChecked(true);
+						mDrawerLayout.closeDrawers();
+						return true;
 					}
-					else
-					{
-						Context context = v.getContext();
-						Intent intent = new Intent(context, TripDetailActivity.class);
-						intent.putExtra(TripDetailFragment.ARG_ITEM_ID, holder.mItem.id);
-
-						context.startActivity(intent);
-					}
-				}
-			});
-		}
-
-		@Override
-		public int getItemCount()
-		{
-			return mValues.size();
-		}
-
-		public class ViewHolder extends RecyclerView.ViewHolder
-		{
-			public final View mView;
-			public final TextView mIdView;
-			public final TextView mContentView;
-			public DummyContent.DummyItem mItem;
-
-			public ViewHolder(View view)
-			{
-				super(view);
-				mView = view;
-				mIdView = view.findViewById(R.id.id);
-				mContentView = view.findViewById(R.id.content);
-			}
-
-			@Override
-			public String toString()
-			{
-				return super.toString() + " '" + mContentView.getText() + "'";
-			}
-		}
+				});
 	}
 }
