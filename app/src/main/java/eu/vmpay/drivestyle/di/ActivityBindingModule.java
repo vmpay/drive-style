@@ -5,6 +5,7 @@ import dagger.android.ContributesAndroidInjector;
 import eu.vmpay.drivestyle.tripDetails.TripDetailActivity;
 import eu.vmpay.drivestyle.tripDetails.TripDetailModule;
 import eu.vmpay.drivestyle.tripList.TripListActivity;
+import eu.vmpay.drivestyle.tripList.TripListModule;
 
 /**
  * Created by andrew on 9/26/17.

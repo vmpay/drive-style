@@ -60,8 +60,6 @@ public interface TripListContract
 
 		void openTripDetails(@NonNull Trip requestedTrip);
 
-		void clearCompletedTrips();
-
 		TripListFilterType getFiltering();
 
 		void setFiltering(TripListFilterType requestType);

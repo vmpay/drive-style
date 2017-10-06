@@ -12,6 +12,7 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import eu.vmpay.drivestyle.data.Trip;
+import eu.vmpay.drivestyle.di.AppComponent;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -25,7 +26,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * <p/>
  * By marking the constructor with {@code @Inject} and the class with {@code @Singleton}, Dagger
  * injects the dependencies required to create an instance of the TripsRespository (if it fails, it
- * emits a compiler error). It uses {@link TripRepositoryModule} to do so, and the constructed
+ * emits a compiler error). It uses {@link TripsRepositoryModule} to do so, and the constructed
  * instance is available in {@link AppComponent}.
  * <p/>
  * Dagger generated code doesn't require public access to the constructor or class, and
@@ -63,7 +64,7 @@ public class TripsRepository implements TripDataSource
 	 * with {@code @Nullable} values.
 	 */
 	@Inject
-	TripsRepository(@Remote TripDataSource tripsRemoteDataSource,
+	TripsRepository(@Local TripDataSource tripsRemoteDataSource,
 	                @Local TripDataSource tripsLocalDataSource)
 	{
 		mTripsRemoteDataSource = tripsRemoteDataSource;

@@ -1,6 +1,7 @@
 package eu.vmpay.drivestyle.tripDetails;
 
 import dagger.Binds;
+import dagger.Module;
 import dagger.Provides;
 import dagger.android.ContributesAndroidInjector;
 import eu.vmpay.drivestyle.di.ActivityScoped;
@@ -13,12 +14,12 @@ import static eu.vmpay.drivestyle.tripDetails.TripDetailActivity.EXTRA_TRIP_ID;
  * This is a Dagger module. We use this to pass in the View dependency to the
  * {@link TripDetailPresenter}.
  */
-
+@Module
 public abstract class TripDetailModule
 {
 	@Provides
 	@ActivityScoped
-	static String provideTaskId(TripDetailActivity activity)
+	static String provideTripId(TripDetailActivity activity)
 	{
 		return activity.getIntent().getStringExtra(EXTRA_TRIP_ID);
 	}

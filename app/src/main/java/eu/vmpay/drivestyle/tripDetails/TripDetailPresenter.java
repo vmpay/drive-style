@@ -28,7 +28,7 @@ import eu.vmpay.drivestyle.data.source.TripsRepository;
  * it's good practice minimise the visibility of the class/constructor as much as possible.
  */
 
-public class TripDetailPresenter implements TripDetailContract.Presenter
+final class TripDetailPresenter implements TripDetailContract.Presenter
 {
 	private final TripsRepository mTripsRepository;
 	private final SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
@@ -149,5 +149,11 @@ public class TripDetailPresenter implements TripDetailContract.Presenter
 	public void dropView()
 	{
 		mTripDetailView = null;
+	}
+
+	@Override
+	public void deleteTrip()
+	{
+
 	}
 }

@@ -142,10 +142,10 @@ public class TripListFragment extends DaggerFragment implements TripListContract
 	@Override
 	public void showTrips(List<Trip> trips)
 	{
-		.replaceData(trips);
+		mListAdapter.replaceData(trips);
 
-		mTasksView.setVisibility(View.VISIBLE);
-		mNoTasksView.setVisibility(View.GONE);
+//		mTasksView.setVisibility(View.VISIBLE);
+//		mNoTasksView.setVisibility(View.GONE);
 	}
 
 	@Override
@@ -308,6 +308,17 @@ public class TripListFragment extends DaggerFragment implements TripListContract
 		{
 			mValues = items;
 			mItemListener = itemListener;
+		}
+
+		public void replaceData(List<Trip> trips)
+		{
+			setList(trips);
+			notifyDataSetChanged();
+		}
+
+		private void setList(List<Trip> trips)
+		{
+//			mTasks = checkNotNull(trips);
 		}
 
 		@Override

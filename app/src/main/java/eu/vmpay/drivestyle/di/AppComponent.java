@@ -37,7 +37,7 @@ public interface AppComponent extends AndroidInjector<DaggerApplication>
 
 	void inject(DriveStyleApplication application);
 
-	TripsRepository getTasksRepository();
+	TripsRepository getTripsRepository();
 
 	@Override
 	void inject(DaggerApplication instance);

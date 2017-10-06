@@ -1,6 +1,5 @@
 package eu.vmpay.drivestyle.tripList;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
@@ -142,9 +141,9 @@ public class TripListActivity extends DaggerAppCompatActivity
 								// Do nothing, we're already on that screen
 								break;
 							case R.id.settings_navigation_menu_item:
-								Intent intent =
-										new Intent(TasksActivity.this, StatisticsActivity.class);
-								startActivity(intent);
+//								Intent intent =
+//										new Intent(TasksActivity.this, StatisticsActivity.class);
+//								startActivity(intent);
 								break;
 							case R.id.logout_navigation_menu_item:
 								//TODO: log out

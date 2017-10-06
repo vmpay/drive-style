@@ -2,9 +2,14 @@ package eu.vmpay.drivestyle;
 
 
 import android.app.Application;
+import android.support.annotation.VisibleForTesting;
+
+import javax.inject.Inject;
 
 import dagger.android.AndroidInjector;
 import dagger.android.DaggerApplication;
+import eu.vmpay.drivestyle.data.source.TripsRepository;
+import eu.vmpay.drivestyle.di.AppComponent;
 
 /**
  * Created by andrew on 9/25/17.
@@ -15,9 +20,20 @@ import dagger.android.DaggerApplication;
 
 public class DriveStyleApplication extends DaggerApplication
 {
+	@Inject
+	TripsRepository tripsRepository;
+
 	@Override
 	protected AndroidInjector<? extends DaggerApplication> applicationInjector()
 	{
-		return null;
+		AppComponent appComponent = DaggerAppComponent.builder().application(this).build();
+		appComponent.inject(this);
+		return appComponent;
+	}
+
+	@VisibleForTesting
+	public TripsRepository getTripsRepository()
+	{
+		return tripsRepository;
 	}
 }
