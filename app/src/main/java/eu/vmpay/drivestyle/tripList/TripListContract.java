@@ -35,7 +35,7 @@ public interface TripListContract
 
 		void showTurnFilterLabel();
 
-		void showLineChangeFilterLabel();
+		void showLaneChangeFilterLabel();
 
 		void showAllFilterLabel();
 

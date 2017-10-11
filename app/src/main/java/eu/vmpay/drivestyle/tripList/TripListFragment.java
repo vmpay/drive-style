@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -20,6 +21,7 @@ import javax.inject.Inject;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 import butterknife.Unbinder;
 import dagger.android.support.DaggerFragment;
 import eu.vmpay.drivestyle.R;
@@ -35,8 +37,12 @@ public class TripListFragment extends DaggerFragment implements TripListContract
 {
 	@Inject
 	TripListContract.Presenter mPresenter;
+
 	@BindView(R.id.tvFilteringLabel)
 	TextView tvFilteringLabel;
+	@BindView(R.id.track_list)
+	RecyclerView recyclerView;
+
 	TripItemListener mItemListener = new TripItemListener()
 	{
 		@Override
@@ -91,9 +97,12 @@ public class TripListFragment extends DaggerFragment implements TripListContract
 		View root = inflater.inflate(R.layout.track_list, container, false);
 		unbinder = ButterKnife.bind(this, root);
 
-		RecyclerView recyclerView = root.findViewById(R.id.track_list);
 		assert recyclerView != null;
+		LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getActivity());
+		linearLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
+		recyclerView.setLayoutManager(linearLayoutManager);
 		recyclerView.setAdapter(mListAdapter);
+//		recyclerView.setHasFixedSize(true);
 
 //		if(root.findViewById(R.id.track_detail_container) != null)
 //		{
@@ -107,6 +116,21 @@ public class TripListFragment extends DaggerFragment implements TripListContract
 		setHasOptionsMenu(true);
 
 		return root;
+	}
+
+	@OnClick({ R.id.fab })
+	public void onClick(View v)
+	{
+		switch(v.getId())
+		{
+			case R.id.fab:
+				Snackbar.make(v, "Replace with your own action", Snackbar.LENGTH_LONG)
+						.setAction("Action", null).show();
+				// TODO: 10/11/17 launch add trip intent
+				break;
+			default:
+
+		}
 	}
 
 	@Override
@@ -200,7 +224,7 @@ public class TripListFragment extends DaggerFragment implements TripListContract
 	}
 
 	@Override
-	public void showLineChangeFilterLabel()
+	public void showLaneChangeFilterLabel()
 	{
 		tvFilteringLabel.setText(getResources().getString(R.string.label_lane_change));
 	}
@@ -344,7 +368,7 @@ public class TripListFragment extends DaggerFragment implements TripListContract
 				@Override
 				public void onClick(View view)
 				{
-					mItemListener.onTripClick(new Trip(item.content, 0, 0, item.details, item.id));
+					mItemListener.onTripClick(new Trip(Long.parseLong(item.id), item.content, 0, 0, 0.0, "type", "source"));
 				}
 			});
 //			{

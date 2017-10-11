@@ -67,20 +67,32 @@ public class TripDetailFragment extends DaggerFragment implements TripDetailCont
 	{
 		super.onCreate(savedInstanceState);
 
-		if(getArguments().containsKey(ARG_ITEM_ID))
+		long id = Long.parseLong(tripId);
+		if(id > 0)
 		{
-			// Load the dummy content specified by the fragment
-			// arguments. In a real-world scenario, use a Loader
-			// to load content from a content provider.
-			mItem = DummyContent.ITEM_MAP.get(getArguments().getString(ARG_ITEM_ID));
+			mItem = DummyContent.ITEM_MAP.get(tripId);
 
 			Activity activity = this.getActivity();
 			CollapsingToolbarLayout appBarLayout = activity.findViewById(R.id.toolbar_layout);
 			if(appBarLayout != null)
 			{
-				appBarLayout.setTitle(tripId);
+				appBarLayout.setTitle(mItem.content);
 			}
 		}
+//		if(getArguments().containsKey(ARG_ITEM_ID))
+//		{
+//			// Load the dummy content specified by the fragment
+//			// arguments. In a real-world scenario, use a Loader
+//			// to load content from a content provider.
+//			mItem = DummyContent.ITEM_MAP.get(getArguments().getString(ARG_ITEM_ID));
+//
+//			Activity activity = this.getActivity();
+//			CollapsingToolbarLayout appBarLayout = activity.findViewById(R.id.toolbar_layout);
+//			if(appBarLayout != null)
+//			{
+//				appBarLayout.setTitle(tripId);
+//			}
+//		}
 	}
 
 	@Override
@@ -92,10 +104,10 @@ public class TripDetailFragment extends DaggerFragment implements TripDetailCont
 		unbinder = ButterKnife.bind(this, rootView);
 
 		// Show the dummy content as text in a TextView.
-//		if(mItem != null)
-//		{
-//			((TextView) rootView.findViewById(R.id.trip_detail)).setText(mItem.details);
-//		}
+		if(mItem != null)
+		{
+			((TextView) rootView.findViewById(R.id.trip_detail)).setText(mItem.details);
+		}
 
 		return rootView;
 	}

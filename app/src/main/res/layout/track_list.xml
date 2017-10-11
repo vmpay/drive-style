@@ -1,33 +1,47 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+<android.support.design.widget.CoordinatorLayout
 	android:name="eu.vmpay.drivestyle.TrackListFragment"
 	xmlns:android="http://schemas.android.com/apk/res/android"
 	xmlns:app="http://schemas.android.com/apk/res-auto"
 	xmlns:tools="http://schemas.android.com/tools"
 	android:layout_width="match_parent"
 	android:layout_height="match_parent"
-	android:layout_marginLeft="16dp"
-	android:layout_marginRight="16dp"
 	android:orientation="vertical"
 	app:layoutManager="LinearLayoutManager"
 	>
 
-	<TextView
-		android:id="@+id/tvFilteringLabel"
-		android:layout_width="match_parent"
-		android:layout_height="wrap_content"
-		android:layout_marginBottom="@dimen/activity_vertical_margin"
-		android:layout_marginLeft="@dimen/list_item_padding"
-		android:layout_marginRight="@dimen/list_item_padding"
-		android:layout_marginTop="@dimen/activity_vertical_margin"
-		android:gravity="center_vertical"
-		android:textAppearance="@style/TextAppearance.AppCompat.Title"
-		/>
-
-	<android.support.v7.widget.RecyclerView
-		android:id="@+id/track_list"
+	<LinearLayout
 		android:layout_width="match_parent"
 		android:layout_height="match_parent"
-		tools:listitem="@layout/track_list_content"/>
+		android:orientation="vertical">
 
-</LinearLayout>
+		<TextView
+			android:id="@+id/tvFilteringLabel"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:layout_marginBottom="@dimen/activity_vertical_margin"
+			android:layout_marginLeft="@dimen/list_item_padding"
+			android:layout_marginRight="@dimen/list_item_padding"
+			android:layout_marginTop="@dimen/activity_vertical_margin"
+			android:gravity="center_vertical"
+			android:textAppearance="@style/TextAppearance.AppCompat.Title"
+			/>
+
+		<android.support.v7.widget.RecyclerView
+
+			android:id="@+id/track_list"
+			android:layout_width="match_parent"
+			android:layout_height="match_parent"
+			tools:listitem="@layout/track_list_content"/>
+
+	</LinearLayout>
+
+	<android.support.design.widget.FloatingActionButton
+		android:id="@+id/fab"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:layout_gravity="bottom|end"
+		android:layout_margin="@dimen/fab_margin"
+		app:srcCompat="@drawable/ic_add_black_24dp"/>
+
+</android.support.design.widget.CoordinatorLayout>

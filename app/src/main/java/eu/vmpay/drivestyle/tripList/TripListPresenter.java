@@ -85,6 +85,8 @@ public class TripListPresenter implements TripListContract.Presenter
 			mTripsRepository.refreshTrips();
 		}
 
+		showFilterLabel();
+
 		// The network request might be handled in a different thread so make sure Espresso knows
 		// that the app is busy until the response is handled.
 //		EspressoIdlingResource.increment(); // App is busy until further notice
@@ -153,6 +155,43 @@ public class TripListPresenter implements TripListContract.Presenter
 //				mTripListView.showLoadingTasksError();
 //			}
 //		});
+	}
+
+	private void showFilterLabel()
+	{
+		switch(mCurrentFiltering)
+		{
+			case ALL:
+				if(mTripListView != null)
+				{
+					mTripListView.showAllFilterLabel();
+				}
+				break;
+			case BRAKE:
+				if(mTripListView != null)
+				{
+					mTripListView.showBrakeFilterLabel();
+				}
+				break;
+			case TURN:
+				if(mTripListView != null)
+				{
+					mTripListView.showTurnFilterLabel();
+				}
+				break;
+			case LANE_CHANGE:
+				if(mTripListView != null)
+				{
+					mTripListView.showLaneChangeFilterLabel();
+				}
+				break;
+			default:
+				if(mTripListView != null)
+				{
+					mTripListView.showAllFilterLabel();
+				}
+				break;
+		}
 	}
 
 	@Override
