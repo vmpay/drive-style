@@ -10,6 +10,7 @@ import dagger.android.AndroidInjector;
 import dagger.android.DaggerApplication;
 import eu.vmpay.drivestyle.data.source.TripsRepository;
 import eu.vmpay.drivestyle.di.AppComponent;
+import eu.vmpay.drivestyle.di.DaggerAppComponent;
 
 /**
  * Created by andrew on 9/25/17.
