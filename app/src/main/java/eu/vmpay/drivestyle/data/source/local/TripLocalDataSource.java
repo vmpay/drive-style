@@ -53,7 +53,6 @@ public class TripLocalDataSource implements TripDataSource
 		{
 			while(c.moveToNext())
 			{
-				c.moveToFirst();
 				long id = c.getLong(c.getColumnIndexOrThrow(TripPersistenceContract.TripEntry._ID));
 				String title = c.getString(c.getColumnIndexOrThrow(TripPersistenceContract.TripEntry.COLUMN_NAME_TITLE));
 				long startTime = c.getLong(c.getColumnIndexOrThrow(TripPersistenceContract.TripEntry.COLUMN_NAME_START_TIME));

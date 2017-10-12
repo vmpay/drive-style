@@ -53,6 +53,7 @@ ext {
     rxjavaVersion = '2.1.4'
     rxandroidVersion = '2.0.1'
     sqlbriteVersion = '2.0.0'
+    butterKnifeVersion = '8.8.1'
 }
 
 //When there is an error in code generation you will may see

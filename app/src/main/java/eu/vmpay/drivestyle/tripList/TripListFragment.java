@@ -13,6 +13,8 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -43,6 +45,17 @@ public class TripListFragment extends DaggerFragment implements TripListContract
 	TextView tvFilteringLabel;
 	@BindView(R.id.track_list)
 	RecyclerView recyclerView;
+	@BindView(R.id.llTripList)
+	LinearLayout llTripList;
+	@BindView(R.id.llNoTrips)
+	LinearLayout llNoTrips;
+	@BindView(R.id.ivNoTrips)
+	ImageView ivNoTrips;
+	@BindView(R.id.tvNoTrips)
+	TextView tvNoTrips;
+	@BindView(R.id.tvInstruction)
+	TextView tvInstruction;
+
 
 	TripItemListener mItemListener = new TripItemListener()
 	{
@@ -170,8 +183,8 @@ public class TripListFragment extends DaggerFragment implements TripListContract
 	{
 		mListAdapter.replaceData(trips);
 
-//		mTasksView.setVisibility(View.VISIBLE);
-//		mNoTasksView.setVisibility(View.GONE);
+		llTripList.setVisibility(View.VISIBLE);
+		llNoTrips.setVisibility(View.GONE);
 	}
 
 	@Override
@@ -230,37 +243,41 @@ public class TripListFragment extends DaggerFragment implements TripListContract
 	@Override
 	public void showNoTrips()
 	{
-//		showNoTasksViews(
-//				getResources().getString(R.string.no_tasks_all),
-//				R.drawable.ic_assignment_turned_in_24dp,
-//				false
-//		);
+		showNoTasksViews(
+				getResources().getString(R.string.no_trips_all),
+				R.drawable.ic_do_not_disturb_black_24dp,
+				true
+		);
 	}
 
 	@Override
 	public void showNoBrakeTrips()
 	{
-//		showNoTasksViews(
-//				getResources().getString(R.string.no_tasks_active),
-//				R.drawable.ic_check_circle_24dp,
-//				false
-//		);
+		showNoTasksViews(
+				getResources().getString(R.string.no_trips_brake),
+				R.drawable.ic_do_not_disturb_black_24dp,
+				false
+		);
 	}
 
 	@Override
 	public void showNoTurnTrips()
 	{
-
+		showNoTasksViews(
+				getResources().getString(R.string.no_trips_turn),
+				R.drawable.ic_do_not_disturb_black_24dp,
+				false
+		);
 	}
 
 	@Override
 	public void showNoLaneChangeTrips()
 	{
-//		showNoTasksViews(
-//				getResources().getString(R.string.no_tasks_completed),
-//				R.drawable.ic_verified_user_24dp,
-//				false
-//		);
+		showNoTasksViews(
+				getResources().getString(R.string.no_trips_lane_change),
+				R.drawable.ic_do_not_disturb_black_24dp,
+				false
+		);
 	}
 
 	@Override
@@ -282,13 +299,13 @@ public class TripListFragment extends DaggerFragment implements TripListContract
 
 	private void showNoTasksViews(String mainText, int iconRes, boolean showAddView)
 	{
-//		mTasksView.setVisibility(View.GONE);
-//		mNoTasksView.setVisibility(View.VISIBLE);
-//
-//		mNoTaskMainView.setText(mainText);
-//		//noinspection deprecation
-//		mNoTaskIcon.setImageDrawable(getResources().getDrawable(iconRes));
-//		mNoTaskAddView.setVisibility(showAddView ? View.VISIBLE : View.GONE);
+		llTripList.setVisibility(View.GONE);
+		llNoTrips.setVisibility(View.VISIBLE);
+
+		tvNoTrips.setText(mainText);
+		//noinspection deprecation
+		ivNoTrips.setImageResource(iconRes);
+		tvInstruction.setVisibility(showAddView ? View.VISIBLE : View.GONE);
 	}
 
 	@Override

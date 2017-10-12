@@ -89,7 +89,6 @@ public class TripListPresenter implements TripListContract.Presenter
 			mTripsRepository.refreshTrips();
 		}
 
-//		showFilterLabel();
 		mTripsRepository.getTrips(new TripDataSource.LoadTripsCallback()
 		{
 			@Override

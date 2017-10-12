@@ -3,6 +3,7 @@ package eu.vmpay.drivestyle.data;
 import android.content.Context;
 import android.support.annotation.NonNull;
 
+import java.util.List;
 import java.util.Random;
 
 import eu.vmpay.drivestyle.data.source.local.TripLocalDataSource;
@@ -20,7 +21,20 @@ public class FakeTripLocalDataSource extends TripLocalDataSource
 	public FakeTripLocalDataSource(@NonNull Context context)
 	{
 		super(context);
-		generateFakeData();
+		getTrips(new LoadTripsCallback()
+		{
+			@Override
+			public void onTripsLoaded(List<Trip> trips)
+			{
+			}
+
+			@Override
+			public void onDataNotAvailable()
+			{
+				generateFakeData();
+			}
+		});
+
 	}
 
 	private void generateFakeData()

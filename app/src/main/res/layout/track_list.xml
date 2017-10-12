@@ -11,6 +11,7 @@
 	>
 
 	<LinearLayout
+		android:id="@+id/llTripList"
 		android:layout_width="match_parent"
 		android:layout_height="match_parent"
 		android:orientation="vertical">
@@ -32,7 +33,40 @@
 			android:id="@+id/track_list"
 			android:layout_width="match_parent"
 			android:layout_height="match_parent"
-			tools:listitem="@layout/track_list_content"/>
+			tools:listitem="@layout/track_list_item"/>
+
+	</LinearLayout>
+
+	<LinearLayout
+		android:id="@+id/llNoTrips"
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:layout_gravity="center_vertical"
+		android:orientation="vertical"
+		android:visibility="gone">
+
+		<ImageView
+			android:id="@+id/ivNoTrips"
+			android:layout_width="48dp"
+			android:layout_height="48dp"
+			android:layout_gravity="center"
+			app:srcCompat="@drawable/ic_do_not_disturb_black_24dp"/>
+
+		<TextView
+			android:id="@+id/tvNoTrips"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:layout_gravity="center"
+			android:layout_marginBottom="@dimen/list_item_padding"
+			android:text="@string/no_trips_all"/>
+
+		<TextView
+			android:id="@+id/tvInstruction"
+			android:layout_width="wrap_content"
+			android:layout_height="48dp"
+			android:layout_gravity="center"
+			android:gravity="center"
+			android:text="@string/no_trips_add"/>
 
 	</LinearLayout>
 

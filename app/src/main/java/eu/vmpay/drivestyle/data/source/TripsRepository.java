@@ -64,7 +64,7 @@ public class TripsRepository implements TripDataSource
 	 * with {@code @Nullable} values.
 	 */
 	@Inject
-	TripsRepository(@Local TripDataSource tripsRemoteDataSource,
+	TripsRepository(//@Local TripDataSource tripsRemoteDataSource,
 	                @Local TripDataSource tripsLocalDataSource)
 	{
 //		mTripsRemoteDataSource = tripsRemoteDataSource;
