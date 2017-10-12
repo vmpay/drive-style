@@ -104,6 +104,8 @@ public class TripListActivity extends DaggerAppCompatActivity
 
 	private void setupDrawerContent(NavigationView navigationView)
 	{
+		navigationView.getMenu().getItem(0).setChecked(true);
+//		((MenuItem) navigationView.findViewById(R.id.list_navigation_menu_item)).setChecked(true);
 		navigationView.setNavigationItemSelectedListener(
 				new NavigationView.OnNavigationItemSelectedListener()
 				{
@@ -120,9 +122,9 @@ public class TripListActivity extends DaggerAppCompatActivity
 //										new Intent(TasksActivity.this, StatisticsActivity.class);
 //								startActivity(intent);
 								break;
-							case R.id.logout_navigation_menu_item:
-								//TODO: log out
-								break;
+//							case R.id.logout_navigation_menu_item:
+//								//TODO: log out
+//								break;
 							default:
 								break;
 						}

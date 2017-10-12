@@ -153,9 +153,9 @@ public class TripListFragment extends DaggerFragment implements TripListContract
 	{
 		switch(item.getItemId())
 		{
-			case R.id.menu_clear:
+//			case R.id.menu_clear:
 //				mPresenter.clearCompletedTrips();
-				break;
+//				break;
 			case R.id.menu_filter:
 				showFilteringPopUpMenu();
 				break;

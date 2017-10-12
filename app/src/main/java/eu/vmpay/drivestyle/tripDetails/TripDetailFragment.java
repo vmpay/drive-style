@@ -3,7 +3,7 @@ package eu.vmpay.drivestyle.tripDetails;
 import android.app.Activity;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.design.widget.CollapsingToolbarLayout;
+import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -67,18 +67,18 @@ public class TripDetailFragment extends DaggerFragment implements TripDetailCont
 	{
 		super.onCreate(savedInstanceState);
 
-		long id = Long.parseLong(tripId);
-		if(id > 0)
-		{
-			mItem = DummyContent.ITEM_MAP.get(tripId);
-
-			Activity activity = this.getActivity();
-			CollapsingToolbarLayout appBarLayout = activity.findViewById(R.id.toolbar_layout);
-			if(appBarLayout != null)
-			{
-				appBarLayout.setTitle(mItem.content);
-			}
-		}
+//		long id = Long.parseLong(tripId);
+//		if(id > 0)
+//		{
+//			mItem = DummyContent.ITEM_MAP.get(tripId);
+//
+//			Activity activity = this.getActivity();
+//			CollapsingToolbarLayout appBarLayout = activity.findViewById(R.id.toolbar_layout);
+//			if(appBarLayout != null)
+//			{
+//				appBarLayout.setTitle(mItem.content);
+//			}
+//		}
 //		if(getArguments().containsKey(ARG_ITEM_ID))
 //		{
 //			// Load the dummy content specified by the fragment
@@ -149,7 +149,7 @@ public class TripDetailFragment extends DaggerFragment implements TripDetailCont
 	public void showTitle(String title)
 	{
 		Activity activity = this.getActivity();
-		CollapsingToolbarLayout appBarLayout = activity.findViewById(R.id.toolbar_layout);
+		Toolbar appBarLayout = activity.findViewById(R.id.detail_toolbar);
 		if(appBarLayout != null)
 		{
 			appBarLayout.setTitle(title);
@@ -160,7 +160,7 @@ public class TripDetailFragment extends DaggerFragment implements TripDetailCont
 	public void hideTitle()
 	{
 		Activity activity = this.getActivity();
-		CollapsingToolbarLayout appBarLayout = activity.findViewById(R.id.toolbar_layout);
+		Toolbar appBarLayout = activity.findViewById(R.id.detail_toolbar);
 		if(appBarLayout != null)
 		{
 			appBarLayout.setTitle("");
@@ -171,8 +171,8 @@ public class TripDetailFragment extends DaggerFragment implements TripDetailCont
 	public void showDetails(String startTime, String finishTime, Double mark, String type, String scenario)
 	{
 		tripDetail.setText(String.format(Locale.US,
-				"Start time %s\nFinishTime %s\nMark %f\nType %s\nScenario %s",
-				startTime, finishTime, mark, type, scenario));
+				"Mark %.2f\nStart time %s\nFinishTime %s\nType %s\nScenario %s",
+				mark, startTime, finishTime, type, scenario));
 	}
 
 	@Override

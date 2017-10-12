@@ -9,9 +9,9 @@
 			android:id="@+id/settings_navigation_menu_item"
 			android:icon="@drawable/ic_settings_black_24dp"
 			android:title="@string/settings_title"/>
-		<item
-			android:id="@+id/logout_navigation_menu_item"
-			android:icon="@drawable/ic_settings_black_24dp"
-			android:title="@string/logout_title"/>
+		<!--<item-->
+		<!--android:id="@+id/logout_navigation_menu_item"-->
+		<!--android:icon="@drawable/ic_settings_black_24dp"-->
+		<!--android:title="@string/logout_title"/>-->
 	</group>
 </menu>

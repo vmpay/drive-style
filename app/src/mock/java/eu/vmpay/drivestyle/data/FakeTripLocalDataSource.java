@@ -44,7 +44,22 @@ public class FakeTripLocalDataSource extends TripLocalDataSource
 		for(int i = 0; i < FAKE_COUNT; i++)
 		{
 			long timestamp = System.currentTimeMillis();
-			trip = new Trip("Trip " + (i + 1), timestamp, timestamp + 5000, random.nextDouble() * 5, "Type", TripListFilterType.BRAKE);
+			TripListFilterType filterType;
+			switch(random.nextInt() % 3)
+			{
+				case 0:
+					filterType = TripListFilterType.BRAKE;
+					break;
+				case 1:
+					filterType = TripListFilterType.TURN;
+					break;
+				case 2:
+					filterType = TripListFilterType.LANE_CHANGE;
+					break;
+				default:
+					filterType = TripListFilterType.BRAKE;
+			}
+			trip = new Trip("Trip " + (i + 1), timestamp, timestamp + 5000, random.nextDouble() * 5, "Type", filterType);
 			saveTrip(trip);
 		}
 	}
