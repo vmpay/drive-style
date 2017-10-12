@@ -14,6 +14,7 @@ import javax.inject.Singleton;
 
 import eu.vmpay.drivestyle.data.Trip;
 import eu.vmpay.drivestyle.data.source.TripDataSource;
+import eu.vmpay.drivestyle.tripList.TripListFilterType;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -59,9 +60,9 @@ public class TripLocalDataSource implements TripDataSource
 				long finishTime = c.getLong(c.getColumnIndexOrThrow(TripPersistenceContract.TripEntry.COLUMN_NAME_FINISH_TIME));
 				double mark = c.getDouble(c.getColumnIndexOrThrow(TripPersistenceContract.TripEntry.COLUMN_NAME_MARK));
 				String type = c.getString(c.getColumnIndexOrThrow(TripPersistenceContract.TripEntry.COLUMN_NAME_TYPE));
-				String scenario = c.getString(c.getColumnIndexOrThrow(TripPersistenceContract.TripEntry.COLUMN_NAME_SCENARIO));
+				int scenario = c.getInt(c.getColumnIndexOrThrow(TripPersistenceContract.TripEntry.COLUMN_NAME_SCENARIO));
 
-				Trip trip = new Trip(id, title, startTime, finishTime, mark, type, scenario);
+				Trip trip = new Trip(id, title, startTime, finishTime, mark, type, TripListFilterType.values()[scenario]);
 				trips.add(trip);
 			}
 		}
@@ -111,9 +112,9 @@ public class TripLocalDataSource implements TripDataSource
 			long finishTime = c.getLong(c.getColumnIndexOrThrow(TripPersistenceContract.TripEntry.COLUMN_NAME_FINISH_TIME));
 			double mark = c.getDouble(c.getColumnIndexOrThrow(TripPersistenceContract.TripEntry.COLUMN_NAME_MARK));
 			String type = c.getString(c.getColumnIndexOrThrow(TripPersistenceContract.TripEntry.COLUMN_NAME_TYPE));
-			String scenario = c.getString(c.getColumnIndexOrThrow(TripPersistenceContract.TripEntry.COLUMN_NAME_SCENARIO));
+			int scenario = c.getInt(c.getColumnIndexOrThrow(TripPersistenceContract.TripEntry.COLUMN_NAME_SCENARIO));
 
-			trip = new Trip(id, title, startTime, finishTime, mark, type, scenario);
+			trip = new Trip(id, title, startTime, finishTime, mark, type, TripListFilterType.values()[scenario]);
 		}
 		if(c != null)
 		{
@@ -144,7 +145,7 @@ public class TripLocalDataSource implements TripDataSource
 		values.put(TripPersistenceContract.TripEntry.COLUMN_NAME_FINISH_TIME, trip.getmFinishTime());
 		values.put(TripPersistenceContract.TripEntry.COLUMN_NAME_MARK, trip.getmMark());
 		values.put(TripPersistenceContract.TripEntry.COLUMN_NAME_TYPE, trip.getmType());
-		values.put(TripPersistenceContract.TripEntry.COLUMN_NAME_SCENARIO, trip.getmScenario());
+		values.put(TripPersistenceContract.TripEntry.COLUMN_NAME_SCENARIO, trip.getmScenario().ordinal());
 
 		db.insert(TripPersistenceContract.TripEntry.TABLE_NAME, null, values);
 

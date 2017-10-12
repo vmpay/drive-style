@@ -104,7 +104,7 @@ final class TripDetailPresenter implements TripDetailContract.Presenter
 		long finishTime = trip.getmFinishTime();
 		Double mark = trip.getmMark();
 		String type = trip.getmType();
-		String scenario = trip.getmScenario();
+		String scenario = trip.getmScenario().name();
 
 		if(Strings.isNullOrEmpty(title))
 		{

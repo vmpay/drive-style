@@ -36,7 +36,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 @Singleton
 public class TripsRepository implements TripDataSource
 {
-	private final TripDataSource mTripsRemoteDataSource;
+//	private final TripDataSource mTripsRemoteDataSource;
 
 	private final TripDataSource mTripsLocalDataSource;
 
@@ -67,7 +67,7 @@ public class TripsRepository implements TripDataSource
 	TripsRepository(@Local TripDataSource tripsRemoteDataSource,
 	                @Local TripDataSource tripsLocalDataSource)
 	{
-		mTripsRemoteDataSource = tripsRemoteDataSource;
+//		mTripsRemoteDataSource = tripsRemoteDataSource;
 		mTripsLocalDataSource = tripsLocalDataSource;
 	}
 
@@ -90,13 +90,13 @@ public class TripsRepository implements TripDataSource
 			return;
 		}
 
-		if(mCacheIsDirty)
-		{
-			// If the cache is dirty we need to fetch new data from the network.
-			getTripsFromRemoteDataSource(callback);
-		}
-		else
-		{
+//		if(mCacheIsDirty)
+//		{
+//			// If the cache is dirty we need to fetch new data from the network.
+//			getTripsFromRemoteDataSource(callback);
+//		}
+//		else
+//		{
 			// Query the local storage if available. If not, query the network.
 			mTripsLocalDataSource.getTrips(new LoadTripsCallback()
 			{
@@ -110,17 +110,17 @@ public class TripsRepository implements TripDataSource
 				@Override
 				public void onDataNotAvailable()
 				{
-					getTripsFromRemoteDataSource(callback);
+//					getTripsFromRemoteDataSource(callback);
 				}
 			});
-		}
+//		}
 	}
 
 	@Override
 	public void saveTrip(@NonNull Trip trip)
 	{
 		checkNotNull(trip);
-		mTripsRemoteDataSource.saveTrip(trip);
+//		mTripsRemoteDataSource.saveTrip(trip);
 		mTripsLocalDataSource.saveTrip(trip);
 
 		// Do in memory cache update to keep the app UI up to date
@@ -173,26 +173,26 @@ public class TripsRepository implements TripDataSource
 			@Override
 			public void onDataNotAvailable()
 			{
-				mTripsRemoteDataSource.getTrip(tripId, new GetTripCallback()
-				{
-					@Override
-					public void onTripLoaded(Trip trip)
-					{
-						// Do in memory cache update to keep the app UI up to date
-						if(mCachedTrips == null)
-						{
-							mCachedTrips = new LinkedHashMap<>();
-						}
-						mCachedTrips.put(trip.getId(), trip);
-						callback.onTripLoaded(trip);
-					}
-
-					@Override
-					public void onDataNotAvailable()
-					{
-						callback.onDataNotAvailable();
-					}
-				});
+//				mTripsRemoteDataSource.getTrip(tripId, new GetTripCallback()
+//				{
+//					@Override
+//					public void onTripLoaded(Trip trip)
+//					{
+//						// Do in memory cache update to keep the app UI up to date
+//						if(mCachedTrips == null)
+//						{
+//							mCachedTrips = new LinkedHashMap<>();
+//						}
+//						mCachedTrips.put(trip.getId(), trip);
+//						callback.onTripLoaded(trip);
+//					}
+//
+//					@Override
+//					public void onDataNotAvailable()
+//					{
+//						callback.onDataNotAvailable();
+//					}
+//				});
 			}
 		});
 	}
@@ -206,7 +206,7 @@ public class TripsRepository implements TripDataSource
 	@Override
 	public void deleteAllTrips()
 	{
-		mTripsRemoteDataSource.deleteAllTrips();
+//		mTripsRemoteDataSource.deleteAllTrips();
 		mTripsLocalDataSource.deleteAllTrips();
 
 		if(mCachedTrips == null)
@@ -219,7 +219,7 @@ public class TripsRepository implements TripDataSource
 	@Override
 	public void deleteTrip(@NonNull long tripId)
 	{
-		mTripsRemoteDataSource.deleteTrip(checkNotNull(tripId));
+//		mTripsRemoteDataSource.deleteTrip(checkNotNull(tripId));
 		mTripsLocalDataSource.deleteTrip(checkNotNull(tripId));
 
 		mCachedTrips.remove(Long.toString(tripId));
@@ -227,22 +227,22 @@ public class TripsRepository implements TripDataSource
 
 	private void getTripsFromRemoteDataSource(@NonNull final LoadTripsCallback callback)
 	{
-		mTripsRemoteDataSource.getTrips(new LoadTripsCallback()
-		{
-			@Override
-			public void onTripsLoaded(List<Trip> trips)
-			{
-				refreshCache(trips);
-				refreshLocalDataSource(trips);
-				callback.onTripsLoaded(new ArrayList<>(mCachedTrips.values()));
-			}
-
-			@Override
-			public void onDataNotAvailable()
-			{
-				callback.onDataNotAvailable();
-			}
-		});
+//		mTripsRemoteDataSource.getTrips(new LoadTripsCallback()
+//		{
+//			@Override
+//			public void onTripsLoaded(List<Trip> trips)
+//			{
+//				refreshCache(trips);
+//				refreshLocalDataSource(trips);
+//				callback.onTripsLoaded(new ArrayList<>(mCachedTrips.values()));
+//			}
+//
+//			@Override
+//			public void onDataNotAvailable()
+//			{
+//				callback.onDataNotAvailable();
+//			}
+//		});
 	}
 
 	private void refreshCache(List<Trip> trips)

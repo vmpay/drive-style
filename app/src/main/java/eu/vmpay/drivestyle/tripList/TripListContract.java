@@ -39,9 +39,11 @@ public interface TripListContract
 
 		void showAllFilterLabel();
 
-		void showNoActiveTrips();
+		void showNoBrakeTrips();
 
-		void showNoCompletedTrips();
+		void showNoTurnTrips();
+
+		void showNoLaneChangeTrips();
 
 		void showSuccessfullySavedMessage();
 

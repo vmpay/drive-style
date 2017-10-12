@@ -39,7 +39,7 @@ public final class TripPersistenceContract
 						COLUMN_NAME_FINISH_TIME + TEXT_TYPE + COMMA_SEP +
 						COLUMN_NAME_MARK + REAL_TYPE + COMMA_SEP +
 						COLUMN_NAME_TYPE + TEXT_TYPE + COMMA_SEP +
-						COLUMN_NAME_SCENARIO + TEXT_TYPE +
+						COLUMN_NAME_SCENARIO + INTEGER_TYPE +
 						" )";
 
 		public static final String[] COLUMNS =

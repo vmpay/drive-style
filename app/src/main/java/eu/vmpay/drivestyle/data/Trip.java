@@ -3,6 +3,8 @@ package eu.vmpay.drivestyle.data;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import eu.vmpay.drivestyle.tripList.TripListFilterType;
+
 
 /**
  * Created by Andrew on 25/09/2017.
@@ -29,9 +31,9 @@ public final class Trip
 	private final String mType;
 
 	@NonNull
-	private final String mScenario;
+	private final TripListFilterType mScenario;
 
-	public Trip(long mId, @NonNull String mTitle, @NonNull long mStartTime, @NonNull long mFinishTime, Double mMark, @NonNull String mType, @NonNull String mScenario)
+	public Trip(long mId, @NonNull String mTitle, @NonNull long mStartTime, @NonNull long mFinishTime, Double mMark, @NonNull String mType, @NonNull TripListFilterType mScenario)
 	{
 		this.mId = mId;
 		this.mTitle = mTitle;
@@ -52,7 +54,7 @@ public final class Trip
 	 * @param mType
 	 * @param mScenario
 	 */
-	public Trip(@NonNull String mTitle, @NonNull long mStartTime, @NonNull long mFinishTime, Double mMark, @NonNull String mType, @NonNull String mScenario)
+	public Trip(@NonNull String mTitle, @NonNull long mStartTime, @NonNull long mFinishTime, Double mMark, @NonNull String mType, @NonNull TripListFilterType mScenario)
 	{
 		this(-1, mTitle, mStartTime, mFinishTime, mMark, mType, mScenario);
 	}
@@ -66,7 +68,7 @@ public final class Trip
 	 * @param mType
 	 * @param mScenario
 	 */
-	public Trip(@NonNull String mTitle, @NonNull long mStartTime, @NonNull long mFinishTime, @NonNull String mType, @NonNull String mScenario)
+	public Trip(@NonNull String mTitle, @NonNull long mStartTime, @NonNull long mFinishTime, @NonNull String mType, @NonNull TripListFilterType mScenario)
 	{
 		this(mTitle, mStartTime, mFinishTime, 0.0, mType, mScenario);
 	}
@@ -115,7 +117,7 @@ public final class Trip
 	}
 
 	@NonNull
-	public String getmScenario()
+	public TripListFilterType getmScenario()
 	{
 		return mScenario;
 	}

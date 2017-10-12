@@ -15,6 +15,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -52,7 +53,7 @@ public class TripListFragment extends DaggerFragment implements TripListContract
 		}
 	};
 	private Unbinder unbinder;
-	private SimpleItemRecyclerViewAdapter mListAdapter;
+	private TripListRecyclerViewAdapter mListAdapter;
 
 	@Inject
 	public TripListFragment()
@@ -64,7 +65,8 @@ public class TripListFragment extends DaggerFragment implements TripListContract
 	public void onCreate(@Nullable Bundle savedInstanceState)
 	{
 		super.onCreate(savedInstanceState);
-		mListAdapter = new SimpleItemRecyclerViewAdapter(DummyContent.ITEMS, mItemListener);
+		mListAdapter = new TripListRecyclerViewAdapter(new ArrayList<Trip>(0), mItemListener);
+//		mListAdapter = new SimpleItemRecyclerViewAdapter(DummyContent.ITEMS, mItemListener);
 	}
 
 	@Override
@@ -202,16 +204,6 @@ public class TripListFragment extends DaggerFragment implements TripListContract
 	}
 
 	@Override
-	public void showNoTrips()
-	{
-//		showNoTasksViews(
-//				getResources().getString(R.string.no_tasks_all),
-//				R.drawable.ic_assignment_turned_in_24dp,
-//				false
-//		);
-	}
-
-	@Override
 	public void showBrakeFilterLabel()
 	{
 		tvFilteringLabel.setText(getResources().getString(R.string.label_brake));
@@ -236,7 +228,17 @@ public class TripListFragment extends DaggerFragment implements TripListContract
 	}
 
 	@Override
-	public void showNoActiveTrips()
+	public void showNoTrips()
+	{
+//		showNoTasksViews(
+//				getResources().getString(R.string.no_tasks_all),
+//				R.drawable.ic_assignment_turned_in_24dp,
+//				false
+//		);
+	}
+
+	@Override
+	public void showNoBrakeTrips()
 	{
 //		showNoTasksViews(
 //				getResources().getString(R.string.no_tasks_active),
@@ -246,7 +248,13 @@ public class TripListFragment extends DaggerFragment implements TripListContract
 	}
 
 	@Override
-	public void showNoCompletedTrips()
+	public void showNoTurnTrips()
+	{
+
+	}
+
+	@Override
+	public void showNoLaneChangeTrips()
 	{
 //		showNoTasksViews(
 //				getResources().getString(R.string.no_tasks_completed),
@@ -368,7 +376,7 @@ public class TripListFragment extends DaggerFragment implements TripListContract
 				@Override
 				public void onClick(View view)
 				{
-					mItemListener.onTripClick(new Trip(Long.parseLong(item.id), item.content, 0, 0, 0.0, "type", "source"));
+					mItemListener.onTripClick(new Trip(Long.parseLong(item.id), item.content, 0, 0, 0.0, "Type", TripListFilterType.BRAKE));
 				}
 			});
 //			{
@@ -378,7 +386,7 @@ public class TripListFragment extends DaggerFragment implements TripListContract
 //					if(mTwoPane)
 //					{
 //						Bundle arguments = new Bundle();
-//						arguments.putString(TripDetailFragment.ARG_ITEM_ID, holder.mItem.id);
+//						arguments.putString(TripDetailFragment.ARG_ITEM_ID, holder.trip.id);
 //						TripDetailFragment fragment = new TripDetailFragment();
 //						fragment.setArguments(arguments);
 //						getSupportFragmentManager().beginTransaction()
@@ -389,7 +397,7 @@ public class TripListFragment extends DaggerFragment implements TripListContract
 //					{
 //						Context context = v.getContext();
 //						Intent intent = new Intent(context, TripDetailActivity.class);
-//						intent.putExtra(TripDetailFragment.ARG_ITEM_ID, holder.mItem.id);
+//						intent.putExtra(TripDetailFragment.ARG_ITEM_ID, holder.trip.id);
 //
 //						context.startActivity(intent);
 //					}

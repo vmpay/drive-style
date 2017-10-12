@@ -84,7 +84,7 @@ public class TripDetailFragment extends DaggerFragment implements TripDetailCont
 //			// Load the dummy content specified by the fragment
 //			// arguments. In a real-world scenario, use a Loader
 //			// to load content from a content provider.
-//			mItem = DummyContent.ITEM_MAP.get(getArguments().getString(ARG_ITEM_ID));
+//			trip = DummyContent.ITEM_MAP.get(getArguments().getString(ARG_ITEM_ID));
 //
 //			Activity activity = this.getActivity();
 //			CollapsingToolbarLayout appBarLayout = activity.findViewById(R.id.toolbar_layout);
@@ -152,7 +152,7 @@ public class TripDetailFragment extends DaggerFragment implements TripDetailCont
 		CollapsingToolbarLayout appBarLayout = activity.findViewById(R.id.toolbar_layout);
 		if(appBarLayout != null)
 		{
-			appBarLayout.setTitle(tripId);
+			appBarLayout.setTitle(title);
 		}
 	}
 
@@ -171,7 +171,7 @@ public class TripDetailFragment extends DaggerFragment implements TripDetailCont
 	public void showDetails(String startTime, String finishTime, Double mark, String type, String scenario)
 	{
 		tripDetail.setText(String.format(Locale.US,
-				"Start time %s\nFinishTime %s\nMark %d\nType %s\nScenario %s",
+				"Start time %s\nFinishTime %s\nMark %f\nType %s\nScenario %s",
 				startTime, finishTime, mark, type, scenario));
 	}
 

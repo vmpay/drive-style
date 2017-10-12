@@ -2,6 +2,9 @@ package eu.vmpay.drivestyle.tripList;
 
 import android.support.annotation.NonNull;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 
@@ -11,6 +14,7 @@ import eu.vmpay.drivestyle.data.source.TripsRepository;
 import eu.vmpay.drivestyle.di.ActivityScoped;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static eu.vmpay.drivestyle.tripList.TripListFilterType.ALL;
 
 /**
  * Created by andrew on 9/26/17.
@@ -32,7 +36,7 @@ public class TripListPresenter implements TripListContract.Presenter
 	@Nullable
 	private TripListContract.View mTripListView;
 
-	private TripListFilterType mCurrentFiltering = TripListFilterType.ALL;
+	private TripListFilterType mCurrentFiltering = ALL;
 
 	private boolean mFirstLoad = true;
 
@@ -85,76 +89,102 @@ public class TripListPresenter implements TripListContract.Presenter
 			mTripsRepository.refreshTrips();
 		}
 
-		showFilterLabel();
+//		showFilterLabel();
+		mTripsRepository.getTrips(new TripDataSource.LoadTripsCallback()
+		{
+			@Override
+			public void onTripsLoaded(List<Trip> trips)
+			{
+				List<Trip> tripsToShow = new ArrayList<Trip>();
 
-		// The network request might be handled in a different thread so make sure Espresso knows
-		// that the app is busy until the response is handled.
-//		EspressoIdlingResource.increment(); // App is busy until further notice
-//
-//		mTasksRepository.getTasks(new TasksDataSource.LoadTasksCallback()
-//		{
-//			@Override
-//			public void onTasksLoaded(List<Task> tasks)
-//			{
-//				List<Task> tasksToShow = new ArrayList<>();
-//
-//				// This callback may be called twice, once for the cache and once for loading
-//				// the data from the server API, so we check before decrementing, otherwise
-//				// it throws "Counter has been corrupted!" exception.
-//				if(!EspressoIdlingResource.getIdlingResource().isIdleNow())
-//				{
-//					EspressoIdlingResource.decrement(); // Set app as idle.
-//				}
-//
-//				// We filter the tasks based on the requestType
-//				for(Task task : tasks)
-//				{
-//					switch(mCurrentFiltering)
-//					{
-//						case ALL_TASKS:
-//							tasksToShow.add(task);
-//							break;
-//						case ACTIVE_TASKS:
-//							if(task.isActive())
-//							{
-//								tasksToShow.add(task);
-//							}
-//							break;
-//						case COMPLETED_TASKS:
-//							if(task.isCompleted())
-//							{
-//								tasksToShow.add(task);
-//							}
-//							break;
-//						default:
-//							tasksToShow.add(task);
-//							break;
-//					}
-//				}
-//				// The view may not be able to handle UI updates anymore
-//				if(mTripListView == null || !mTripListView.isActive())
-//				{
-//					return;
-//				}
-//				if(showLoadingUI)
-//				{
-//					mTripListView.setLoadingIndicator(false);
-//				}
-//
-//				processTasks(tasksToShow);
-//			}
-//
-//			@Override
-//			public void onDataNotAvailable()
-//			{
-//				// The view may not be able to handle UI updates anymore
-//				if(!mTripListView.isActive())
-//				{
-//					return;
-//				}
-//				mTripListView.showLoadingTasksError();
-//			}
-//		});
+				// We filter the tasks based on the requestType
+				for(Trip trip : trips)
+				{
+					switch(mCurrentFiltering)
+					{
+						case ALL:
+							tripsToShow.add(trip);
+							break;
+						case BRAKE:
+						case TURN:
+						case LANE_CHANGE:
+							if(trip.getmScenario().equals(mCurrentFiltering))
+							{
+								tripsToShow.add(trip);
+							}
+							break;
+						default:
+							tripsToShow.add(trip);
+							break;
+					}
+				}
+
+				// The view may not be able to handle UI updates anymore
+				if(mTripListView == null || !mTripListView.isActive())
+				{
+					return;
+				}
+				if(showLoadingUI)
+				{
+					mTripListView.setLoadingIndicator(false);
+				}
+
+				processTrips(tripsToShow);
+			}
+
+			@Override
+			public void onDataNotAvailable()
+			{
+				// The view may not be able to handle UI updates anymore
+				if(!mTripListView.isActive())
+				{
+					return;
+				}
+				mTripListView.showLoadingTripsError();
+			}
+		});
+	}
+
+	private void processTrips(List<Trip> tripList)
+	{
+		if(tripList.isEmpty())
+		{
+			// Show a message indicating there are no tasks for that filter type.
+			processEmptyTrips();
+		}
+		else
+		{
+			// Show the list of tasks
+			if(mTripListView != null)
+			{
+				mTripListView.showTrips(tripList);
+			}
+			// Set the filter label's text.
+			showFilterLabel();
+		}
+	}
+
+	private void processEmptyTrips()
+	{
+		if(mTripListView == null) return;
+		switch(mCurrentFiltering)
+		{
+			case ALL:
+				mTripListView.showNoTrips();
+				break;
+			case BRAKE:
+				mTripListView.showNoBrakeTrips();
+				break;
+			case TURN:
+				mTripListView.showNoTurnTrips();
+				break;
+			case LANE_CHANGE:
+				mTripListView.showNoLaneChangeTrips();
+				break;
+			default:
+				mTripListView.showNoTrips();
+				break;
+		}
 	}
 
 	private void showFilterLabel()
