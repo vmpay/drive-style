@@ -79,7 +79,6 @@ public class TripListFragment extends DaggerFragment implements TripListContract
 	{
 		super.onCreate(savedInstanceState);
 		mListAdapter = new TripListRecyclerViewAdapter(new ArrayList<Trip>(0), mItemListener);
-//		mListAdapter = new SimpleItemRecyclerViewAdapter(DummyContent.ITEMS, mItemListener);
 	}
 
 	@Override
@@ -118,15 +117,6 @@ public class TripListFragment extends DaggerFragment implements TripListContract
 		recyclerView.setLayoutManager(linearLayoutManager);
 		recyclerView.setAdapter(mListAdapter);
 //		recyclerView.setHasFixedSize(true);
-
-//		if(root.findViewById(R.id.track_detail_container) != null)
-//		{
-//			// The detail container view will be present only in the
-//			// large-screen layouts (res/values-w900dp).
-//			// If this view is present, then the
-//			// activity should be in two-pane mode.
-//			mTwoPane = true;
-//		}
 
 		setHasOptionsMenu(true);
 

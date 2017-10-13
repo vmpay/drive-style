@@ -3,6 +3,7 @@ package eu.vmpay.drivestyle.tripDetails;
 import android.app.Activity;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.design.widget.Snackbar;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -18,6 +19,7 @@ import javax.inject.Inject;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 import butterknife.Unbinder;
 import dagger.android.support.DaggerFragment;
 import eu.vmpay.drivestyle.R;
@@ -137,6 +139,21 @@ public class TripDetailFragment extends DaggerFragment implements TripDetailCont
 //				return true;
 //		}
 		return false;
+	}
+
+	@OnClick({ R.id.fab })
+	public void onClick(View v)
+	{
+		switch(v.getId())
+		{
+			case R.id.fab:
+				Snackbar.make(v, "Replace with your own action", Snackbar.LENGTH_LONG)
+						.setAction("Action", null).show();
+				// TODO: launch edit trip activity
+				break;
+			default:
+
+		}
 	}
 
 	@Override
