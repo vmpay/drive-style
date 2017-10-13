@@ -12,6 +12,7 @@ import java.util.List;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import eu.vmpay.drivestyle.data.AccelerometerData;
 import eu.vmpay.drivestyle.data.LocationData;
 import eu.vmpay.drivestyle.data.Trip;
 import eu.vmpay.drivestyle.data.source.TripDataSource;
@@ -36,6 +37,7 @@ public class TripLocalDataSource implements TripDataSource
 	}
 
 	//---------------------------------------------------------------TRIPS---------------------------------------------------------------
+
 	/**
 	 * Note: {@link LoadTripsCallback#onDataNotAvailable()} is fired if the database doesn't exist
 	 * or the table is empty.
@@ -324,6 +326,140 @@ public class TripLocalDataSource implements TripDataSource
 		String[] selectionArgs = { Long.toString(locationDataId) };
 
 		db.delete(LocationDataPersistenceContract.LocationDataEntity.TABLE_NAME, selection, selectionArgs);
+
+		db.close();
+	}
+
+	//---------------------------------------------------------------ACCELEROMETER---------------------------------------------------------------
+
+	@Override
+	public void getAccelerometerDataModels(@NonNull String tripId, @NonNull LoadAccelerometerDataModelsCallback callback)
+	{
+		List<AccelerometerData> locationDataList = new ArrayList<AccelerometerData>();
+		SQLiteDatabase db = mDbHelper.getReadableDatabase();
+
+		String[] projection = AccelerometerDataPersistenceContract.AccelerometerDataEntity.COLUMNS;
+
+		String selection = AccelerometerDataPersistenceContract.AccelerometerDataEntity.COLUMN_NAME_TRIP_ID + " LIKE ?";
+		String[] selectionArgs = { tripId };
+
+		Cursor c = db.query(
+				AccelerometerDataPersistenceContract.AccelerometerDataEntity.TABLE_NAME, projection, selection, selectionArgs, null, null, null);
+
+		if(c != null && c.getCount() > 0)
+		{
+			while(c.moveToNext())
+			{
+				long id = c.getLong(c.getColumnIndexOrThrow(AccelerometerDataPersistenceContract.AccelerometerDataEntity._ID));
+				long mTripId = c.getLong(c.getColumnIndexOrThrow(AccelerometerDataPersistenceContract.AccelerometerDataEntity.COLUMN_NAME_TRIP_ID));
+				long timestamp = c.getLong(c.getColumnIndexOrThrow(AccelerometerDataPersistenceContract.AccelerometerDataEntity.COLUMN_NAME_TIMESTAMP));
+				double accX = c.getDouble(c.getColumnIndexOrThrow(AccelerometerDataPersistenceContract.AccelerometerDataEntity.COLUMN_NAME_ACC_X));
+				double accY = c.getDouble(c.getColumnIndexOrThrow(AccelerometerDataPersistenceContract.AccelerometerDataEntity.COLUMN_NAME_ACC_Y));
+				double accZ = c.getDouble(c.getColumnIndexOrThrow(AccelerometerDataPersistenceContract.AccelerometerDataEntity.COLUMN_NAME_ACC_Z));
+
+				AccelerometerData accelerometerData = new AccelerometerData(id, mTripId, timestamp, accX, accY, accZ);
+				locationDataList.add(accelerometerData);
+			}
+		}
+		if(c != null)
+		{
+			c.close();
+		}
+
+		db.close();
+
+		if(locationDataList.isEmpty())
+		{
+			// This will be called if the table is new or just empty.
+			callback.onDataNotAvailable();
+		}
+		else
+		{
+			callback.onAccelerometerDataModelsLoaded(locationDataList);
+		}
+	}
+
+	@Override
+	public void getAccelerometerDataModel(@NonNull String accelerometerDataId, @NonNull GetAccelerometerDataModelCallback callback)
+	{
+		SQLiteDatabase db = mDbHelper.getReadableDatabase();
+
+		String[] projection = AccelerometerDataPersistenceContract.AccelerometerDataEntity.COLUMNS;
+
+		String selection = AccelerometerDataPersistenceContract.AccelerometerDataEntity._ID + " LIKE ?";
+		String[] selectionArgs = { accelerometerDataId };
+
+		Cursor c = db.query(
+				TripPersistenceContract.TripEntry.TABLE_NAME, projection, selection, selectionArgs, null, null, null);
+
+		AccelerometerData accelerometerData = null;
+
+		if(c != null && c.getCount() > 0)
+		{
+			c.moveToFirst();
+			long id = c.getLong(c.getColumnIndexOrThrow(AccelerometerDataPersistenceContract.AccelerometerDataEntity._ID));
+			long tripId = c.getLong(c.getColumnIndexOrThrow(AccelerometerDataPersistenceContract.AccelerometerDataEntity.COLUMN_NAME_TRIP_ID));
+			long timestamp = c.getLong(c.getColumnIndexOrThrow(AccelerometerDataPersistenceContract.AccelerometerDataEntity.COLUMN_NAME_TIMESTAMP));
+			double accX = c.getDouble(c.getColumnIndexOrThrow(AccelerometerDataPersistenceContract.AccelerometerDataEntity.COLUMN_NAME_ACC_X));
+			double accY = c.getDouble(c.getColumnIndexOrThrow(AccelerometerDataPersistenceContract.AccelerometerDataEntity.COLUMN_NAME_ACC_Y));
+			double accZ = c.getDouble(c.getColumnIndexOrThrow(AccelerometerDataPersistenceContract.AccelerometerDataEntity.COLUMN_NAME_ACC_Z));
+
+			accelerometerData = new AccelerometerData(id, tripId, timestamp, accX, accY, accZ);
+		}
+		if(c != null)
+		{
+			c.close();
+		}
+
+		db.close();
+
+		if(accelerometerData != null)
+		{
+			callback.onAccelerometerDataModelLoaded(accelerometerData);
+		}
+		else
+		{
+			callback.onDataNotAvailable();
+		}
+	}
+
+	@Override
+	public void saveAccelerometerDataModel(@NonNull AccelerometerData accelerometerData)
+	{
+		checkNotNull(accelerometerData);
+		SQLiteDatabase db = mDbHelper.getWritableDatabase();
+
+		ContentValues values = new ContentValues();
+		values.put(AccelerometerDataPersistenceContract.AccelerometerDataEntity.COLUMN_NAME_TRIP_ID, accelerometerData.getTripId());
+		values.put(AccelerometerDataPersistenceContract.AccelerometerDataEntity.COLUMN_NAME_TIMESTAMP, accelerometerData.getTimestamp());
+		values.put(AccelerometerDataPersistenceContract.AccelerometerDataEntity.COLUMN_NAME_ACC_X, accelerometerData.getAccX());
+		values.put(AccelerometerDataPersistenceContract.AccelerometerDataEntity.COLUMN_NAME_ACC_Y, accelerometerData.getAccY());
+		values.put(AccelerometerDataPersistenceContract.AccelerometerDataEntity.COLUMN_NAME_ACC_Z, accelerometerData.getAccZ());
+
+		db.insert(AccelerometerDataPersistenceContract.AccelerometerDataEntity.TABLE_NAME, null, values);
+
+		db.close();
+	}
+
+	@Override
+	public void deleteAllAccelerometerDataModels()
+	{
+		SQLiteDatabase db = mDbHelper.getWritableDatabase();
+
+		db.delete(AccelerometerDataPersistenceContract.AccelerometerDataEntity.TABLE_NAME, null, null);
+
+		db.close();
+	}
+
+	@Override
+	public void deleteAccelerometerDataModel(@NonNull long accelerometerDataId)
+	{
+		SQLiteDatabase db = mDbHelper.getWritableDatabase();
+
+		String selection = AccelerometerDataPersistenceContract.AccelerometerDataEntity._ID + " LIKE ?";
+		String[] selectionArgs = { Long.toString(accelerometerDataId) };
+
+		db.delete(AccelerometerDataPersistenceContract.AccelerometerDataEntity.TABLE_NAME, selection, selectionArgs);
 
 		db.close();
 	}

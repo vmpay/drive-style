@@ -71,6 +71,7 @@ public class FakeTripLocalDataSource extends TripLocalDataSource
 				{
 					saveLocation(new LocationData(entry.getmId(), entry.getmStartTime(), 52.219968, 21.011818, 0, 0));
 					saveLocation(new LocationData(entry.getmId(), entry.getmFinishTime(), 52.220162, 21.012359, 0, 0));
+					saveAccelerometerDataModel(new AccelerometerData(entry.getmId(), entry.getmStartTime(), 0, 0, 0));
 				}
 			}
 

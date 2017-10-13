@@ -54,7 +54,7 @@ public final class LocationData
 	}
 
 	/**
-	 * Default constructor
+	 * Use this constructor if mId is not available
 	 *
 	 * @param tripId    trip record id in the database
 	 * @param timestamp unix timestamp of the recorded data

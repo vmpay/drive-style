@@ -4,6 +4,7 @@ import android.support.annotation.NonNull;
 
 import java.util.List;
 
+import eu.vmpay.drivestyle.data.AccelerometerData;
 import eu.vmpay.drivestyle.data.LocationData;
 import eu.vmpay.drivestyle.data.Trip;
 
@@ -15,6 +16,7 @@ import eu.vmpay.drivestyle.data.Trip;
 public interface TripDataSource
 {
 	//---------------------------------------------------------------TRIPS---------------------------------------------------------------
+
 	void getTrips(@NonNull LoadTripsCallback callback);
 
 	void getTrip(@NonNull String tripId, @NonNull GetTripCallback callback);
@@ -67,6 +69,34 @@ public interface TripDataSource
 	{
 
 		void onLocationLoaded(LocationData locationData);
+
+		void onDataNotAvailable();
+	}
+
+	//---------------------------------------------------------------ACCELEROMETER---------------------------------------------------------------
+
+	void getAccelerometerDataModels(@NonNull String tripId, @NonNull LoadAccelerometerDataModelsCallback callback);
+
+	void getAccelerometerDataModel(@NonNull String accelerometerDataId, @NonNull GetAccelerometerDataModelCallback callback);
+
+	void saveAccelerometerDataModel(@NonNull AccelerometerData accelerometerData);
+
+	void deleteAllAccelerometerDataModels();
+
+	void deleteAccelerometerDataModel(@NonNull long accelerometerDataId);
+
+	interface LoadAccelerometerDataModelsCallback
+	{
+
+		void onAccelerometerDataModelsLoaded(List<AccelerometerData> accelerometerDataList);
+
+		void onDataNotAvailable();
+	}
+
+	interface GetAccelerometerDataModelCallback
+	{
+
+		void onAccelerometerDataModelLoaded(AccelerometerData accelerometerData);
 
 		void onDataNotAvailable();
 	}

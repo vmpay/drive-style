@@ -11,6 +11,7 @@ import java.util.List;
 
 import javax.inject.Inject;
 
+import eu.vmpay.drivestyle.data.AccelerometerData;
 import eu.vmpay.drivestyle.data.LocationData;
 import eu.vmpay.drivestyle.data.Trip;
 import eu.vmpay.drivestyle.data.source.TripDataSource;
@@ -96,6 +97,22 @@ final class TripDetailPresenter implements TripDetailContract.Presenter
 //								Log.d("TAG", entry.toString());
 //							}
 							// TODO: 10/13/17 add map
+						}
+
+						@Override
+						public void onDataNotAvailable()
+						{
+						}
+					});
+					mTripsRepository.getAccelerometerDataModels(trip.getId(), new TripDataSource.LoadAccelerometerDataModelsCallback()
+					{
+						@Override
+						public void onAccelerometerDataModelsLoaded(List<AccelerometerData> accelerometerDataList)
+						{
+//							for(AccelerometerData entry : accelerometerDataList)
+//							{
+//								Log.d("TAG", entry.toString());
+//							}
 						}
 
 						@Override

@@ -11,6 +11,7 @@ import java.util.Map;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import eu.vmpay.drivestyle.data.AccelerometerData;
 import eu.vmpay.drivestyle.data.LocationData;
 import eu.vmpay.drivestyle.data.Trip;
 import eu.vmpay.drivestyle.di.AppComponent;
@@ -289,6 +290,7 @@ public class TripsRepository implements TripDataSource
 	@Override
 	public void getLocations(@NonNull String tripId, @NonNull final LoadLocationsCallback callback)
 	{
+		checkNotNull(tripId);
 		checkNotNull(callback);
 
 		// Query the local storage if available.
@@ -348,5 +350,72 @@ public class TripsRepository implements TripDataSource
 	public void deleteLocation(@NonNull long locationDataId)
 	{
 		mTripsLocalDataSource.deleteLocation(checkNotNull(locationDataId));
+	}
+
+
+	//---------------------------------------------------------------ACCELEROMETER---------------------------------------------------------------
+	@Override
+	public void getAccelerometerDataModels(@NonNull String tripId, @NonNull final LoadAccelerometerDataModelsCallback callback)
+	{
+		checkNotNull(tripId);
+		checkNotNull(callback);
+
+		// Query the local storage if available.
+		mTripsLocalDataSource.getAccelerometerDataModels(tripId, new LoadAccelerometerDataModelsCallback()
+		{
+			@Override
+			public void onAccelerometerDataModelsLoaded(List<AccelerometerData> accelerometerDataList)
+			{
+				callback.onAccelerometerDataModelsLoaded(accelerometerDataList);
+			}
+
+			@Override
+			public void onDataNotAvailable()
+			{
+				callback.onDataNotAvailable();
+			}
+		});
+	}
+
+	@Override
+	public void getAccelerometerDataModel(@NonNull String accelerometerDataId, @NonNull final GetAccelerometerDataModelCallback callback)
+	{
+		checkNotNull(accelerometerDataId);
+		checkNotNull(callback);
+
+		// Query the local storage if available.
+		mTripsLocalDataSource.getAccelerometerDataModel(accelerometerDataId, new GetAccelerometerDataModelCallback()
+		{
+			@Override
+			public void onAccelerometerDataModelLoaded(AccelerometerData accelerometerData)
+			{
+				callback.onAccelerometerDataModelLoaded(accelerometerData);
+			}
+
+			@Override
+			public void onDataNotAvailable()
+			{
+				callback.onDataNotAvailable();
+			}
+		});
+	}
+
+	@Override
+	public void saveAccelerometerDataModel(@NonNull AccelerometerData accelerometerData)
+	{
+		checkNotNull(accelerometerData);
+		mTripsLocalDataSource.saveAccelerometerDataModel(accelerometerData);
+	}
+
+	@Override
+	public void deleteAllAccelerometerDataModels()
+	{
+		mTripsLocalDataSource.deleteAllAccelerometerDataModels();
+	}
+
+	@Override
+	public void deleteAccelerometerDataModel(@NonNull long accelerometerDataId)
+	{
+		mTripsLocalDataSource.deleteAccelerometerDataModel(checkNotNull(accelerometerDataId));
 	}
 }
