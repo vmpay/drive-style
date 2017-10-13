@@ -62,5 +62,22 @@ public class FakeTripLocalDataSource extends TripLocalDataSource
 			trip = new Trip("Trip " + (i + 1), timestamp, timestamp + 5000, random.nextDouble() * 5, "Type", filterType);
 			saveTrip(trip);
 		}
+		getTrips(new LoadTripsCallback()
+		{
+			@Override
+			public void onTripsLoaded(List<Trip> trips)
+			{
+				for(Trip entry : trips)
+				{
+					saveLocation(new LocationData(entry.getmId(), entry.getmStartTime(), 52.219968, 21.011818, 0, 0));
+					saveLocation(new LocationData(entry.getmId(), entry.getmFinishTime(), 52.220162, 21.012359, 0, 0));
+				}
+			}
+
+			@Override
+			public void onDataNotAvailable()
+			{
+			}
+		});
 	}
 }

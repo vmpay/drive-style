@@ -4,6 +4,7 @@ import android.support.annotation.NonNull;
 
 import java.util.List;
 
+import eu.vmpay.drivestyle.data.LocationData;
 import eu.vmpay.drivestyle.data.Trip;
 
 /**
@@ -13,6 +14,7 @@ import eu.vmpay.drivestyle.data.Trip;
 
 public interface TripDataSource
 {
+	//---------------------------------------------------------------TRIPS---------------------------------------------------------------
 	void getTrips(@NonNull LoadTripsCallback callback);
 
 	void getTrip(@NonNull String tripId, @NonNull GetTripCallback callback);
@@ -37,6 +39,34 @@ public interface TripDataSource
 	{
 
 		void onTripLoaded(Trip trip);
+
+		void onDataNotAvailable();
+	}
+
+	//---------------------------------------------------------------LOCATIONS---------------------------------------------------------------
+
+	void getLocations(@NonNull String tripId, @NonNull LoadLocationsCallback callback);
+
+	void getLocation(@NonNull String locationDataId, @NonNull GetLocationCallback callback);
+
+	void saveLocation(@NonNull LocationData locationData);
+
+	void deleteAllLocations();
+
+	void deleteLocation(@NonNull long locationDataId);
+
+	interface LoadLocationsCallback
+	{
+
+		void onLocationsLoaded(List<LocationData> locationDataList);
+
+		void onDataNotAvailable();
+	}
+
+	interface GetLocationCallback
+	{
+
+		void onLocationLoaded(LocationData locationData);
 
 		void onDataNotAvailable();
 	}

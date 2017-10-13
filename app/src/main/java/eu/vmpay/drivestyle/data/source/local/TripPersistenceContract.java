@@ -6,14 +6,8 @@ import android.provider.BaseColumns;
  * Created by Andrew on 25/09/2017.
  */
 
-public final class TripPersistenceContract
+public final class TripPersistenceContract extends BasePersistenceContract
 {
-	private static final String REAL_TYPE = " INTEGER";
-	private static final String INTEGER_TYPE = " INTEGER";
-	private static final String TEXT_TYPE = " TEXT";
-	private static final String BOOLEAN_TYPE = " INTEGER";
-	private static final String COMMA_SEP = ",";
-
 	// To prevent someone from accidentally instantiating the contract class,
 	// give it an empty constructor.
 	private TripPersistenceContract()
@@ -53,5 +47,4 @@ public final class TripPersistenceContract
 						COLUMN_NAME_SCENARIO
 				};
 	}
-
 }

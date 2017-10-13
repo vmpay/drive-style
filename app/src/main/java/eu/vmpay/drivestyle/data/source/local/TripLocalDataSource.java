@@ -12,6 +12,7 @@ import java.util.List;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import eu.vmpay.drivestyle.data.LocationData;
 import eu.vmpay.drivestyle.data.Trip;
 import eu.vmpay.drivestyle.data.source.TripDataSource;
 import eu.vmpay.drivestyle.tripList.TripListFilterType;
@@ -34,6 +35,7 @@ public class TripLocalDataSource implements TripDataSource
 		mDbHelper = new TripDbHelper(context);
 	}
 
+	//---------------------------------------------------------------TRIPS---------------------------------------------------------------
 	/**
 	 * Note: {@link LoadTripsCallback#onDataNotAvailable()} is fired if the database doesn't exist
 	 * or the table is empty.
@@ -154,7 +156,7 @@ public class TripLocalDataSource implements TripDataSource
 	@Override
 	public void refreshTrips()
 	{
-		// Not required because the {@link TasksRepository} handles the logic of refreshing the
+		// Not required because the {@link TripsRepository} handles the logic of refreshing the
 		// tasks from all the available data sources.
 	}
 
@@ -177,6 +179,151 @@ public class TripLocalDataSource implements TripDataSource
 		String[] selectionArgs = { Long.toString(tripId) };
 
 		db.delete(TripPersistenceContract.TripEntry.TABLE_NAME, selection, selectionArgs);
+
+		db.close();
+	}
+
+	//---------------------------------------------------------------LOCATION---------------------------------------------------------------
+
+	/**
+	 * Note: {@link LoadLocationsCallback#onDataNotAvailable()} is fired if the database doesn't exist
+	 * or the table is empty.
+	 */
+	@Override
+	public void getLocations(@NonNull String tripId, @NonNull LoadLocationsCallback callback)
+	{
+		List<LocationData> locationDataList = new ArrayList<LocationData>();
+		SQLiteDatabase db = mDbHelper.getReadableDatabase();
+
+		String[] projection = LocationDataPersistenceContract.LocationDataEntity.COLUMNS;
+
+		String selection = LocationDataPersistenceContract.LocationDataEntity.COLUMN_NAME_TRIP_ID + " LIKE ?";
+		String[] selectionArgs = { tripId };
+
+		Cursor c = db.query(
+				LocationDataPersistenceContract.LocationDataEntity.TABLE_NAME, projection, selection, selectionArgs, null, null, null);
+
+		if(c != null && c.getCount() > 0)
+		{
+			while(c.moveToNext())
+			{
+				long id = c.getLong(c.getColumnIndexOrThrow(LocationDataPersistenceContract.LocationDataEntity._ID));
+				long mTripId = c.getLong(c.getColumnIndexOrThrow(LocationDataPersistenceContract.LocationDataEntity.COLUMN_NAME_TRIP_ID));
+				long timestamp = c.getLong(c.getColumnIndexOrThrow(LocationDataPersistenceContract.LocationDataEntity.COLUMN_NAME_TIMESTAMP));
+				double latitude = c.getDouble(c.getColumnIndexOrThrow(LocationDataPersistenceContract.LocationDataEntity.COLUMN_NAME_LATITUDE));
+				double longitude = c.getDouble(c.getColumnIndexOrThrow(LocationDataPersistenceContract.LocationDataEntity.COLUMN_NAME_LONGITUDE));
+				double altitude = c.getDouble(c.getColumnIndexOrThrow(LocationDataPersistenceContract.LocationDataEntity.COLUMN_NAME_ALTITUDE));
+				double speed = c.getDouble(c.getColumnIndexOrThrow(LocationDataPersistenceContract.LocationDataEntity.COLUMN_NAME_SPEED));
+
+				LocationData locationData = new LocationData(id, mTripId, timestamp, latitude, longitude, altitude, speed);
+				locationDataList.add(locationData);
+			}
+		}
+		if(c != null)
+		{
+			c.close();
+		}
+
+		db.close();
+
+		if(locationDataList.isEmpty())
+		{
+			// This will be called if the table is new or just empty.
+			callback.onDataNotAvailable();
+		}
+		else
+		{
+			callback.onLocationsLoaded(locationDataList);
+		}
+	}
+
+	/**
+	 * Note: {@link GetLocationCallback#onDataNotAvailable()} is fired if the {@link LocationData} isn't
+	 * found.
+	 */
+	@Override
+	public void getLocation(@NonNull String locationDataId, @NonNull GetLocationCallback callback)
+	{
+		SQLiteDatabase db = mDbHelper.getReadableDatabase();
+
+		String[] projection = LocationDataPersistenceContract.LocationDataEntity.COLUMNS;
+
+		String selection = LocationDataPersistenceContract.LocationDataEntity._ID + " LIKE ?";
+		String[] selectionArgs = { locationDataId };
+
+		Cursor c = db.query(
+				TripPersistenceContract.TripEntry.TABLE_NAME, projection, selection, selectionArgs, null, null, null);
+
+		LocationData locationData = null;
+
+		if(c != null && c.getCount() > 0)
+		{
+			c.moveToFirst();
+			long id = c.getLong(c.getColumnIndexOrThrow(LocationDataPersistenceContract.LocationDataEntity._ID));
+			long tripId = c.getLong(c.getColumnIndexOrThrow(LocationDataPersistenceContract.LocationDataEntity.COLUMN_NAME_TRIP_ID));
+			long timestamp = c.getLong(c.getColumnIndexOrThrow(LocationDataPersistenceContract.LocationDataEntity.COLUMN_NAME_TIMESTAMP));
+			double latitude = c.getDouble(c.getColumnIndexOrThrow(LocationDataPersistenceContract.LocationDataEntity.COLUMN_NAME_LATITUDE));
+			double longitude = c.getDouble(c.getColumnIndexOrThrow(LocationDataPersistenceContract.LocationDataEntity.COLUMN_NAME_LONGITUDE));
+			double altitude = c.getDouble(c.getColumnIndexOrThrow(LocationDataPersistenceContract.LocationDataEntity.COLUMN_NAME_ALTITUDE));
+			double speed = c.getDouble(c.getColumnIndexOrThrow(LocationDataPersistenceContract.LocationDataEntity.COLUMN_NAME_SPEED));
+
+			locationData = new LocationData(id, tripId, timestamp, latitude, longitude, altitude, speed);
+		}
+		if(c != null)
+		{
+			c.close();
+		}
+
+		db.close();
+
+		if(locationData != null)
+		{
+			callback.onLocationLoaded(locationData);
+		}
+		else
+		{
+			callback.onDataNotAvailable();
+		}
+	}
+
+	@Override
+	public void saveLocation(@NonNull LocationData locationData)
+	{
+		checkNotNull(locationData);
+		SQLiteDatabase db = mDbHelper.getWritableDatabase();
+
+		ContentValues values = new ContentValues();
+		values.put(LocationDataPersistenceContract.LocationDataEntity.COLUMN_NAME_TRIP_ID, locationData.getTripId());
+		values.put(LocationDataPersistenceContract.LocationDataEntity.COLUMN_NAME_TIMESTAMP, locationData.getTimestamp());
+		values.put(LocationDataPersistenceContract.LocationDataEntity.COLUMN_NAME_LATITUDE, locationData.getLatitude());
+		values.put(LocationDataPersistenceContract.LocationDataEntity.COLUMN_NAME_LONGITUDE, locationData.getLongitude());
+		values.put(LocationDataPersistenceContract.LocationDataEntity.COLUMN_NAME_ALTITUDE, locationData.getAltitude());
+		values.put(LocationDataPersistenceContract.LocationDataEntity.COLUMN_NAME_SPEED, locationData.getSpeed());
+
+		db.insert(LocationDataPersistenceContract.LocationDataEntity.TABLE_NAME, null, values);
+
+		db.close();
+	}
+
+	@Override
+	public void deleteAllLocations()
+	{
+		SQLiteDatabase db = mDbHelper.getWritableDatabase();
+
+		db.delete(LocationDataPersistenceContract.LocationDataEntity.TABLE_NAME, null, null);
+
+		db.close();
+	}
+
+	@Override
+	public void deleteLocation(@NonNull long locationDataId)
+	{
+		SQLiteDatabase db = mDbHelper.getWritableDatabase();
+
+		String selection = LocationDataPersistenceContract.LocationDataEntity._ID + " LIKE ?";
+		String[] selectionArgs = { Long.toString(locationDataId) };
+
+		db.delete(LocationDataPersistenceContract.LocationDataEntity.TABLE_NAME, selection, selectionArgs);
 
 		db.close();
 	}

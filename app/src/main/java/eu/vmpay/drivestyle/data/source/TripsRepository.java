@@ -11,6 +11,7 @@ import java.util.Map;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import eu.vmpay.drivestyle.data.LocationData;
 import eu.vmpay.drivestyle.data.Trip;
 import eu.vmpay.drivestyle.di.AppComponent;
 
@@ -65,7 +66,8 @@ public class TripsRepository implements TripDataSource
 	 */
 	@Inject
 	TripsRepository(//@Local TripDataSource tripsRemoteDataSource,
-	                @Local TripDataSource tripsLocalDataSource)
+	                @Local TripDataSource tripsLocalDataSource
+	)
 	{
 //		mTripsRemoteDataSource = tripsRemoteDataSource;
 		mTripsLocalDataSource = tripsLocalDataSource;
@@ -97,22 +99,23 @@ public class TripsRepository implements TripDataSource
 //		}
 //		else
 //		{
-			// Query the local storage if available. If not, query the network.
-			mTripsLocalDataSource.getTrips(new LoadTripsCallback()
+		// Query the local storage if available. If not, query the network.
+		mTripsLocalDataSource.getTrips(new LoadTripsCallback()
+		{
+			@Override
+			public void onTripsLoaded(List<Trip> trips)
 			{
-				@Override
-				public void onTripsLoaded(List<Trip> trips)
-				{
-					refreshCache(trips);
-					callback.onTripsLoaded(new ArrayList<>(mCachedTrips.values()));
-				}
+				refreshCache(trips);
+				callback.onTripsLoaded(new ArrayList<>(mCachedTrips.values()));
+			}
 
-				@Override
-				public void onDataNotAvailable()
-				{
+			@Override
+			public void onDataNotAvailable()
+			{
+				callback.onDataNotAvailable();
 //					getTripsFromRemoteDataSource(callback);
-				}
-			});
+			}
+		});
 //		}
 	}
 
@@ -280,5 +283,70 @@ public class TripsRepository implements TripDataSource
 		{
 			return mCachedTrips.get(id);
 		}
+	}
+
+	//---------------------------------------------------------------TRIPS---------------------------------------------------------------
+	@Override
+	public void getLocations(@NonNull String tripId, @NonNull final LoadLocationsCallback callback)
+	{
+		checkNotNull(callback);
+
+		// Query the local storage if available.
+		mTripsLocalDataSource.getLocations(tripId, new LoadLocationsCallback()
+		{
+			@Override
+			public void onLocationsLoaded(List<LocationData> locationDataList)
+			{
+				callback.onLocationsLoaded(locationDataList);
+			}
+
+			@Override
+			public void onDataNotAvailable()
+			{
+				callback.onDataNotAvailable();
+			}
+		});
+	}
+
+	@Override
+	public void getLocation(@NonNull String locationDataId, @NonNull final GetLocationCallback callback)
+	{
+		checkNotNull(locationDataId);
+		checkNotNull(callback);
+
+		// Query the local storage if available.
+		mTripsLocalDataSource.getLocation(locationDataId, new GetLocationCallback()
+		{
+			@Override
+			public void onLocationLoaded(LocationData locationData)
+			{
+				callback.onLocationLoaded(locationData);
+			}
+
+			@Override
+			public void onDataNotAvailable()
+			{
+				callback.onDataNotAvailable();
+			}
+		});
+	}
+
+	@Override
+	public void saveLocation(@NonNull LocationData locationData)
+	{
+		checkNotNull(locationData);
+		mTripsLocalDataSource.saveLocation(locationData);
+	}
+
+	@Override
+	public void deleteAllLocations()
+	{
+		mTripsLocalDataSource.deleteAllLocations();
+	}
+
+	@Override
+	public void deleteLocation(@NonNull long locationDataId)
+	{
+		mTripsLocalDataSource.deleteLocation(checkNotNull(locationDataId));
 	}
 }

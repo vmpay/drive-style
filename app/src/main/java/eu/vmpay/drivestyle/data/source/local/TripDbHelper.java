@@ -25,12 +25,14 @@ public class TripDbHelper extends SQLiteOpenHelper
 	public void onCreate(SQLiteDatabase db)
 	{
 		db.execSQL(TripPersistenceContract.TripEntry.CREATE_TABLE);
+		db.execSQL(LocationDataPersistenceContract.LocationDataEntity.CREATE_TABLE);
 	}
 
 	public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion)
 	{
 		// Not required as at version 1
 		db.execSQL("DROP TABLE IF EXISTS " + TripPersistenceContract.TripEntry.TABLE_NAME);
+		db.execSQL("DROP TABLE IF EXISTS " + LocationDataPersistenceContract.LocationDataEntity.TABLE_NAME);
 	}
 
 	public void onDowngrade(SQLiteDatabase db, int oldVersion, int newVersion)

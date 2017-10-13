@@ -7,9 +7,11 @@ import com.google.common.base.Strings;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 
 import javax.inject.Inject;
 
+import eu.vmpay.drivestyle.data.LocationData;
 import eu.vmpay.drivestyle.data.Trip;
 import eu.vmpay.drivestyle.data.source.TripDataSource;
 import eu.vmpay.drivestyle.data.source.TripsRepository;
@@ -82,6 +84,26 @@ final class TripDetailPresenter implements TripDetailContract.Presenter
 				{
 					showTripDetails(trip);
 				}
+				if(trip != null)
+				{
+					mTripsRepository.getLocations(trip.getId(), new TripDataSource.LoadLocationsCallback()
+					{
+						@Override
+						public void onLocationsLoaded(List<LocationData> locationDataList)
+						{
+//							for (LocationData entry :locationDataList)
+//							{
+//								Log.d("TAG", entry.toString());
+//							}
+							// TODO: 10/13/17 add map
+						}
+
+						@Override
+						public void onDataNotAvailable()
+						{
+						}
+					});
+				}
 			}
 
 			@Override
@@ -95,6 +117,7 @@ final class TripDetailPresenter implements TripDetailContract.Presenter
 				mTripDetailView.showLoadingDetailsError();
 			}
 		});
+
 	}
 
 	private void showTripDetails(@NonNull Trip trip)
