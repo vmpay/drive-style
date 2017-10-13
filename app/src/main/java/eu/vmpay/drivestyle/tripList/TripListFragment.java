@@ -1,5 +1,6 @@
 package eu.vmpay.drivestyle.tripList;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -7,6 +8,7 @@ import android.support.design.widget.Snackbar;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -41,8 +43,8 @@ public class TripListFragment extends DaggerFragment implements TripListContract
 	@Inject
 	TripListContract.Presenter mPresenter;
 
-	@BindView(R.id.tvFilteringLabel)
-	TextView tvFilteringLabel;
+	//	@BindView(R.id.tvFilteringLabel)
+//	TextView tvFilteringLabel;
 	@BindView(R.id.track_list)
 	RecyclerView recyclerView;
 	@BindView(R.id.llTripList)
@@ -209,25 +211,45 @@ public class TripListFragment extends DaggerFragment implements TripListContract
 	@Override
 	public void showBrakeFilterLabel()
 	{
-		tvFilteringLabel.setText(getResources().getString(R.string.label_brake));
+		Activity activity = this.getActivity();
+		Toolbar appBarLayout = activity.findViewById(R.id.toolbar);
+		if(appBarLayout != null)
+		{
+			appBarLayout.setTitle(getResources().getString(R.string.label_brake));
+		}
 	}
 
 	@Override
 	public void showTurnFilterLabel()
 	{
-		tvFilteringLabel.setText(getResources().getString(R.string.label_turn));
+		Activity activity = this.getActivity();
+		Toolbar appBarLayout = activity.findViewById(R.id.toolbar);
+		if(appBarLayout != null)
+		{
+			appBarLayout.setTitle(getResources().getString(R.string.label_turn));
+		}
 	}
 
 	@Override
 	public void showLaneChangeFilterLabel()
 	{
-		tvFilteringLabel.setText(getResources().getString(R.string.label_lane_change));
+		Activity activity = this.getActivity();
+		Toolbar appBarLayout = activity.findViewById(R.id.toolbar);
+		if(appBarLayout != null)
+		{
+			appBarLayout.setTitle(getResources().getString(R.string.label_lane_change));
+		}
 	}
 
 	@Override
 	public void showAllFilterLabel()
 	{
-		tvFilteringLabel.setText(getResources().getString(R.string.label_all));
+		Activity activity = this.getActivity();
+		Toolbar appBarLayout = activity.findViewById(R.id.toolbar);
+		if(appBarLayout != null)
+		{
+			appBarLayout.setTitle(getResources().getString(R.string.label_all));
+		}
 	}
 
 	@Override

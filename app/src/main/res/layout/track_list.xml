@@ -16,20 +16,19 @@
 		android:layout_height="match_parent"
 		android:orientation="vertical">
 
-		<TextView
-			android:id="@+id/tvFilteringLabel"
-			android:layout_width="match_parent"
-			android:layout_height="wrap_content"
-			android:layout_marginBottom="@dimen/activity_vertical_margin"
-			android:layout_marginLeft="@dimen/list_item_padding"
-			android:layout_marginRight="@dimen/list_item_padding"
-			android:layout_marginTop="@dimen/activity_vertical_margin"
-			android:gravity="center_vertical"
-			android:textAppearance="@style/TextAppearance.AppCompat.Title"
-			/>
+		<!--<TextView-->
+		<!--android:id="@+id/tvFilteringLabel"-->
+		<!--android:layout_width="match_parent"-->
+		<!--android:layout_height="wrap_content"-->
+		<!--android:layout_marginBottom="@dimen/activity_vertical_margin"-->
+		<!--android:layout_marginLeft="@dimen/list_item_padding"-->
+		<!--android:layout_marginRight="@dimen/list_item_padding"-->
+		<!--android:layout_marginTop="@dimen/activity_vertical_margin"-->
+		<!--android:gravity="center_vertical"-->
+		<!--android:textAppearance="@style/TextAppearance.AppCompat.Title"-->
+		<!--/>-->
 
 		<android.support.v7.widget.RecyclerView
-
 			android:id="@+id/track_list"
 			android:layout_width="match_parent"
 			android:layout_height="match_parent"
