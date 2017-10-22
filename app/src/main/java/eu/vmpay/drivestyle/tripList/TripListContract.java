@@ -69,5 +69,9 @@ public interface TripListContract
 		void takeView(TripListContract.View view);
 
 		void dropView();
+
+		void registerSensor();
+
+		void unregisterSensor();
 	}
 }

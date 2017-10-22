@@ -2,6 +2,7 @@ package eu.vmpay.drivestyle.tripDetails;
 
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.util.Log;
 
 import com.google.common.base.Strings;
 
@@ -92,10 +93,10 @@ final class TripDetailPresenter implements TripDetailContract.Presenter
 						@Override
 						public void onLocationsLoaded(List<LocationData> locationDataList)
 						{
-//							for (LocationData entry :locationDataList)
-//							{
-//								Log.d("TAG", entry.toString());
-//							}
+							for(LocationData entry : locationDataList)
+							{
+								Log.d("TAG", entry.toString());
+							}
 							// TODO: 10/13/17 add map
 						}
 
@@ -109,10 +110,10 @@ final class TripDetailPresenter implements TripDetailContract.Presenter
 						@Override
 						public void onAccelerometerDataModelsLoaded(List<AccelerometerData> accelerometerDataList)
 						{
-//							for(AccelerometerData entry : accelerometerDataList)
-//							{
-//								Log.d("TAG", entry.toString());
-//							}
+							for(AccelerometerData entry : accelerometerDataList)
+							{
+								Log.d("TAG", entry.toString());
+							}
 						}
 
 						@Override

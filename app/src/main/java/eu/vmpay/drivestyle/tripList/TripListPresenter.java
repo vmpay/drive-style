@@ -12,6 +12,7 @@ import eu.vmpay.drivestyle.data.Trip;
 import eu.vmpay.drivestyle.data.source.TripDataSource;
 import eu.vmpay.drivestyle.data.source.TripsRepository;
 import eu.vmpay.drivestyle.di.ActivityScoped;
+import eu.vmpay.drivestyle.sensors.motion.AccelerometerSensor;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static eu.vmpay.drivestyle.tripList.TripListFilterType.ALL;
@@ -33,6 +34,7 @@ import static eu.vmpay.drivestyle.tripList.TripListFilterType.ALL;
 public class TripListPresenter implements TripListContract.Presenter
 {
 	private final TripsRepository mTripsRepository;
+	private final AccelerometerSensor mAccelerometerSensor;
 	@Nullable
 	private TripListContract.View mTripListView;
 
@@ -45,11 +47,11 @@ public class TripListPresenter implements TripListContract.Presenter
 	 * with {@code @Nullable} values.
 	 */
 	@Inject
-	TripListPresenter(TripsRepository tripsRepository)
+	TripListPresenter(TripsRepository tripsRepository, AccelerometerSensor accelerometerSensor)
 	{
 		mTripsRepository = tripsRepository;
+		mAccelerometerSensor = accelerometerSensor;
 	}
-
 
 	@Override
 	public void result(int requestCode, int resultCode)
@@ -273,5 +275,17 @@ public class TripListPresenter implements TripListContract.Presenter
 	public void dropView()
 	{
 		mTripListView = null;
+	}
+
+	@Override
+	public void registerSensor()
+	{
+		mAccelerometerSensor.startSensor();
+	}
+
+	@Override
+	public void unregisterSensor()
+	{
+		mAccelerometerSensor.stopSensor();
 	}
 }

@@ -2,6 +2,13 @@
 <manifest package="eu.vmpay.drivestyle"
 		  xmlns:android="http://schemas.android.com/apk/res/android">
 
+	<uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+	<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+
+	<uses-feature
+		android:name="android.hardware.sensor.accelerometer"
+		android:required="true"/>
+
 	<application
 		android:name=".DriveStyleApplication"
 		android:allowBackup="true"

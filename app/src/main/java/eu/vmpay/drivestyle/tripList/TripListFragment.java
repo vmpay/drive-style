@@ -3,6 +3,7 @@ package eu.vmpay.drivestyle.tripList;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.support.v7.widget.LinearLayoutManager;
@@ -69,6 +70,7 @@ public class TripListFragment extends DaggerFragment implements TripListContract
 	};
 	private Unbinder unbinder;
 	private TripListRecyclerViewAdapter mListAdapter;
+	private boolean sensorActive = false;
 
 	@Inject
 	public TripListFragment()
@@ -134,6 +136,24 @@ public class TripListFragment extends DaggerFragment implements TripListContract
 				Snackbar.make(v, "Replace with your own action", Snackbar.LENGTH_LONG)
 						.setAction("Action", null).show();
 				// TODO: 10/11/17 launch add trip intent
+				if(sensorActive)
+				{
+					mPresenter.unregisterSensor();
+				}
+				else
+				{
+					Handler handler = new Handler();
+					handler.postDelayed(new Runnable()
+					{
+						@Override
+						public void run()
+						{
+							mPresenter.unregisterSensor();
+						}
+					}, 10_000);
+					mPresenter.registerSensor();
+				}
+				sensorActive = !sensorActive;
 				break;
 			default:
 
