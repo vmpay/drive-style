@@ -32,6 +32,8 @@
 			android:id="@+id/track_list"
 			android:layout_width="match_parent"
 			android:layout_height="match_parent"
+			android:paddingEnd="@dimen/list_item_padding"
+			android:paddingStart="@dimen/list_item_padding"
 			tools:listitem="@layout/track_list_item"/>
 
 	</LinearLayout>
