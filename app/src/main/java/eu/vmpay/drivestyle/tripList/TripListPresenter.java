@@ -1,5 +1,6 @@
 package eu.vmpay.drivestyle.tripList;
 
+import android.app.Activity;
 import android.support.annotation.NonNull;
 
 import java.util.ArrayList;
@@ -293,9 +294,9 @@ public class TripListPresenter implements TripListContract.Presenter
 	}
 
 	@Override
-	public void requestLocation()
+	public void requestLocation(Activity activity)
 	{
-		mFusedLocationProvider.connectClient();
+		mFusedLocationProvider.connectClient(activity);
 	}
 
 	@Override

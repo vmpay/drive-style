@@ -9,6 +9,7 @@ import dagger.Provides;
 import eu.vmpay.drivestyle.sensors.location.FusedLocationProvider;
 import eu.vmpay.drivestyle.sensors.location.FusedLocationProviderContract;
 import eu.vmpay.drivestyle.sensors.motion.AccelerometerSensor;
+import eu.vmpay.drivestyle.sensors.motion.AccelerometerSensorContract;
 
 /**
  * Created by Andrew on 22/10/2017.
@@ -18,7 +19,7 @@ public class SensorModule
 {
 	@Singleton
 	@Provides
-	AccelerometerSensor provideAccelerometerSensor(Application context)
+	AccelerometerSensorContract provideAccelerometerSensor(Application context)
 	{
 		return new AccelerometerSensor(context);
 	}

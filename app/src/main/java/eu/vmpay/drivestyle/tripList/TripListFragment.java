@@ -150,12 +150,12 @@ public class TripListFragment extends DaggerFragment implements TripListContract
 						public void run()
 						{
 //							mPresenter.unregisterSensor();
-							mPresenter.stopLocationRequest();
+//							mPresenter.stopLocationRequest();
 
 						}
 					}, 10_000);
 //					mPresenter.registerSensor();
-					mPresenter.requestLocation();
+					mPresenter.requestLocation(getActivity());
 				}
 				sensorActive = !sensorActive;
 				break;

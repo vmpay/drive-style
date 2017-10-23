@@ -1,7 +1,9 @@
 package eu.vmpay.drivestyle.sensors.location;
 
 import android.Manifest;
+import android.app.Activity;
 import android.content.Context;
+import android.content.IntentSender;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
@@ -12,11 +14,17 @@ import android.util.Log;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.PendingResult;
+import com.google.android.gms.common.api.ResultCallback;
+import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.LocationSettingsRequest;
+import com.google.android.gms.location.LocationSettingsResult;
+import com.google.android.gms.location.LocationSettingsStates;
+import com.google.android.gms.location.LocationSettingsStatusCodes;
 
 import java.util.Locale;
 
@@ -38,6 +46,8 @@ public class FusedLocationProvider implements FusedLocationProviderContract, Goo
 	private GoogleApiClient googleApiClient;
 	private LocationRequest locationRequest;
 	private final int REQUEST_CHECK_SETTINGS = 0x1;
+	private Activity activity;
+	private boolean isServiceConnected = false;
 
 	@Inject
 	public FusedLocationProvider(@Nullable Context mContext)
@@ -61,27 +71,30 @@ public class FusedLocationProvider implements FusedLocationProviderContract, Goo
 				.setInterval(1000)
 				.setFastestInterval(5000)
 		;
-
-		requestLocation();
+		isServiceConnected = true;
+		requestLocation(activity);
 	}
 
 	@Override
 	public void onConnectionSuspended(int i)
 	{
 		Log.i(TAG, "GoogleApiClient connection has been suspended");
+		isServiceConnected = false;
 	}
 
 	@Override
 	public void onConnectionFailed(@NonNull ConnectionResult connectionResult)
 	{
 		Log.i(TAG, "GoogleApiClient connection has failed");
+		isServiceConnected = false;
 	}
 
 	@Override
-	public void connectClient()
+	public void connectClient(Activity activity)
 	{
 		if(googleApiClient != null)
 		{
+			this.activity = activity;
 			googleApiClient.connect();
 		}
 	}
@@ -96,28 +109,69 @@ public class FusedLocationProvider implements FusedLocationProviderContract, Goo
 	}
 
 	@Override
-	public void requestLocation()
+	public void requestLocation(Activity activity)
 	{
-		if(ActivityCompat.checkSelfPermission(mContext, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
-				&& ActivityCompat.checkSelfPermission(mContext, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED)
+		if(!isServiceConnected)
 		{
-			// TODO: Consider calling
-			//    ActivityCompat#requestPermissions
-			// here to request the missing permissions, and then overriding
-			//   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-			//                                          int[] grantResults)
-			// to handle the case where the user grants the permission. See the documentation
-			// for ActivityCompat#requestPermissions for more details.
 			return;
 		}
-		LocationServices.FusedLocationApi.requestLocationUpdates(googleApiClient, locationRequest, this);
 
 		LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder()
 				.addLocationRequest(locationRequest);
 
-//		PendingResult<LocationSettingsResult> result =
-//				LocationServices.SettingsApi.checkLocationSettings(googleApiClient,
-//						builder.build());
+		PendingResult<LocationSettingsResult> result =
+				LocationServices.SettingsApi.checkLocationSettings(googleApiClient,
+						builder.build());
+
+		result.setResultCallback(new ResultCallback<LocationSettingsResult>()
+		{
+			@Override
+			public void onResult(@NonNull LocationSettingsResult locationSettingsResult)
+			{
+				final Status status = locationSettingsResult.getStatus();
+				final LocationSettingsStates states = locationSettingsResult.getLocationSettingsStates();
+				switch(status.getStatusCode())
+				{
+					case LocationSettingsStatusCodes.SUCCESS:
+						// All location settings are satisfied. The client can
+						// initialize location requests here.
+						if(ActivityCompat.checkSelfPermission(mContext, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
+								&& ActivityCompat.checkSelfPermission(mContext, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED)
+						{
+							// TODO: Consider calling
+							//    ActivityCompat#requestPermissions
+							// here to request the missing permissions, and then overriding
+							//   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+							//                                          int[] grantResults)
+							// to handle the case where the user grants the permission. See the documentation
+							// for ActivityCompat#requestPermissions for more details.
+							return;
+						}
+						LocationServices.FusedLocationApi.requestLocationUpdates(googleApiClient, locationRequest, FusedLocationProvider.this);
+						break;
+					case LocationSettingsStatusCodes.RESOLUTION_REQUIRED:
+						// Location settings are not satisfied, but this can be fixed
+						// by showing the user a dialog.
+						try
+						{
+							// Show the dialog by calling startResolutionForResult(),
+							// and check the result in onActivityResult().
+							status.startResolutionForResult(
+									FusedLocationProvider.this.activity,
+									REQUEST_CHECK_SETTINGS);
+						} catch(IntentSender.SendIntentException e)
+						{
+							// Ignore the error.
+						}
+						break;
+					case LocationSettingsStatusCodes.SETTINGS_CHANGE_UNAVAILABLE:
+						// Location settings are not satisfied. However, we have no way
+						// to fix the settings so we won't show the dialog.
+						break;
+				}
+			}
+		});
+
 
 //		Task<LocationSettingsResponse> result =
 //				LocationServices.getSettingsClient(mContext).checkLocationSettings(builder.build());

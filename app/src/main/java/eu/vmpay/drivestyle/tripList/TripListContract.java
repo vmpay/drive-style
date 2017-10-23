@@ -1,5 +1,6 @@
 package eu.vmpay.drivestyle.tripList;
 
+import android.app.Activity;
 import android.support.annotation.NonNull;
 
 import java.util.List;
@@ -74,7 +75,7 @@ public interface TripListContract
 
 		void unregisterSensor();
 
-		void requestLocation();
+		void requestLocation(Activity activity);
 
 		void stopLocationRequest();
 	}
