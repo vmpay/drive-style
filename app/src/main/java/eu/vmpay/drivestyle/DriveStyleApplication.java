@@ -40,6 +40,13 @@ public class DriveStyleApplication extends DaggerApplication
 		return appComponent;
 	}
 
+	@Override
+	public void onCreate()
+	{
+		super.onCreate();
+		fusedLocationProvider.connectClient();
+	}
+
 	@VisibleForTesting
 	public TripsRepository getTripsRepository()
 	{

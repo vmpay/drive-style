@@ -8,7 +8,7 @@ import android.app.Activity;
 
 public interface FusedLocationProviderContract
 {
-	void connectClient(Activity activity);
+	void connectClient();
 
 	void disconnectClient();
 

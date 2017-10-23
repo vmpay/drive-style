@@ -66,13 +66,13 @@ public class FusedLocationProvider implements FusedLocationProviderContract, Goo
 	@Override
 	public void onConnected(@Nullable Bundle bundle)
 	{
+		Log.i(TAG, "GoogleApiClient connection has been established");
 		locationRequest = LocationRequest.create()
 				.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
 				.setInterval(1000)
 				.setFastestInterval(5000)
 		;
 		isServiceConnected = true;
-		requestLocation(activity);
 	}
 
 	@Override
@@ -90,11 +90,10 @@ public class FusedLocationProvider implements FusedLocationProviderContract, Goo
 	}
 
 	@Override
-	public void connectClient(Activity activity)
+	public void connectClient()
 	{
 		if(googleApiClient != null)
 		{
-			this.activity = activity;
 			googleApiClient.connect();
 		}
 	}

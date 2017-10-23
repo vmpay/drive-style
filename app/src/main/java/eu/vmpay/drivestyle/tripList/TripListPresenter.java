@@ -296,7 +296,7 @@ public class TripListPresenter implements TripListContract.Presenter
 	@Override
 	public void requestLocation(Activity activity)
 	{
-		mFusedLocationProvider.connectClient(activity);
+		mFusedLocationProvider.requestLocation(activity);
 	}
 
 	@Override
