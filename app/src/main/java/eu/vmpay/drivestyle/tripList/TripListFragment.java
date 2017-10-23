@@ -138,7 +138,8 @@ public class TripListFragment extends DaggerFragment implements TripListContract
 				// TODO: 10/11/17 launch add trip intent
 				if(sensorActive)
 				{
-					mPresenter.unregisterSensor();
+//					mPresenter.unregisterSensor();
+					mPresenter.stopLocationRequest();
 				}
 				else
 				{
@@ -148,10 +149,13 @@ public class TripListFragment extends DaggerFragment implements TripListContract
 						@Override
 						public void run()
 						{
-							mPresenter.unregisterSensor();
+//							mPresenter.unregisterSensor();
+							mPresenter.stopLocationRequest();
+
 						}
 					}, 10_000);
-					mPresenter.registerSensor();
+//					mPresenter.registerSensor();
+					mPresenter.requestLocation();
 				}
 				sensorActive = !sensorActive;
 				break;

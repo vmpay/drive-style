@@ -54,6 +54,7 @@ ext {
     rxandroidVersion = '2.0.1'
     sqlbriteVersion = '2.0.0'
     butterKnifeVersion = '8.8.1'
+    googlePlayServicesVersion = '11.4.2'
 }
 
 //When there is an error in code generation you will may see

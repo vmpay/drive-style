@@ -9,6 +9,10 @@
 		android:name="android.hardware.sensor.accelerometer"
 		android:required="true"/>
 
+	<meta-data
+		android:name="com.google.android.gms.version"
+		android:value="@integer/google_play_services_version"/>
+
 	<application
 		android:name=".DriveStyleApplication"
 		android:allowBackup="true"

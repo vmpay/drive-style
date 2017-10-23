@@ -6,6 +6,8 @@ import javax.inject.Singleton;
 
 import dagger.Module;
 import dagger.Provides;
+import eu.vmpay.drivestyle.sensors.location.FusedLocationProvider;
+import eu.vmpay.drivestyle.sensors.location.FusedLocationProviderContract;
 import eu.vmpay.drivestyle.sensors.motion.AccelerometerSensor;
 
 /**
@@ -19,5 +21,12 @@ public class SensorModule
 	AccelerometerSensor provideAccelerometerSensor(Application context)
 	{
 		return new AccelerometerSensor(context);
+	}
+
+	@Singleton
+	@Provides
+	FusedLocationProviderContract provideFusedLocationProvider(Application context)
+	{
+		return new FusedLocationProvider(context);
 	}
 }

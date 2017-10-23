@@ -11,6 +11,7 @@ import dagger.android.DaggerApplication;
 import eu.vmpay.drivestyle.data.source.TripsRepository;
 import eu.vmpay.drivestyle.di.AppComponent;
 import eu.vmpay.drivestyle.di.DaggerAppComponent;
+import eu.vmpay.drivestyle.sensors.location.FusedLocationProviderContract;
 import eu.vmpay.drivestyle.sensors.motion.AccelerometerSensor;
 
 /**
@@ -27,6 +28,9 @@ public class DriveStyleApplication extends DaggerApplication
 
 	@Inject
 	AccelerometerSensor accelerometerSensor;
+
+	@Inject
+	FusedLocationProviderContract fusedLocationProvider;
 
 	@Override
 	protected AndroidInjector<? extends DaggerApplication> applicationInjector()

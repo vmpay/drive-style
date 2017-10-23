@@ -12,6 +12,7 @@ import eu.vmpay.drivestyle.data.Trip;
 import eu.vmpay.drivestyle.data.source.TripDataSource;
 import eu.vmpay.drivestyle.data.source.TripsRepository;
 import eu.vmpay.drivestyle.di.ActivityScoped;
+import eu.vmpay.drivestyle.sensors.location.FusedLocationProviderContract;
 import eu.vmpay.drivestyle.sensors.motion.AccelerometerSensor;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -35,6 +36,7 @@ public class TripListPresenter implements TripListContract.Presenter
 {
 	private final TripsRepository mTripsRepository;
 	private final AccelerometerSensor mAccelerometerSensor;
+	private FusedLocationProviderContract mFusedLocationProvider;
 	@Nullable
 	private TripListContract.View mTripListView;
 
@@ -47,10 +49,11 @@ public class TripListPresenter implements TripListContract.Presenter
 	 * with {@code @Nullable} values.
 	 */
 	@Inject
-	TripListPresenter(TripsRepository tripsRepository, AccelerometerSensor accelerometerSensor)
+	TripListPresenter(TripsRepository tripsRepository, AccelerometerSensor accelerometerSensor, FusedLocationProviderContract fusedLocationProvider)
 	{
 		mTripsRepository = tripsRepository;
 		mAccelerometerSensor = accelerometerSensor;
+		mFusedLocationProvider = fusedLocationProvider;
 	}
 
 	@Override
@@ -287,5 +290,17 @@ public class TripListPresenter implements TripListContract.Presenter
 	public void unregisterSensor()
 	{
 		mAccelerometerSensor.stopSensor();
+	}
+
+	@Override
+	public void requestLocation()
+	{
+		mFusedLocationProvider.connectClient();
+	}
+
+	@Override
+	public void stopLocationRequest()
+	{
+		mFusedLocationProvider.stopLocationRequest();
 	}
 }

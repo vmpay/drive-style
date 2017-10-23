@@ -73,5 +73,9 @@ public interface TripListContract
 		void registerSensor();
 
 		void unregisterSensor();
+
+		void requestLocation();
+
+		void stopLocationRequest();
 	}
 }
