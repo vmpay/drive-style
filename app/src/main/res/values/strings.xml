@@ -24,4 +24,6 @@
 	<string name="no_trips_brake">You have no brake scenarios</string>
 	<string name="no_trips_turn">You have no turn scenarios</string>
 	<string name="no_trips_lane_change">You have no lane change scenarios</string>
+	<string name="title_activity_add_trip_activty">AddTripActivty</string>
+	<string name="action_settings">Settings</string>
 </resources>

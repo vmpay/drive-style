@@ -8,7 +8,6 @@ import java.util.List;
 import eu.vmpay.drivestyle.BasePresenter;
 import eu.vmpay.drivestyle.BaseView;
 import eu.vmpay.drivestyle.data.Trip;
-import eu.vmpay.drivestyle.tripDetails.TripDetailContract;
 
 /**
  * Created by andrew on 9/26/17.
@@ -16,7 +15,7 @@ import eu.vmpay.drivestyle.tripDetails.TripDetailContract;
 
 public interface TripListContract
 {
-	interface View extends BaseView<TripDetailContract.Presenter>
+	interface View extends BaseView<Presenter>
 	{
 		void setLoadingIndicator(boolean active);
 

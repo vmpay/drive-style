@@ -42,6 +42,15 @@
 				android:name="android.support.PARENT_ACTIVITY"
 				android:value="eu.vmpay.drivestyle.tripList.TripListActivity"/>
 		</activity>
+		<activity
+			android:name=".addTrip.AddTripActivity"
+			android:label="@string/title_activity_add_trip_activty"
+			android:parentActivityName=".tripList.TripListActivity"
+			android:theme="@style/AppTheme.NoActionBar">
+			<meta-data
+				android:name="android.support.PARENT_ACTIVITY"
+				android:value="eu.vmpay.drivestyle.tripList.TripListActivity"/>
+		</activity>
 	</application>
 
 </manifest>
