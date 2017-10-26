@@ -48,6 +48,7 @@ public class FusedLocationProvider implements FusedLocationProviderContract, Goo
 	private final int REQUEST_CHECK_SETTINGS = 0x1;
 	private Activity activity;
 	private boolean isServiceConnected = false;
+	private final int ACCESS_FINE_LOCATION_CODE = 2;
 
 	@Inject
 	public FusedLocationProvider(@Nullable Context mContext)
@@ -108,12 +109,14 @@ public class FusedLocationProvider implements FusedLocationProviderContract, Goo
 	}
 
 	@Override
-	public void requestLocation(Activity activity)
+	public void requestLocation(final Activity activity)
 	{
 		if(!isServiceConnected)
 		{
 			return;
 		}
+
+		this.activity = activity;
 
 		LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder()
 				.addLocationRequest(locationRequest);
@@ -144,6 +147,9 @@ public class FusedLocationProvider implements FusedLocationProviderContract, Goo
 							//                                          int[] grantResults)
 							// to handle the case where the user grants the permission. See the documentation
 							// for ActivityCompat#requestPermissions for more details.
+							ActivityCompat.requestPermissions(activity,
+									new String[] { Manifest.permission.ACCESS_FINE_LOCATION },
+									ACCESS_FINE_LOCATION_CODE);
 							return;
 						}
 						LocationServices.FusedLocationApi.requestLocationUpdates(googleApiClient, locationRequest, FusedLocationProvider.this);
@@ -170,46 +176,6 @@ public class FusedLocationProvider implements FusedLocationProviderContract, Goo
 				}
 			}
 		});
-
-
-//		Task<LocationSettingsResponse> result =
-//				LocationServices.getSettingsClient(mContext).checkLocationSettings(builder.build());
-//		result.addOnCompleteListener(new OnCompleteListener<LocationSettingsResponse>()
-//		{
-//			@Override
-//			public void onComplete(@NonNull Task<LocationSettingsResponse> task)
-//			{
-//				try {
-//					LocationSettingsResponse response = task.getResult(ApiException.class);
-//					// All location settings are satisfied. The client can initialize location
-//					// requests here.
-//				} catch (ApiException exception) {
-//					switch (exception.getStatusCode()) {
-//						case LocationSettingsStatusCodes.RESOLUTION_REQUIRED:
-//							// Location settings are not satisfied. But could be fixed by showing the
-//							// user a dialog.
-//							try {
-//								// Cast to a resolvable exception.
-//								ResolvableApiException resolvable = (ResolvableApiException) exception;
-//								// Show the dialog by calling startResolutionForResult(),
-//								// and check the result in onActivityResult().
-//								resolvable.startResolutionForResult(
-//										mContext,
-//										REQUEST_CHECK_SETTINGS);
-//							} catch (IntentSender.SendIntentException e) {
-//								// Ignore the error.
-//							} catch (ClassCastException e) {
-//								// Ignore, should be an impossible error.
-//							}
-//							break;
-//						case LocationSettingsStatusCodes.SETTINGS_CHANGE_UNAVAILABLE:
-//							// Location settings are not satisfied. However, we have no way to fix the
-//							// settings so we won't show the dialog.
-//							break;
-//					}
-//				}
-//			}
-//		});
 	}
 
 	@Override
