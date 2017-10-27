@@ -74,6 +74,7 @@ dependencies {
     compile "com.google.android.gms:play-services-location:$rootProject.googlePlayServicesVersion"
     compile "com.jakewharton:butterknife:$rootProject.butterKnifeVersion"
     apt "com.jakewharton:butterknife-compiler:$rootProject.butterKnifeVersion"
+    compile 'com.stepstone.stepper:material-stepper:4.3.1'
 
     // Dagger dependencies
     apt "com.google.dagger:dagger-compiler:$rootProject.daggerVersion"

@@ -12,6 +12,8 @@ public interface AddTripContract
 	interface View extends BaseView<Presenter>
 	{
 		boolean isActive();
+
+		void showStep(int stepIndex);
 	}
 
 	interface Presenter extends BasePresenter<View>

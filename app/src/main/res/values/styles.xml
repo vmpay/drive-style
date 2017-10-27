@@ -17,4 +17,32 @@
 
 	<style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light"/>
 
+	<style name="stepperStyle">
+		<item name="android:textSize">@dimen/dot_size</item>
+		<item name="android:textColor">@color/colorGrey</item>
+		<item name="android:padding">@dimen/small_padding</item>
+	</style>
+
+	<style name="FlatButtonStyle" parent="Widget.AppCompat.Button.Borderless">
+		<item name="android:textColor">@color/colorGrey</item>
+	</style>
+
+	<style name="ProceedButtonStyle" parent="FlatButtonStyle">
+		<item name="android:drawableRight">@drawable/ic_keyboard_arrow_right_black_24dp</item>
+	</style>
+
+	<style name="BackButtonStyle" parent="FlatButtonStyle">
+		<item name="android:drawableLeft">@drawable/ic_keyboard_arrow_left_black_24dp</item>
+	</style>
+
+	<style name="StepTitleStyle">
+		<item name="android:textAlignment">center</item>
+		<item name="android:padding">@dimen/medium_padding</item>
+		<item name="android:textSize">@dimen/text_header</item>
+	</style>
+
+	<style name="RadioButtonStyle" parent="Widget.AppCompat.CompoundButton.RadioButton">
+		<item name="android:textColor">@color/colorGrey</item>
+	</style>
+
 </resources>

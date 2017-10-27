@@ -24,7 +24,7 @@ public class AddTripActivity extends DaggerAppCompatActivity
 	protected void onCreate(Bundle savedInstanceState)
 	{
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_add_trip_activty);
+		setContentView(R.layout.activity_add_trip);
 		Toolbar toolbar = findViewById(R.id.toolbar);
 		setSupportActionBar(toolbar);
 
