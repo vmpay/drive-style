@@ -54,6 +54,8 @@ public class AddTripFragment extends Fragment implements AddTripContract.View
 	@BindView(R.id.tvThird)
 	TextView tvThird;
 
+	private int currentStep = 1;
+
 	@Inject
 	public AddTripFragment()
 	{
@@ -136,7 +138,7 @@ public class AddTripFragment extends Fragment implements AddTripContract.View
 		tvThird.setTextColor(getResources().getColor(R.color.colorGrey));
 	}
 
-	@OnClick({ R.id.fab })
+	@OnClick({ R.id.btnNext })
 	public void onClick(View v)
 	{
 		switch(v.getId())
@@ -144,6 +146,10 @@ public class AddTripFragment extends Fragment implements AddTripContract.View
 			case R.id.fab:
 				Snackbar.make(v, "Replace with your own action", Snackbar.LENGTH_LONG)
 						.setAction("Action", null).show();
+				break;
+			case R.id.btnNext:
+				currentStep++;
+				showStep(currentStep);
 				break;
 			default:
 				break;
