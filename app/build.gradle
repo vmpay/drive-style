@@ -82,7 +82,5 @@ dependencies {
     compile "com.google.dagger:dagger-android-support:$rootProject.daggerVersion"
     apt "com.google.dagger:dagger-android-processor:$rootProject.daggerVersion"
 
-    compile 'com.android.support.constraint:constraint-layout:1.0.2'
     testCompile 'junit:junit:4.12'
-    provided 'org.glassfish:javax.annotation:10.0-b28'
 }

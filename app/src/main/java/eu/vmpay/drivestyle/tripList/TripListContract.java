@@ -62,6 +62,8 @@ public interface TripListContract
 
 		void openTripDetails(@NonNull Trip requestedTrip);
 
+		void openAddTripDetails();
+
 		TripListFilterType getFiltering();
 
 		void setFiltering(TripListFilterType requestType);

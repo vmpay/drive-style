@@ -3,7 +3,6 @@ package eu.vmpay.drivestyle.tripList;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.support.v7.widget.LinearLayoutManager;
@@ -31,9 +30,9 @@ import butterknife.OnClick;
 import butterknife.Unbinder;
 import dagger.android.support.DaggerFragment;
 import eu.vmpay.drivestyle.R;
+import eu.vmpay.drivestyle.addTrip.AddTripActivity;
 import eu.vmpay.drivestyle.data.Trip;
 import eu.vmpay.drivestyle.tripDetails.TripDetailActivity;
-import eu.vmpay.drivestyle.tripList.dummy.DummyContent;
 
 /**
  * Created by andrew on 9/26/17.
@@ -44,8 +43,6 @@ public class TripListFragment extends DaggerFragment implements TripListContract
 	@Inject
 	TripListContract.Presenter mPresenter;
 
-	//	@BindView(R.id.tvFilteringLabel)
-//	TextView tvFilteringLabel;
 	@BindView(R.id.track_list)
 	RecyclerView recyclerView;
 	@BindView(R.id.llTripList)
@@ -70,7 +67,6 @@ public class TripListFragment extends DaggerFragment implements TripListContract
 	};
 	private Unbinder unbinder;
 	private TripListRecyclerViewAdapter mListAdapter;
-	private boolean sensorActive = false;
 
 	@Inject
 	public TripListFragment()
@@ -133,31 +129,9 @@ public class TripListFragment extends DaggerFragment implements TripListContract
 		switch(v.getId())
 		{
 			case R.id.fab:
-				Snackbar.make(v, "Replace with your own action", Snackbar.LENGTH_LONG)
-						.setAction("Action", null).show();
-				// TODO: 10/11/17 launch add trip intent
-				if(sensorActive)
-				{
-//					mPresenter.unregisterSensor();
-					mPresenter.stopLocationRequest();
-				}
-				else
-				{
-					Handler handler = new Handler();
-					handler.postDelayed(new Runnable()
-					{
-						@Override
-						public void run()
-						{
-//							mPresenter.unregisterSensor();
-//							mPresenter.stopLocationRequest();
-
-						}
-					}, 10_000);
-//					mPresenter.registerSensor();
-					mPresenter.requestLocation(getActivity());
-				}
-				sensorActive = !sensorActive;
+//				Snackbar.make(v, "Replace with your own action", Snackbar.LENGTH_LONG)
+//						.setAction("Action", null).show();
+				mPresenter.openAddTripDetails();
 				break;
 			default:
 
@@ -206,8 +180,8 @@ public class TripListFragment extends DaggerFragment implements TripListContract
 	@Override
 	public void showAddTrip()
 	{
-//		Intent intent = new Intent(getContext(), AddEditTaskActivity.class);
-//		startActivityForResult(intent, AddEditTaskActivity.REQUEST_ADD_TASK);
+		Intent intent = new Intent(getContext(), AddTripActivity.class);
+		startActivityForResult(intent, AddTripActivity.REQUEST_ADD_TRIP);
 	}
 
 	@Override
@@ -380,110 +354,5 @@ public class TripListFragment extends DaggerFragment implements TripListContract
 	public interface TripItemListener
 	{
 		void onTripClick(Trip clickedTrip);
-	}
-
-	public class SimpleItemRecyclerViewAdapter
-			extends RecyclerView.Adapter<SimpleItemRecyclerViewAdapter.ViewHolder>
-	{
-
-		private final List<DummyContent.DummyItem> mValues;
-		private TripItemListener mItemListener;
-
-		public SimpleItemRecyclerViewAdapter(List<DummyContent.DummyItem> items, TripItemListener itemListener)
-		{
-			mValues = items;
-			mItemListener = itemListener;
-		}
-
-		public void replaceData(List<Trip> trips)
-		{
-			setList(trips);
-			notifyDataSetChanged();
-		}
-
-		private void setList(List<Trip> trips)
-		{
-//			mTasks = checkNotNull(trips);
-		}
-
-		@Override
-		public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType)
-		{
-			View view = LayoutInflater.from(parent.getContext())
-					.inflate(R.layout.track_list_content, parent, false);
-			return new ViewHolder(view);
-		}
-
-		@Override
-		public void onBindViewHolder(final ViewHolder holder, int position)
-		{
-			final DummyContent.DummyItem item = mValues.get(position);
-			holder.mItem = item;
-			holder.mIdView.setText(mValues.get(position).id);
-			holder.mContentView.setText(mValues.get(position).content);
-
-
-			holder.mView.setOnClickListener(new View.OnClickListener()
-			{
-
-				@Override
-				public void onClick(View view)
-				{
-					mItemListener.onTripClick(new Trip(Long.parseLong(item.id), item.content, 0, 0, 0.0, "Type", TripListFilterType.BRAKE));
-				}
-			});
-//			{
-//				@Override
-//				public void onClick(View v)
-//				{
-//					if(mTwoPane)
-//					{
-//						Bundle arguments = new Bundle();
-//						arguments.putString(TripDetailFragment.ARG_ITEM_ID, holder.trip.id);
-//						TripDetailFragment fragment = new TripDetailFragment();
-//						fragment.setArguments(arguments);
-//						getSupportFragmentManager().beginTransaction()
-//								.replace(R.id.track_detail_container, fragment)
-//								.commit();
-//					}
-//					else
-//					{
-//						Context context = v.getContext();
-//						Intent intent = new Intent(context, TripDetailActivity.class);
-//						intent.putExtra(TripDetailFragment.ARG_ITEM_ID, holder.trip.id);
-//
-//						context.startActivity(intent);
-//					}
-//				}
-//			});
-		}
-
-		@Override
-		public int getItemCount()
-		{
-			return mValues.size();
-		}
-
-		public class ViewHolder extends RecyclerView.ViewHolder
-		{
-			public final View mView;
-			public final TextView mIdView;
-			public final TextView mContentView;
-			public DummyContent.DummyItem mItem;
-
-			public ViewHolder(View view)
-			{
-				super(view);
-				mView = view;
-				mIdView = view.findViewById(R.id.id);
-				mContentView = view.findViewById(R.id.content);
-			}
-
-			@Override
-			public String toString()
-			{
-				return super.toString() + " '" + mContentView.getText() + "'";
-			}
-		}
 	}
 }

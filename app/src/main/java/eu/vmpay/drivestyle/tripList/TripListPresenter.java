@@ -249,6 +249,15 @@ public class TripListPresenter implements TripListContract.Presenter
 	}
 
 	@Override
+	public void openAddTripDetails()
+	{
+		if(mTripListView != null)
+		{
+			mTripListView.showAddTrip();
+		}
+	}
+
+	@Override
 	public TripListFilterType getFiltering()
 	{
 		return mCurrentFiltering;

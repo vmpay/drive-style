@@ -2,6 +2,8 @@ package eu.vmpay.drivestyle.di;
 
 import dagger.Module;
 import dagger.android.ContributesAndroidInjector;
+import eu.vmpay.drivestyle.addTrip.AddTripActivity;
+import eu.vmpay.drivestyle.addTrip.AddTripModule;
 import eu.vmpay.drivestyle.tripDetails.TripDetailActivity;
 import eu.vmpay.drivestyle.tripDetails.TripDetailModule;
 import eu.vmpay.drivestyle.tripList.TripListActivity;
@@ -25,4 +27,8 @@ public abstract class ActivityBindingModule
 	@ActivityScoped
 	@ContributesAndroidInjector(modules = TripDetailModule.class)
 	abstract TripDetailActivity tripDetailActivity();
+
+	@ActivityScoped
+	@ContributesAndroidInjector(modules = AddTripModule.class)
+	abstract AddTripActivity addTripActivity();
 }

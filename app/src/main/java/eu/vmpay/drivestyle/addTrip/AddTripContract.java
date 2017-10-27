@@ -16,6 +16,5 @@ public interface AddTripContract
 
 	interface Presenter extends BasePresenter<View>
 	{
-		void deleteTrip();
 	}
 }
