@@ -118,6 +118,7 @@ public class AddTripFragment extends Fragment implements AddTripContract.View
 				tvThird.setTextColor(getResources().getColor(R.color.colorAccent));
 				break;
 			default:
+				this.currentStep = 1;
 				llFirstStep.setVisibility(View.VISIBLE);
 				tvFirst.setText(R.string.stepper_marked);
 				tvFirst.setTextColor(getResources().getColor(R.color.colorAccent));
@@ -129,7 +130,7 @@ public class AddTripFragment extends Fragment implements AddTripContract.View
 	{
 		llFirstStep.setVisibility(View.GONE);
 		llSecondStep.setVisibility(View.GONE);
-		llFirstStep.setVisibility(View.GONE);
+		llThirdStep.setVisibility(View.GONE);
 		tvFirst.setText(R.string.stepper_empty);
 		tvSecond.setText(R.string.stepper_empty);
 		tvThird.setText(R.string.stepper_empty);
