@@ -18,6 +18,8 @@ final class AddTripPresenter implements AddTripContract.Presenter
 	@Nullable
 	private AddTripContract.View addTripView;
 
+	private int currentStep = 1;
+
 	@Inject
 	public AddTripPresenter(AccelerometerSensorContract accelerometerSensor, FusedLocationProviderContract fusedLocationProvider)
 	{
@@ -35,5 +37,21 @@ final class AddTripPresenter implements AddTripContract.Presenter
 	public void dropView()
 	{
 		addTripView = null;
+	}
+
+	@Override
+	public void showNext()
+	{
+		switch(currentStep)
+		{
+			case 1:
+				break;
+			case 2:
+				break;
+			case 3:
+				break;
+			default:
+				break;
+		}
 	}
 }

@@ -44,7 +44,7 @@ public class DriveStyleApplication extends DaggerApplication
 	public void onCreate()
 	{
 		super.onCreate();
-		fusedLocationProvider.connectClient();
+//		fusedLocationProvider.connectClient();
 	}
 
 	@VisibleForTesting

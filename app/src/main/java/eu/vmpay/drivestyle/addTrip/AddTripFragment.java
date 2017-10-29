@@ -149,8 +149,9 @@ public class AddTripFragment extends Fragment implements AddTripContract.View
 						.setAction("Action", null).show();
 				break;
 			case R.id.btnNext:
-				currentStep++;
-				showStep(currentStep);
+				mPresenter.showNext();
+//				currentStep++;
+//				showStep(currentStep);
 				break;
 			default:
 				break;
