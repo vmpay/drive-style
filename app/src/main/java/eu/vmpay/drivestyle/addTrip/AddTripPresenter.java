@@ -31,7 +31,7 @@ final class AddTripPresenter implements AddTripContract.Presenter, Accelerometer
 	private AddTripContract.View addTripView;
 
 	private boolean accCalibrationFinished = false;
-	private HashMap<Long, Double[]> motionDataMap = new HashMap<>();
+	private HashMap<Long, Double[]> motionDataMap = new HashMap<>(), motionDataMapCopy = new HashMap<>();
 	private Handler recyclerHandler = new Handler();
 
 	private int currentStep = 1;
@@ -101,14 +101,14 @@ final class AddTripPresenter implements AddTripContract.Presenter, Accelerometer
 	@Override
 	public void saveData(String tripTitle, String type, TripListFilterType scenario)
 	{
-		if(motionDataMap.isEmpty())
+		if(motionDataMapCopy.isEmpty())
 		{
 			return;
 		}
 
-		long startTimestamp = motionDataMap.keySet().iterator().next();
-		long stopTimestamp = motionDataMap.keySet().iterator().next();
-		final Iterator<Long> iterator = motionDataMap.keySet().iterator();
+		long startTimestamp = motionDataMapCopy.keySet().iterator().next();
+		long stopTimestamp = motionDataMapCopy.keySet().iterator().next();
+		final Iterator<Long> iterator = motionDataMapCopy.keySet().iterator();
 		while(iterator.hasNext())
 		{
 			stopTimestamp = iterator.next();
@@ -117,7 +117,7 @@ final class AddTripPresenter implements AddTripContract.Presenter, Accelerometer
 		Trip trip = new Trip(tripTitle.isEmpty() ? "Trip " + new Date(startTimestamp).toString() : tripTitle, startTimestamp, stopTimestamp, type, scenario);
 		Log.d(TAG, trip.toString());
 
-		for(Map.Entry<Long, Double[]> entry : motionDataMap.entrySet())
+		for(Map.Entry<Long, Double[]> entry : motionDataMapCopy.entrySet())
 		{
 			AccelerometerData accelerometerData = new AccelerometerData(-1, entry.getKey(), entry.getValue()[0], entry.getValue()[1], entry.getValue()[2]);
 			Log.d(TAG, accelerometerData.toString());
@@ -133,7 +133,7 @@ final class AddTripPresenter implements AddTripContract.Presenter, Accelerometer
 			{
 				accCalibrationFinished = true;
 				addTripView.motionSensorCalibrated();
-//				recyclerHandler.postDelayed(recycleMap, 5_000);
+				recyclerHandler.postDelayed(recycleMap, 5_000);
 			}
 			if(currentStep == 2)
 			{
@@ -152,15 +152,15 @@ final class AddTripPresenter implements AddTripContract.Presenter, Accelerometer
 		}
 
 		long currentTimeStamp = System.currentTimeMillis();
-		Iterator<Long> iterator = motionDataMap.keySet().iterator();
-		if(iterator.hasNext())
-		{
-			Long oldTimestamp = iterator.next();
-			if(currentTimeStamp - oldTimestamp > 5_000)
-			{
-				motionDataMap.remove(oldTimestamp);
-			}
-		}
+//		Iterator<Long> iterator = motionDataMap.keySet().iterator();
+//		if(iterator.hasNext())
+//		{
+//			Long oldTimestamp = iterator.next();
+//			if(currentTimeStamp - oldTimestamp > 5_000)
+//			{
+//				motionDataMap.remove(oldTimestamp);
+//			}
+//		}
 		motionDataMap.put(currentTimeStamp, accelerationArray);
 	}
 
@@ -169,6 +169,9 @@ final class AddTripPresenter implements AddTripContract.Presenter, Accelerometer
 		@Override
 		public void run()
 		{
+//			motionDataMapCopy.clear();
+			motionDataMapCopy.putAll(motionDataMap);
+			motionDataMap.clear();
 			clearOldData();
 			recyclerHandler.postDelayed(recycleMap, 5_000);
 		}
@@ -177,11 +180,11 @@ final class AddTripPresenter implements AddTripContract.Presenter, Accelerometer
 	private void clearOldData()
 	{
 		long currentTimeStamp = System.currentTimeMillis();
-		for(Long timestamp : motionDataMap.keySet())
+		for(Long timestamp : motionDataMapCopy.keySet())
 		{
 			if(currentTimeStamp - timestamp > 5_000)
 			{
-				motionDataMap.remove(timestamp);
+				motionDataMapCopy.remove(timestamp);
 			}
 		}
 	}
