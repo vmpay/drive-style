@@ -41,4 +41,5 @@
 	<string name="acceleration_y">Acceleration Y</string>
 	<string name="acceleration_z">Acceleration Z</string>
 	<string name="title">Title</string>
+	<string name="button_done">Done</string>
 </resources>

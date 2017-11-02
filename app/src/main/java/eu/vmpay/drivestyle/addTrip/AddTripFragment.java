@@ -1,24 +1,31 @@
 package eu.vmpay.drivestyle.addTrip;
 
 import android.os.Bundle;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
+import android.widget.RadioButton;
 import android.widget.TextView;
+
+import java.util.Locale;
 
 import javax.inject.Inject;
 
 import butterknife.BindView;
+import butterknife.BindViews;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import butterknife.Unbinder;
 import eu.vmpay.drivestyle.R;
 import eu.vmpay.drivestyle.di.ActivityScoped;
+import eu.vmpay.drivestyle.tripList.TripListFilterType;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -28,33 +35,32 @@ import static com.google.common.base.Preconditions.checkNotNull;
 @ActivityScoped
 public class AddTripFragment extends Fragment implements AddTripContract.View
 {
+	private static final String TAG = "AddTripFragment";
+
 	@Inject
 	AddTripContract.Presenter mPresenter;
 
 	private Unbinder unbinder;
+	private int currentStep = 0;
 
-	@BindView(R.id.llFirstStep)
-	LinearLayout llFirstStep;
-	@BindView(R.id.llSecondStep)
-	LinearLayout llSecondStep;
-	@BindView(R.id.llThirdStep)
-	LinearLayout llThirdStep;
-	@BindView(R.id.pbAcc)
-	ProgressBar pbAcc;
-	@BindView(R.id.pbLocation)
-	ProgressBar pbLocation;
-	@BindView(R.id.ivAcc)
-	ImageView ivAcc;
-	@BindView(R.id.ivLocation)
-	ImageView ivLocation;
-	@BindView(R.id.tvFirst)
-	TextView tvFirst;
-	@BindView(R.id.tvSecond)
-	TextView tvSecond;
-	@BindView(R.id.tvThird)
-	TextView tvThird;
+	@BindView(R.id.llFirstStep) LinearLayout llFirstStep;
+	@BindView(R.id.llSecondStep) LinearLayout llSecondStep;
+	@BindView(R.id.llThirdStep) LinearLayout llThirdStep;
 
-	private int currentStep = 1;
+	@BindView(R.id.pbAcc) ProgressBar pbAcc;
+	@BindView(R.id.pbLocation) ProgressBar pbLocation;
+	@BindView(R.id.ivAcc) ImageView ivAcc;
+	@BindView(R.id.ivLocation) ImageView ivLocation;
+
+	@BindViews({ R.id.tvAccX, R.id.tvAccY, R.id.tvAccZ }) TextView[] tvAcceleration;
+	@BindView(R.id.etName) EditText etName;
+	@BindViews({ R.id.rbnBrake, R.id.rbnTurn, R.id.rbnLaneChange }) RadioButton[] radioButtons;
+
+	@BindView(R.id.tvFirst) TextView tvFirst;
+	@BindView(R.id.tvSecond) TextView tvSecond;
+	@BindView(R.id.tvThird) TextView tvThird;
+	@BindView(R.id.btnNext) Button btnNext;
+
 
 	@Inject
 	public AddTripFragment()
@@ -76,13 +82,24 @@ public class AddTripFragment extends Fragment implements AddTripContract.View
 	@Override
 	public void onResume()
 	{
+		Log.d(TAG, "onResume");
 		super.onResume();
 		mPresenter.takeView(this);
+		mPresenter.startMotionSensor();
+	}
+
+	@Override
+	public void onPause()
+	{
+		Log.d(TAG, "onPause");
+		mPresenter.stopMotionSensor();
+		super.onPause();
 	}
 
 	@Override
 	public void onDestroy()
 	{
+		Log.d(TAG, "onDestroy");
 		mPresenter.dropView();
 		unbinder.unbind();
 		super.onDestroy();
@@ -99,6 +116,7 @@ public class AddTripFragment extends Fragment implements AddTripContract.View
 	{
 		checkNotNull(stepIndex);
 
+		currentStep = stepIndex;
 		clearStepper();
 		switch(stepIndex)
 		{
@@ -106,6 +124,7 @@ public class AddTripFragment extends Fragment implements AddTripContract.View
 				llFirstStep.setVisibility(View.VISIBLE);
 				tvFirst.setText(R.string.stepper_marked);
 				tvFirst.setTextColor(getResources().getColor(R.color.colorAccent));
+				btnNext.setText(getString(R.string.button_next));
 				break;
 			case 2:
 				llSecondStep.setVisibility(View.VISIBLE);
@@ -116,13 +135,46 @@ public class AddTripFragment extends Fragment implements AddTripContract.View
 				llThirdStep.setVisibility(View.VISIBLE);
 				tvThird.setText(R.string.stepper_marked);
 				tvThird.setTextColor(getResources().getColor(R.color.colorAccent));
+				btnNext.setText(getString(R.string.button_done));
+				break;
+			case 4:
+				TripListFilterType scenario = TripListFilterType.BRAKE;
+				if(radioButtons[1].isChecked())
+				{
+					scenario = TripListFilterType.TURN;
+				}
+				if(radioButtons[2].isChecked())
+				{
+					scenario = TripListFilterType.LANE_CHANGE;
+				}
+				mPresenter.saveData(etName.getText().toString(), "OnGo", scenario);
 				break;
 			default:
-				this.currentStep = 1;
 				llFirstStep.setVisibility(View.VISIBLE);
 				tvFirst.setText(R.string.stepper_marked);
 				tvFirst.setTextColor(getResources().getColor(R.color.colorAccent));
+				btnNext.setText(getString(R.string.button_next));
 				break;
+		}
+	}
+
+	@Override
+	public void motionSensorCalibrated()
+	{
+		pbAcc.setVisibility(View.GONE);
+		ivAcc.setVisibility(View.VISIBLE);
+		btnNext.setEnabled(true);
+	}
+
+	@Override
+	public void showMotionData(double[] acceleration)
+	{
+		if(currentStep == 2)
+		{
+			for(int i = 0; i < tvAcceleration.length; i++)
+			{
+				tvAcceleration[i].setText(String.format(Locale.US, "%.3f", acceleration[i]));
+			}
 		}
 	}
 
@@ -144,14 +196,8 @@ public class AddTripFragment extends Fragment implements AddTripContract.View
 	{
 		switch(v.getId())
 		{
-			case R.id.fab:
-				Snackbar.make(v, "Replace with your own action", Snackbar.LENGTH_LONG)
-						.setAction("Action", null).show();
-				break;
 			case R.id.btnNext:
-				mPresenter.showNext();
-//				currentStep++;
-//				showStep(currentStep);
+				mPresenter.proceed();
 				break;
 			default:
 				break;

@@ -293,7 +293,7 @@ public class TripListPresenter implements TripListContract.Presenter
 	@Override
 	public void registerSensor()
 	{
-		mAccelerometerSensor.startSensor();
+//		mAccelerometerSensor.startSensor();
 	}
 
 	@Override

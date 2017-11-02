@@ -6,7 +6,12 @@ package eu.vmpay.drivestyle.sensors.motion;
 
 public interface AccelerometerSensorContract
 {
-	void startSensor();
+	void startSensor(AccDataReceived IAccDataReceived);
 
 	void stopSensor();
+
+	interface AccDataReceived
+	{
+		void onAccDataReceived(double[] acceleration);
+	}
 }

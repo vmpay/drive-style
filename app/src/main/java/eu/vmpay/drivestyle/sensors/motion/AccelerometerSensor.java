@@ -6,9 +6,6 @@ import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.support.annotation.Nullable;
-import android.util.Log;
-
-import java.util.Locale;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -25,6 +22,7 @@ public class AccelerometerSensor implements SensorEventListener, AccelerometerSe
 
 	private SensorManager mSensorManager;
 	private Sensor mSensor;
+	private AccDataReceived callback;
 
 	private double[] gravity = new double[3];
 	private double[] linear_acceleration = new double[3];
@@ -65,10 +63,16 @@ public class AccelerometerSensor implements SensorEventListener, AccelerometerSe
 
 		// TODO: 22/10/2017 publish event
 
-		Log.d(TAG, String.format(Locale.US, "event \t%.2f\t%.2f\t%.2f",
-				event.values[0], event.values[1], event.values[2]));
-		Log.d(TAG, String.format(Locale.US, "filtered \t%.2f\t%.2f\t%.2f",
-				linear_acceleration[0], linear_acceleration[1], linear_acceleration[2]));
+//		Log.d(TAG, String.format(Locale.US, "event \t%.2f\t%.2f\t%.2f",
+//				event.values[0], event.values[1], event.values[2]));
+//		Log.d(TAG, String.format(Locale.US, "filtered \t%.2f\t%.2f\t%.2f",
+//				linear_acceleration[0], linear_acceleration[1], linear_acceleration[2]));
+
+		if(callback != null)
+		{
+			double[] acceleration = { event.values[0], event.values[1], event.values[2] };
+			callback.onAccDataReceived(acceleration);
+		}
 	}
 
 	@Override
@@ -78,8 +82,9 @@ public class AccelerometerSensor implements SensorEventListener, AccelerometerSe
 
 
 	@Override
-	public void startSensor()
+	public void startSensor(AccDataReceived IAccDataReceived)
 	{
+		callback = IAccDataReceived;
 		if(mSensorManager != null && mSensor != null)
 		{
 			readoutCount = 0;
@@ -93,7 +98,7 @@ public class AccelerometerSensor implements SensorEventListener, AccelerometerSe
 		if(mSensorManager != null)
 		{
 			mSensorManager.unregisterListener(this);
-			Log.d(TAG, "total readouts " + readoutCount);
+//			Log.d(TAG, "total readouts " + readoutCount);
 		}
 	}
 }
