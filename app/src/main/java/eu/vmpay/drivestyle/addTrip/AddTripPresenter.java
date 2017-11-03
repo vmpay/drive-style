@@ -4,9 +4,13 @@ import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 import javax.inject.Inject;
@@ -65,10 +69,12 @@ final class AddTripPresenter implements AddTripContract.Presenter, Accelerometer
 				case 1:
 					currentStep++;
 					addTripView.showStep(currentStep);
+					Log.d(TAG, "recycleMap onAccDataReceived " + System.currentTimeMillis());
+					recyclerHandler.postDelayed(recycleMap, 5_000);
 					break;
 				case 2:
 					stopMotionSensor();
-//					clearOldData();
+					clearOldData();
 					currentStep++;
 					addTripView.showStep(currentStep);
 					break;
@@ -108,19 +114,42 @@ final class AddTripPresenter implements AddTripContract.Presenter, Accelerometer
 
 		long startTimestamp = motionDataMapCopy.keySet().iterator().next();
 		long stopTimestamp = motionDataMapCopy.keySet().iterator().next();
+		long currentTimestamp;
 		final Iterator<Long> iterator = motionDataMapCopy.keySet().iterator();
 		while(iterator.hasNext())
 		{
-			stopTimestamp = iterator.next();
+			currentTimestamp = iterator.next();
+			if(stopTimestamp < currentTimestamp)
+			{
+				stopTimestamp = iterator.next();
+			}
+			if(startTimestamp > currentTimestamp)
+			{
+				startTimestamp = iterator.next();
+			}
 		}
 
 		Trip trip = new Trip(tripTitle.isEmpty() ? "Trip " + new Date(startTimestamp).toString() : tripTitle, startTimestamp, stopTimestamp, type, scenario);
-		Log.d(TAG, trip.toString());
+		Log.d(TAG, trip.toString() + " readings " + motionDataMapCopy.size());
 
+		List<AccelerometerData> accelerometerDataList = new ArrayList<>();
 		for(Map.Entry<Long, Double[]> entry : motionDataMapCopy.entrySet())
 		{
 			AccelerometerData accelerometerData = new AccelerometerData(-1, entry.getKey(), entry.getValue()[0], entry.getValue()[1], entry.getValue()[2]);
-			Log.d(TAG, accelerometerData.toString());
+			accelerometerDataList.add(accelerometerData);
+		}
+		Collections.sort(accelerometerDataList, new Comparator<AccelerometerData>()
+		{
+			@Override
+			public int compare(AccelerometerData o1, AccelerometerData o2)
+			{
+				return (int) (o1.getTimestamp() - o2.getTimestamp());
+			}
+		});
+
+		for(AccelerometerData entry : accelerometerDataList)
+		{
+			Log.d(TAG, entry.toString());
 		}
 	}
 
@@ -133,7 +162,7 @@ final class AddTripPresenter implements AddTripContract.Presenter, Accelerometer
 			{
 				accCalibrationFinished = true;
 				addTripView.motionSensorCalibrated();
-				recyclerHandler.postDelayed(recycleMap, 5_000);
+
 			}
 			if(currentStep == 2)
 			{
@@ -152,15 +181,6 @@ final class AddTripPresenter implements AddTripContract.Presenter, Accelerometer
 		}
 
 		long currentTimeStamp = System.currentTimeMillis();
-//		Iterator<Long> iterator = motionDataMap.keySet().iterator();
-//		if(iterator.hasNext())
-//		{
-//			Long oldTimestamp = iterator.next();
-//			if(currentTimeStamp - oldTimestamp > 5_000)
-//			{
-//				motionDataMap.remove(oldTimestamp);
-//			}
-//		}
 		motionDataMap.put(currentTimeStamp, accelerationArray);
 	}
 
@@ -169,9 +189,6 @@ final class AddTripPresenter implements AddTripContract.Presenter, Accelerometer
 		@Override
 		public void run()
 		{
-//			motionDataMapCopy.clear();
-			motionDataMapCopy.putAll(motionDataMap);
-			motionDataMap.clear();
 			clearOldData();
 			recyclerHandler.postDelayed(recycleMap, 5_000);
 		}
@@ -179,12 +196,17 @@ final class AddTripPresenter implements AddTripContract.Presenter, Accelerometer
 
 	private void clearOldData()
 	{
+		motionDataMapCopy.putAll(motionDataMap);
+		motionDataMap.clear();
 		long currentTimeStamp = System.currentTimeMillis();
-		for(Long timestamp : motionDataMapCopy.keySet())
+		Log.d(TAG, "clearOldData " + currentTimeStamp);
+		Iterator<Map.Entry<Long, Double[]>> it = motionDataMapCopy.entrySet().iterator();
+		while(it.hasNext())
 		{
-			if(currentTimeStamp - timestamp > 5_000)
+			Map.Entry<Long, Double[]> item = it.next();
+			if(currentTimeStamp - item.getKey() > 5_000)
 			{
-				motionDataMapCopy.remove(timestamp);
+				it.remove();
 			}
 		}
 	}
