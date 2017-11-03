@@ -17,6 +17,7 @@ import javax.inject.Inject;
 
 import eu.vmpay.drivestyle.data.AccelerometerData;
 import eu.vmpay.drivestyle.data.Trip;
+import eu.vmpay.drivestyle.data.source.TripsRepository;
 import eu.vmpay.drivestyle.sensors.location.FusedLocationProviderContract;
 import eu.vmpay.drivestyle.sensors.motion.AccelerometerSensorContract;
 import eu.vmpay.drivestyle.tripList.TripListFilterType;
@@ -24,13 +25,13 @@ import eu.vmpay.drivestyle.tripList.TripListFilterType;
 /**
  * Created by andrew on 10/26/17.
  */
-
 final class AddTripPresenter implements AddTripContract.Presenter, AccelerometerSensorContract.AccDataReceived
 {
 	private final String TAG = "AddTripPresenter";
 
 	private final AccelerometerSensorContract accelerometerSensor;
 	private final FusedLocationProviderContract fusedLocationProvider;
+	private TripsRepository tripsRepository;
 	@Nullable
 	private AddTripContract.View addTripView;
 
@@ -41,10 +42,11 @@ final class AddTripPresenter implements AddTripContract.Presenter, Accelerometer
 	private int currentStep = 1;
 
 	@Inject
-	public AddTripPresenter(AccelerometerSensorContract accelerometerSensor, FusedLocationProviderContract fusedLocationProvider)
+	public AddTripPresenter(AccelerometerSensorContract accelerometerSensor, FusedLocationProviderContract fusedLocationProvider, TripsRepository tripsRepository)
 	{
 		this.accelerometerSensor = accelerometerSensor;
 		this.fusedLocationProvider = fusedLocationProvider;
+		this.tripsRepository = tripsRepository;
 	}
 
 	@Override
@@ -131,6 +133,7 @@ final class AddTripPresenter implements AddTripContract.Presenter, Accelerometer
 
 		Trip trip = new Trip(tripTitle.isEmpty() ? "Trip " + new Date(startTimestamp).toString() : tripTitle, startTimestamp, stopTimestamp, type, scenario);
 		Log.d(TAG, trip.toString() + " readings " + motionDataMapCopy.size());
+		tripsRepository.saveTrip(trip);
 
 		List<AccelerometerData> accelerometerDataList = new ArrayList<>();
 		for(Map.Entry<Long, Double[]> entry : motionDataMapCopy.entrySet())
@@ -150,6 +153,7 @@ final class AddTripPresenter implements AddTripContract.Presenter, Accelerometer
 		for(AccelerometerData entry : accelerometerDataList)
 		{
 			Log.d(TAG, entry.toString());
+			tripsRepository.saveAccelerometerDataModel(entry);
 		}
 	}
 
@@ -179,7 +183,6 @@ final class AddTripPresenter implements AddTripContract.Presenter, Accelerometer
 		{
 			accelerationArray[i] = acceleration[i];
 		}
-
 		long currentTimeStamp = System.currentTimeMillis();
 		motionDataMap.put(currentTimeStamp, accelerationArray);
 	}
