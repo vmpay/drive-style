@@ -123,22 +123,22 @@ final class AddTripPresenter implements AddTripContract.Presenter, Accelerometer
 			currentTimestamp = iterator.next();
 			if(stopTimestamp < currentTimestamp)
 			{
-				stopTimestamp = iterator.next();
+				stopTimestamp = currentTimestamp;
 			}
 			if(startTimestamp > currentTimestamp)
 			{
-				startTimestamp = iterator.next();
+				startTimestamp = currentTimestamp;
 			}
 		}
 
 		Trip trip = new Trip(tripTitle.isEmpty() ? "Trip " + new Date(startTimestamp).toString() : tripTitle, startTimestamp, stopTimestamp, type, scenario);
 		Log.d(TAG, trip.toString() + " readings " + motionDataMapCopy.size());
-		tripsRepository.saveTrip(trip);
+		long tripId = tripsRepository.saveDataModel(trip);
 
 		List<AccelerometerData> accelerometerDataList = new ArrayList<>();
 		for(Map.Entry<Long, Double[]> entry : motionDataMapCopy.entrySet())
 		{
-			AccelerometerData accelerometerData = new AccelerometerData(-1, entry.getKey(), entry.getValue()[0], entry.getValue()[1], entry.getValue()[2]);
+			AccelerometerData accelerometerData = new AccelerometerData(tripId, entry.getKey(), entry.getValue()[0], entry.getValue()[1], entry.getValue()[2]);
 			accelerometerDataList.add(accelerometerData);
 		}
 		Collections.sort(accelerometerDataList, new Comparator<AccelerometerData>()
@@ -153,7 +153,7 @@ final class AddTripPresenter implements AddTripContract.Presenter, Accelerometer
 		for(AccelerometerData entry : accelerometerDataList)
 		{
 			Log.d(TAG, entry.toString());
-			tripsRepository.saveAccelerometerDataModel(entry);
+			tripsRepository.saveDataModel(entry);
 		}
 	}
 

@@ -1,6 +1,7 @@
 package eu.vmpay.drivestyle.tripList;
 
 import android.app.Activity;
+import android.content.ContentValues;
 import android.support.annotation.NonNull;
 
 import java.util.ArrayList;
@@ -95,11 +96,13 @@ public class TripListPresenter implements TripListContract.Presenter
 			mTripsRepository.refreshTrips();
 		}
 
-		mTripsRepository.getTrips(new TripDataSource.LoadTripsCallback()
+		Trip trip = new Trip();
+		mTripsRepository.getDataModels(trip, new TripDataSource.LoadModelsCallback()
 		{
 			@Override
-			public void onTripsLoaded(List<Trip> trips)
+			public void onModelsLoaded(List<ContentValues> contentValuesList)
 			{
+				List<Trip> trips = Trip.buildFromContentValuesList(contentValuesList);
 				List<Trip> tripsToShow = new ArrayList<Trip>();
 
 				// We filter the tasks based on the requestType
@@ -148,6 +151,60 @@ public class TripListPresenter implements TripListContract.Presenter
 				mTripListView.showLoadingTripsError();
 			}
 		});
+
+//		mTripsRepository.getTrips(new TripDataSource.LoadTripsCallback()
+//		{
+//			@Override
+//			public void onTripsLoaded(List<Trip> trips)
+//			{
+//				List<Trip> tripsToShow = new ArrayList<Trip>();
+//
+//				// We filter the tasks based on the requestType
+//				for(Trip trip : trips)
+//				{
+//					switch(mCurrentFiltering)
+//					{
+//						case ALL:
+//							tripsToShow.add(trip);
+//							break;
+//						case BRAKE:
+//						case TURN:
+//						case LANE_CHANGE:
+//							if(trip.getmScenario().equals(mCurrentFiltering))
+//							{
+//								tripsToShow.add(trip);
+//							}
+//							break;
+//						default:
+//							tripsToShow.add(trip);
+//							break;
+//					}
+//				}
+//
+//				// The view may not be able to handle UI updates anymore
+//				if(mTripListView == null || !mTripListView.isActive())
+//				{
+//					return;
+//				}
+//				if(showLoadingUI)
+//				{
+//					mTripListView.setLoadingIndicator(false);
+//				}
+//
+//				processTrips(tripsToShow);
+//			}
+//
+//			@Override
+//			public void onDataNotAvailable()
+//			{
+//				// The view may not be able to handle UI updates anymore
+//				if(!mTripListView.isActive())
+//				{
+//					return;
+//				}
+//				mTripListView.showLoadingTripsError();
+//			}
+//		});
 	}
 
 	private void processTrips(List<Trip> tripList)

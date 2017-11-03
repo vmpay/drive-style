@@ -54,7 +54,7 @@ android {
     android.variantFilter { variant ->
         if (variant.buildType.name == 'release'
                 && variant.getFlavors().get(0).name == 'mock') {
-            variant.setIgnore(true);
+            variant.setIgnore(true)
         }
     }
 }
@@ -82,6 +82,12 @@ dependencies {
     compile "com.google.dagger:dagger-android:$rootProject.daggerVersion"
     compile "com.google.dagger:dagger-android-support:$rootProject.daggerVersion"
     apt "com.google.dagger:dagger-android-processor:$rootProject.daggerVersion"
+
+    // RxAndroid dependencies
+    compile "io.reactivex.rxjava2:rxandroid:$rootProject.rxandroidVersion"
+    // Because RxAndroid releases are few and far between, it is recommended you also
+    // explicitly depend on RxJava's latest version for bug fixes and new features.
+    compile "io.reactivex.rxjava2:rxjava:$rootProject.rxjavaVersion"
 
     testCompile 'junit:junit:4.12'
 }

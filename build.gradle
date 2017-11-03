@@ -50,7 +50,7 @@ ext {
     espressoVersion = '3.0.0'
     daggerVersion = '2.11'
     dexmakerVersion = '1.2'
-    rxjavaVersion = '2.1.4'
+    rxjavaVersion = '2.1.5'
     rxandroidVersion = '2.0.1'
     sqlbriteVersion = '2.0.0'
     butterKnifeVersion = '8.8.1'

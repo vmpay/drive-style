@@ -12,6 +12,7 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import eu.vmpay.drivestyle.data.AccelerometerData;
+import eu.vmpay.drivestyle.data.BaseModel;
 import eu.vmpay.drivestyle.data.LocationData;
 import eu.vmpay.drivestyle.data.Trip;
 import eu.vmpay.drivestyle.di.AppComponent;
@@ -38,8 +39,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
 @Singleton
 public class TripsRepository implements TripDataSource
 {
-//	private final TripDataSource mTripsRemoteDataSource;
-
 	private final TripDataSource mTripsLocalDataSource;
 
 	/**
@@ -66,12 +65,49 @@ public class TripsRepository implements TripDataSource
 	 * with {@code @Nullable} values.
 	 */
 	@Inject
-	TripsRepository(//@Local TripDataSource tripsRemoteDataSource,
-	                @Local TripDataSource tripsLocalDataSource
+	TripsRepository(@Local TripDataSource tripsLocalDataSource
 	)
 	{
-//		mTripsRemoteDataSource = tripsRemoteDataSource;
 		mTripsLocalDataSource = tripsLocalDataSource;
+	}
+
+	@Override
+	public <T extends BaseModel> long saveDataModel(@NonNull T dataModel)
+	{
+		checkNotNull(dataModel);
+		return mTripsLocalDataSource.saveDataModel(dataModel);
+	}
+
+	/**
+	 * Gets trips from cache, local data source (SQLite) or remote data source, whichever is
+	 * available first.
+	 * <p>
+	 * Note: {@link LoadModelsCallback#onDataNotAvailable()} is fired if all data sources fail to
+	 * get the data.
+	 */
+	@Override
+	public <T extends BaseModel> void getDataModels(@NonNull T dataModel, @NonNull LoadModelsCallback callback)
+	{
+		checkNotNull(dataModel);
+		checkNotNull(callback);
+
+		mTripsLocalDataSource.getDataModels(dataModel, callback);
+	}
+
+	/**
+	 * Gets trips from local data source (sqlite) unless the table is new or empty. In that case it
+	 * uses the network data source. This is done to simplify the sample.
+	 * <p>
+	 * Note: {@link LoadModelCallback#onDataNotAvailable()} is fired if both data sources fail to
+	 * get the data.
+	 */
+	@Override
+	public <T extends BaseModel> void getDataModel(@NonNull T dataModel, @NonNull LoadModelCallback callback)
+	{
+		checkNotNull(dataModel);
+		checkNotNull(callback);
+
+		mTripsLocalDataSource.getDataModel(dataModel, callback);
 	}
 
 	/**
@@ -93,13 +129,6 @@ public class TripsRepository implements TripDataSource
 			return;
 		}
 
-//		if(mCacheIsDirty)
-//		{
-//			// If the cache is dirty we need to fetch new data from the network.
-//			getTripsFromRemoteDataSource(callback);
-//		}
-//		else
-//		{
 		// Query the local storage if available. If not, query the network.
 		mTripsLocalDataSource.getTrips(new LoadTripsCallback()
 		{
@@ -114,26 +143,10 @@ public class TripsRepository implements TripDataSource
 			public void onDataNotAvailable()
 			{
 				callback.onDataNotAvailable();
-//					getTripsFromRemoteDataSource(callback);
 			}
 		});
-//		}
 	}
 
-	@Override
-	public void saveTrip(@NonNull Trip trip)
-	{
-		checkNotNull(trip);
-//		mTripsRemoteDataSource.saveTrip(trip);
-		mTripsLocalDataSource.saveTrip(trip);
-
-		// Do in memory cache update to keep the app UI up to date
-		if(mCachedTrips == null)
-		{
-			mCachedTrips = new LinkedHashMap<>();
-		}
-		mCachedTrips.put(trip.getId(), trip);
-	}
 
 	/**
 	 * Gets trips from local data source (sqlite) unless the table is new or empty. In that case it
@@ -177,26 +190,7 @@ public class TripsRepository implements TripDataSource
 			@Override
 			public void onDataNotAvailable()
 			{
-//				mTripsRemoteDataSource.getTrip(tripId, new GetTripCallback()
-//				{
-//					@Override
-//					public void onTripLoaded(Trip trip)
-//					{
-//						// Do in memory cache update to keep the app UI up to date
-//						if(mCachedTrips == null)
-//						{
-//							mCachedTrips = new LinkedHashMap<>();
-//						}
-//						mCachedTrips.put(trip.getId(), trip);
-//						callback.onTripLoaded(trip);
-//					}
-//
-//					@Override
-//					public void onDataNotAvailable()
-//					{
-//						callback.onDataNotAvailable();
-//					}
-//				});
+//				callback.onDataNotAvailable();
 			}
 		});
 	}
@@ -210,7 +204,6 @@ public class TripsRepository implements TripDataSource
 	@Override
 	public void deleteAllTrips()
 	{
-//		mTripsRemoteDataSource.deleteAllTrips();
 		mTripsLocalDataSource.deleteAllTrips();
 
 		if(mCachedTrips == null)
@@ -223,30 +216,9 @@ public class TripsRepository implements TripDataSource
 	@Override
 	public void deleteTrip(@NonNull long tripId)
 	{
-//		mTripsRemoteDataSource.deleteTrip(checkNotNull(tripId));
 		mTripsLocalDataSource.deleteTrip(checkNotNull(tripId));
 
 		mCachedTrips.remove(Long.toString(tripId));
-	}
-
-	private void getTripsFromRemoteDataSource(@NonNull final LoadTripsCallback callback)
-	{
-//		mTripsRemoteDataSource.getTrips(new LoadTripsCallback()
-//		{
-//			@Override
-//			public void onTripsLoaded(List<Trip> trips)
-//			{
-//				refreshCache(trips);
-//				refreshLocalDataSource(trips);
-//				callback.onTripsLoaded(new ArrayList<>(mCachedTrips.values()));
-//			}
-//
-//			@Override
-//			public void onDataNotAvailable()
-//			{
-//				callback.onDataNotAvailable();
-//			}
-//		});
 	}
 
 	private void refreshCache(List<Trip> trips)
@@ -261,15 +233,6 @@ public class TripsRepository implements TripDataSource
 			mCachedTrips.put(trip.getId(), trip);
 		}
 		mCacheIsDirty = false;
-	}
-
-	private void refreshLocalDataSource(List<Trip> trips)
-	{
-		mTripsLocalDataSource.deleteAllTrips();
-		for(Trip trip : trips)
-		{
-			mTripsLocalDataSource.saveTrip(trip);
-		}
 	}
 
 	@Nullable
@@ -334,13 +297,6 @@ public class TripsRepository implements TripDataSource
 	}
 
 	@Override
-	public void saveLocation(@NonNull LocationData locationData)
-	{
-		checkNotNull(locationData);
-		mTripsLocalDataSource.saveLocation(locationData);
-	}
-
-	@Override
 	public void deleteAllLocations()
 	{
 		mTripsLocalDataSource.deleteAllLocations();
@@ -398,13 +354,6 @@ public class TripsRepository implements TripDataSource
 				callback.onDataNotAvailable();
 			}
 		});
-	}
-
-	@Override
-	public void saveAccelerometerDataModel(@NonNull AccelerometerData accelerometerData)
-	{
-		checkNotNull(accelerometerData);
-		mTripsLocalDataSource.saveAccelerometerDataModel(accelerometerData);
 	}
 
 	@Override

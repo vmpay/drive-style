@@ -1,8 +1,13 @@
 package eu.vmpay.drivestyle.data;
 
+import android.content.ContentValues;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import eu.vmpay.drivestyle.data.source.local.TripPersistenceContract;
 import eu.vmpay.drivestyle.tripList.TripListFilterType;
 
 
@@ -10,32 +15,29 @@ import eu.vmpay.drivestyle.tripList.TripListFilterType;
  * Created by Andrew on 25/09/2017.
  */
 
-public final class Trip
+public final class Trip extends BaseModel
 {
-	@Nullable
-	private final long mId;
+	@NonNull private final String mTitle;
+	@NonNull private final long mStartTime;
+	@NonNull private final long mFinishTime;
+	@Nullable private final Double mMark;
+	@NonNull private final String mType;
+	@NonNull private final TripListFilterType mScenario;
 
-	@NonNull
-	private final String mTitle;
-
-	@NonNull
-	private final long mStartTime;
-
-	@NonNull
-	private final long mFinishTime;
-
-	@Nullable
-	private final Double mMark;
-
-	@NonNull
-	private final String mType;
-
-	@NonNull
-	private final TripListFilterType mScenario;
+	public Trip()
+	{
+		super(-1, TripPersistenceContract.TripEntry.TABLE_NAME, TripPersistenceContract.TripEntry.COLUMNS);
+		this.mTitle = "";
+		this.mStartTime = -1;
+		this.mFinishTime = -1;
+		this.mMark = -1.0;
+		this.mType = "";
+		this.mScenario = TripListFilterType.ALL;
+	}
 
 	public Trip(long mId, @NonNull String mTitle, @NonNull long mStartTime, @NonNull long mFinishTime, Double mMark, @NonNull String mType, @NonNull TripListFilterType mScenario)
 	{
-		this.mId = mId;
+		super(mId, TripPersistenceContract.TripEntry.TABLE_NAME, TripPersistenceContract.TripEntry.COLUMNS);
 		this.mTitle = mTitle;
 		this.mStartTime = mStartTime;
 		this.mFinishTime = mFinishTime;
@@ -164,5 +166,47 @@ public final class Trip
 				", mType='" + mType + '\'' +
 				", mScenario='" + mScenario + '\'' +
 				'}';
+	}
+
+	@Override
+	public ContentValues getContentValues()
+	{
+		ContentValues values = new ContentValues();
+
+		values.put(TripPersistenceContract.TripEntry.COLUMN_NAME_TITLE, mTitle);
+		values.put(TripPersistenceContract.TripEntry.COLUMN_NAME_START_TIME, mStartTime);
+		values.put(TripPersistenceContract.TripEntry.COLUMN_NAME_FINISH_TIME, mFinishTime);
+		values.put(TripPersistenceContract.TripEntry.COLUMN_NAME_MARK, mMark);
+		values.put(TripPersistenceContract.TripEntry.COLUMN_NAME_TYPE, mType);
+		values.put(TripPersistenceContract.TripEntry.COLUMN_NAME_SCENARIO, mScenario.ordinal());
+
+		return values;
+	}
+
+	@NonNull
+	public static List<Trip> buildFromContentValuesList(List<ContentValues> contentValuesList)
+	{
+		List<Trip> tripList = new ArrayList<>();
+		if(contentValuesList != null)
+		{
+			for(ContentValues contentValues : contentValuesList)
+			{
+				tripList.add(buildFromContentValues(contentValues));
+			}
+		}
+		return tripList;
+	}
+
+	public static Trip buildFromContentValues(ContentValues contentValues)
+	{
+		long id = contentValues.getAsLong(TripPersistenceContract.TripEntry._ID);
+		String title = contentValues.getAsString(TripPersistenceContract.TripEntry.COLUMN_NAME_TITLE);
+		long startTime = contentValues.getAsLong(TripPersistenceContract.TripEntry.COLUMN_NAME_START_TIME);
+		long finishTime = contentValues.getAsLong(TripPersistenceContract.TripEntry.COLUMN_NAME_FINISH_TIME);
+		double mark = contentValues.getAsDouble(TripPersistenceContract.TripEntry.COLUMN_NAME_MARK);
+		String type = contentValues.getAsString(TripPersistenceContract.TripEntry.COLUMN_NAME_TYPE);
+		int scenario = contentValues.getAsInteger(TripPersistenceContract.TripEntry.COLUMN_NAME_SCENARIO);
+
+		return new Trip(id, title, startTime, finishTime, mark, type, TripListFilterType.values()[scenario]);
 	}
 }

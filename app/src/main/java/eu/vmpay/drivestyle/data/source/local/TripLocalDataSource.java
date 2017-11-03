@@ -13,6 +13,7 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import eu.vmpay.drivestyle.data.AccelerometerData;
+import eu.vmpay.drivestyle.data.BaseModel;
 import eu.vmpay.drivestyle.data.LocationData;
 import eu.vmpay.drivestyle.data.Trip;
 import eu.vmpay.drivestyle.data.source.TripDataSource;
@@ -34,6 +35,172 @@ public class TripLocalDataSource implements TripDataSource
 	{
 		checkNotNull(context);
 		mDbHelper = new TripDbHelper(context);
+	}
+
+	@Override
+	public <T extends BaseModel> long saveDataModel(@NonNull T dataModel)
+	{
+		checkNotNull(dataModel);
+		SQLiteDatabase db = mDbHelper.getWritableDatabase();
+
+		long success = db.insert(dataModel.getTableName(), null, dataModel.getContentValues());
+
+		db.close();
+
+		return success;
+	}
+
+	/**
+	 * Note: {@link LoadModelsCallback#onDataNotAvailable()} is fired if the database doesn't exist
+	 * or the table is empty.
+	 */
+	@Override
+	public <T extends BaseModel> void getDataModels(@NonNull T dataModel, @NonNull LoadModelsCallback callback)
+	{
+		List<ContentValues> modelList = new ArrayList<>();
+		SQLiteDatabase db = mDbHelper.getReadableDatabase();
+
+		Cursor c = db.query(
+				dataModel.getTableName(), dataModel.getProjection(), dataModel.getWhereClause(), null, null, null, null);
+
+		if(c != null && c.getCount() > 0)
+		{
+			while(c.moveToNext())
+			{
+				ContentValues contentValues = new ContentValues();
+				for(int i = 0; i < dataModel.getProjection().length; i++)
+				{
+					int columnIndex = c.getColumnIndex(dataModel.getProjection()[i]);
+					switch(c.getType(columnIndex))
+					{
+						case Cursor.FIELD_TYPE_STRING:
+							String stringValue = c.getString(columnIndex);
+							if(stringValue != null)
+							{
+								contentValues.put(dataModel.getProjection()[i], stringValue);
+							}
+							break;
+						case Cursor.FIELD_TYPE_BLOB:
+							byte[] blobValue = c.getBlob(columnIndex);
+							if(blobValue != null)
+							{
+								contentValues.put(dataModel.getProjection()[i], blobValue);
+							}
+							break;
+						case Cursor.FIELD_TYPE_INTEGER:
+							Integer intValue = c.getInt(columnIndex);
+							if(intValue != null)
+							{
+								contentValues.put(dataModel.getProjection()[i], intValue);
+							}
+							break;
+						case Cursor.FIELD_TYPE_FLOAT:
+							Float floatValue = c.getFloat(columnIndex);
+							if(floatValue != null)
+							{
+								contentValues.put(dataModel.getProjection()[i], floatValue);
+							}
+							break;
+						case Cursor.FIELD_TYPE_NULL:
+							contentValues.putNull(dataModel.getProjection()[i]);
+							break;
+					}
+				}
+				modelList.add(contentValues);
+			}
+		}
+
+		if(c != null)
+		{
+			c.close();
+		}
+
+		db.close();
+
+		if(modelList.isEmpty())
+		{
+			// This will be called if the table is new or just empty.
+			callback.onDataNotAvailable();
+		}
+		else
+		{
+			callback.onModelsLoaded(modelList);
+		}
+	}
+
+	/**
+	 * Note: {@link LoadModelCallback#onDataNotAvailable()} is fired if the {@link Trip} isn't
+	 * found.
+	 */
+	@Override
+	public <T extends BaseModel> void getDataModel(@NonNull T dataModel, @NonNull LoadModelCallback callback)
+	{
+		ContentValues contentValues = null;
+		SQLiteDatabase db = mDbHelper.getReadableDatabase();
+
+		Cursor c = db.query(
+				dataModel.getTableName(), dataModel.getProjection(), dataModel.getWhereClause(), null, null, null, null);
+
+
+		if(c != null && c.getCount() > 0)
+		{
+			c.moveToFirst();
+			contentValues = new ContentValues();
+			for(int i = 0; i < dataModel.getProjection().length; i++)
+			{
+				int columnIndex = c.getColumnIndex(dataModel.getProjection()[i]);
+				switch(c.getType(columnIndex))
+				{
+					case Cursor.FIELD_TYPE_STRING:
+						String stringValue = c.getString(columnIndex);
+						if(stringValue != null)
+						{
+							contentValues.put(dataModel.getProjection()[i], stringValue);
+						}
+						break;
+					case Cursor.FIELD_TYPE_BLOB:
+						byte[] blobValue = c.getBlob(columnIndex);
+						if(blobValue != null)
+						{
+							contentValues.put(dataModel.getProjection()[i], blobValue);
+						}
+						break;
+					case Cursor.FIELD_TYPE_INTEGER:
+						Integer intValue = c.getInt(columnIndex);
+						if(intValue != null)
+						{
+							contentValues.put(dataModel.getProjection()[i], intValue);
+						}
+						break;
+					case Cursor.FIELD_TYPE_FLOAT:
+						Float floatValue = c.getFloat(columnIndex);
+						if(floatValue != null)
+						{
+							contentValues.put(dataModel.getProjection()[i], floatValue);
+						}
+						break;
+					case Cursor.FIELD_TYPE_NULL:
+						contentValues.putNull(dataModel.getProjection()[i]);
+						break;
+				}
+			}
+		}
+
+		if(c != null)
+		{
+			c.close();
+		}
+
+		db.close();
+
+		if(contentValues != null)
+		{
+			callback.onModelsLoaded(contentValues);
+		}
+		else
+		{
+			callback.onDataNotAvailable();
+		}
 	}
 
 	//---------------------------------------------------------------TRIPS---------------------------------------------------------------
@@ -134,25 +301,6 @@ public class TripLocalDataSource implements TripDataSource
 		{
 			callback.onDataNotAvailable();
 		}
-	}
-
-	@Override
-	public void saveTrip(@NonNull Trip trip)
-	{
-		checkNotNull(trip);
-		SQLiteDatabase db = mDbHelper.getWritableDatabase();
-
-		ContentValues values = new ContentValues();
-		values.put(TripPersistenceContract.TripEntry.COLUMN_NAME_TITLE, trip.getmTitle());
-		values.put(TripPersistenceContract.TripEntry.COLUMN_NAME_START_TIME, trip.getmStartTime());
-		values.put(TripPersistenceContract.TripEntry.COLUMN_NAME_FINISH_TIME, trip.getmFinishTime());
-		values.put(TripPersistenceContract.TripEntry.COLUMN_NAME_MARK, trip.getmMark());
-		values.put(TripPersistenceContract.TripEntry.COLUMN_NAME_TYPE, trip.getmType());
-		values.put(TripPersistenceContract.TripEntry.COLUMN_NAME_SCENARIO, trip.getmScenario().ordinal());
-
-		db.insert(TripPersistenceContract.TripEntry.TABLE_NAME, null, values);
-
-		db.close();
 	}
 
 	@Override
@@ -289,25 +437,6 @@ public class TripLocalDataSource implements TripDataSource
 	}
 
 	@Override
-	public void saveLocation(@NonNull LocationData locationData)
-	{
-		checkNotNull(locationData);
-		SQLiteDatabase db = mDbHelper.getWritableDatabase();
-
-		ContentValues values = new ContentValues();
-		values.put(LocationDataPersistenceContract.LocationDataEntity.COLUMN_NAME_TRIP_ID, locationData.getTripId());
-		values.put(LocationDataPersistenceContract.LocationDataEntity.COLUMN_NAME_TIMESTAMP, locationData.getTimestamp());
-		values.put(LocationDataPersistenceContract.LocationDataEntity.COLUMN_NAME_LATITUDE, locationData.getLatitude());
-		values.put(LocationDataPersistenceContract.LocationDataEntity.COLUMN_NAME_LONGITUDE, locationData.getLongitude());
-		values.put(LocationDataPersistenceContract.LocationDataEntity.COLUMN_NAME_ALTITUDE, locationData.getAltitude());
-		values.put(LocationDataPersistenceContract.LocationDataEntity.COLUMN_NAME_SPEED, locationData.getSpeed());
-
-		db.insert(LocationDataPersistenceContract.LocationDataEntity.TABLE_NAME, null, values);
-
-		db.close();
-	}
-
-	@Override
 	public void deleteAllLocations()
 	{
 		SQLiteDatabase db = mDbHelper.getWritableDatabase();
@@ -421,24 +550,6 @@ public class TripLocalDataSource implements TripDataSource
 		{
 			callback.onDataNotAvailable();
 		}
-	}
-
-	@Override
-	public void saveAccelerometerDataModel(@NonNull AccelerometerData accelerometerData)
-	{
-		checkNotNull(accelerometerData);
-		SQLiteDatabase db = mDbHelper.getWritableDatabase();
-
-		ContentValues values = new ContentValues();
-		values.put(AccelerometerDataPersistenceContract.AccelerometerDataEntity.COLUMN_NAME_TRIP_ID, accelerometerData.getTripId());
-		values.put(AccelerometerDataPersistenceContract.AccelerometerDataEntity.COLUMN_NAME_TIMESTAMP, accelerometerData.getTimestamp());
-		values.put(AccelerometerDataPersistenceContract.AccelerometerDataEntity.COLUMN_NAME_ACC_X, accelerometerData.getAccX());
-		values.put(AccelerometerDataPersistenceContract.AccelerometerDataEntity.COLUMN_NAME_ACC_Y, accelerometerData.getAccY());
-		values.put(AccelerometerDataPersistenceContract.AccelerometerDataEntity.COLUMN_NAME_ACC_Z, accelerometerData.getAccZ());
-
-		db.insert(AccelerometerDataPersistenceContract.AccelerometerDataEntity.TABLE_NAME, null, values);
-
-		db.close();
 	}
 
 	@Override

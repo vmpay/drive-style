@@ -1,5 +1,7 @@
 package eu.vmpay.drivestyle.tripDetails;
 
+import android.content.ContentValues;
+import android.provider.BaseColumns;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Log;
@@ -17,6 +19,8 @@ import eu.vmpay.drivestyle.data.LocationData;
 import eu.vmpay.drivestyle.data.Trip;
 import eu.vmpay.drivestyle.data.source.TripDataSource;
 import eu.vmpay.drivestyle.data.source.TripsRepository;
+import eu.vmpay.drivestyle.data.source.local.AccelerometerDataPersistenceContract;
+import eu.vmpay.drivestyle.data.source.local.LocationDataPersistenceContract;
 
 /**
  * Created by andrew on 9/26/17.
@@ -34,6 +38,8 @@ import eu.vmpay.drivestyle.data.source.TripsRepository;
 
 final class TripDetailPresenter implements TripDetailContract.Presenter
 {
+	private final String TAG = "TripDetailPresenter";
+
 	private final TripsRepository mTripsRepository;
 	private final SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
 	@Nullable
@@ -67,17 +73,23 @@ final class TripDetailPresenter implements TripDetailContract.Presenter
 //		if (mTripDetailView != null) {
 //			mTripDetailView.setLoadingIndicator(true);
 //		}
-		mTripsRepository.getTrip(mTripId, new TripDataSource.GetTripCallback()
+
+		Trip trip = new Trip();
+		trip.setWhereClause(BaseColumns._ID + " LIKE " + mTripId);
+
+		mTripsRepository.getDataModel(trip, new TripDataSource.LoadModelCallback()
 		{
 			@Override
-			public void onTripLoaded(Trip trip)
+			public void onModelsLoaded(ContentValues contentValues)
 			{
+				Trip trip = Trip.buildFromContentValues(contentValues);
 				// The view may not be able to handle UI updates anymore
 				if(mTripDetailView == null || !mTripDetailView.isActive())
 				{
 					return;
 				}
-//				mTripDetailView.setLoadingIndicator(false);
+
+
 				if(null == trip)
 				{
 					mTripDetailView.showLoadingDetailsError();
@@ -86,16 +98,20 @@ final class TripDetailPresenter implements TripDetailContract.Presenter
 				{
 					showTripDetails(trip);
 				}
+
 				if(trip != null)
 				{
-					mTripsRepository.getLocations(trip.getId(), new TripDataSource.LoadLocationsCallback()
+					LocationData locationData = new LocationData();
+					locationData.setWhereClause(LocationDataPersistenceContract.LocationDataEntity.COLUMN_NAME_TRIP_ID + " LIKE " + trip.getmId());
+					mTripsRepository.getDataModels(locationData, new TripDataSource.LoadModelsCallback()
 					{
 						@Override
-						public void onLocationsLoaded(List<LocationData> locationDataList)
+						public void onModelsLoaded(List<ContentValues> contentValuesList)
 						{
+							List<LocationData> locationDataList = LocationData.buildFromContentValuesList(contentValuesList);
 							for(LocationData entry : locationDataList)
 							{
-								Log.d("TAG", entry.toString());
+								Log.d(TAG, entry.toString());
 							}
 							// TODO: 10/13/17 add map
 						}
@@ -105,14 +121,18 @@ final class TripDetailPresenter implements TripDetailContract.Presenter
 						{
 						}
 					});
-					mTripsRepository.getAccelerometerDataModels(trip.getId(), new TripDataSource.LoadAccelerometerDataModelsCallback()
+
+					AccelerometerData accelerometerData = new AccelerometerData();
+					accelerometerData.setWhereClause(AccelerometerDataPersistenceContract.AccelerometerDataEntity.COLUMN_NAME_TRIP_ID + " LIKE " + trip.getmId());
+					mTripsRepository.getDataModels(accelerometerData, new TripDataSource.LoadModelsCallback()
 					{
 						@Override
-						public void onAccelerometerDataModelsLoaded(List<AccelerometerData> accelerometerDataList)
+						public void onModelsLoaded(List<ContentValues> contentValuesList)
 						{
+							List<AccelerometerData> accelerometerDataList = AccelerometerData.buildFromContentValuesList(contentValuesList);
 							for(AccelerometerData entry : accelerometerDataList)
 							{
-								Log.d("TAG", entry.toString());
+								Log.d(TAG, entry.toString());
 							}
 						}
 
@@ -121,13 +141,47 @@ final class TripDetailPresenter implements TripDetailContract.Presenter
 						{
 						}
 					});
+
+
+//					mTripsRepository.getLocations(trip.getId(), new TripDataSource.LoadLocationsCallback()
+//					{
+//						@Override
+//						public void onLocationsLoaded(List<LocationData> locationDataList)
+//						{
+//							for(LocationData entry : locationDataList)
+//							{
+//								Log.d("TAG", entry.toString());
+//							}
+//							// TODO: 10/13/17 add map
+//						}
+//
+//						@Override
+//						public void onDataNotAvailable()
+//						{
+//						}
+//					});
+//					mTripsRepository.getAccelerometerDataModels(trip.getId(), new TripDataSource.LoadAccelerometerDataModelsCallback()
+//					{
+//						@Override
+//						public void onAccelerometerDataModelsLoaded(List<AccelerometerData> accelerometerDataList)
+//						{
+//							for(AccelerometerData entry : accelerometerDataList)
+//							{
+//								Log.d("TAG", entry.toString());
+//							}
+//						}
+//
+//						@Override
+//						public void onDataNotAvailable()
+//						{
+//						}
+//					});
 				}
 			}
 
 			@Override
 			public void onDataNotAvailable()
 			{
-				// The view may not be able to handle UI updates anymore
 				if(!mTripDetailView.isActive())
 				{
 					return;
@@ -135,6 +189,75 @@ final class TripDetailPresenter implements TripDetailContract.Presenter
 				mTripDetailView.showLoadingDetailsError();
 			}
 		});
+
+//		mTripsRepository.getTrip(mTripId, new TripDataSource.GetTripCallback()
+//		{
+//			@Override
+//			public void onTripLoaded(Trip trip)
+//			{
+//				// The view may not be able to handle UI updates anymore
+//				if(mTripDetailView == null || !mTripDetailView.isActive())
+//				{
+//					return;
+//				}
+////				mTripDetailView.setLoadingIndicator(false);
+//				if(null == trip)
+//				{
+//					mTripDetailView.showLoadingDetailsError();
+//				}
+//				else
+//				{
+//					showTripDetails(trip);
+//				}
+//				if(trip != null)
+//				{
+//					mTripsRepository.getLocations(trip.getId(), new TripDataSource.LoadLocationsCallback()
+//					{
+//						@Override
+//						public void onLocationsLoaded(List<LocationData> locationDataList)
+//						{
+//							for(LocationData entry : locationDataList)
+//							{
+//								Log.d("TAG", entry.toString());
+//							}
+//							// TODO: 10/13/17 add map
+//						}
+//
+//						@Override
+//						public void onDataNotAvailable()
+//						{
+//						}
+//					});
+//					mTripsRepository.getAccelerometerDataModels(trip.getId(), new TripDataSource.LoadAccelerometerDataModelsCallback()
+//					{
+//						@Override
+//						public void onAccelerometerDataModelsLoaded(List<AccelerometerData> accelerometerDataList)
+//						{
+//							for(AccelerometerData entry : accelerometerDataList)
+//							{
+//								Log.d("TAG", entry.toString());
+//							}
+//						}
+//
+//						@Override
+//						public void onDataNotAvailable()
+//						{
+//						}
+//					});
+//				}
+//			}
+//
+//			@Override
+//			public void onDataNotAvailable()
+//			{
+//				// The view may not be able to handle UI updates anymore
+//				if(!mTripDetailView.isActive())
+//				{
+//					return;
+//				}
+//				mTripDetailView.showLoadingDetailsError();
+//			}
+//		});
 
 	}
 

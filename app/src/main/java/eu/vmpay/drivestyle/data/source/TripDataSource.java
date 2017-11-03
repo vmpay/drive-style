@@ -1,10 +1,12 @@
 package eu.vmpay.drivestyle.data.source;
 
+import android.content.ContentValues;
 import android.support.annotation.NonNull;
 
 import java.util.List;
 
 import eu.vmpay.drivestyle.data.AccelerometerData;
+import eu.vmpay.drivestyle.data.BaseModel;
 import eu.vmpay.drivestyle.data.LocationData;
 import eu.vmpay.drivestyle.data.Trip;
 
@@ -15,13 +17,31 @@ import eu.vmpay.drivestyle.data.Trip;
 
 public interface TripDataSource
 {
+	<T extends BaseModel> long saveDataModel(@NonNull T dataModel);
+
+	<T extends BaseModel> void getDataModels(@NonNull T dataModel, @NonNull LoadModelsCallback callback);
+
+	<T extends BaseModel> void getDataModel(@NonNull T dataModel, @NonNull LoadModelCallback callback);
+
+	interface LoadModelsCallback
+	{
+		void onModelsLoaded(List<ContentValues> contentValuesList);
+
+		void onDataNotAvailable();
+	}
+
+	interface LoadModelCallback
+	{
+		void onModelsLoaded(ContentValues contentValues);
+
+		void onDataNotAvailable();
+	}
+
 	//---------------------------------------------------------------TRIPS---------------------------------------------------------------
 
 	void getTrips(@NonNull LoadTripsCallback callback);
 
 	void getTrip(@NonNull String tripId, @NonNull GetTripCallback callback);
-
-	void saveTrip(@NonNull Trip trip);
 
 	void refreshTrips();
 
@@ -51,8 +71,6 @@ public interface TripDataSource
 
 	void getLocation(@NonNull String locationDataId, @NonNull GetLocationCallback callback);
 
-	void saveLocation(@NonNull LocationData locationData);
-
 	void deleteAllLocations();
 
 	void deleteLocation(@NonNull long locationDataId);
@@ -78,8 +96,6 @@ public interface TripDataSource
 	void getAccelerometerDataModels(@NonNull String tripId, @NonNull LoadAccelerometerDataModelsCallback callback);
 
 	void getAccelerometerDataModel(@NonNull String accelerometerDataId, @NonNull GetAccelerometerDataModelCallback callback);
-
-	void saveAccelerometerDataModel(@NonNull AccelerometerData accelerometerData);
 
 	void deleteAllAccelerometerDataModels();
 

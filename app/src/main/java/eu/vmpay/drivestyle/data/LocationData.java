@@ -1,35 +1,39 @@
 package eu.vmpay.drivestyle.data;
 
+import android.content.ContentValues;
 import android.location.Location;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import eu.vmpay.drivestyle.data.source.local.LocationDataPersistenceContract;
+import eu.vmpay.drivestyle.sensors.location.FusedLocationProvider;
 
 /**
  * Created by andrew on 10/13/17.
  */
 
-public final class LocationData
+public final class LocationData extends BaseModel
 {
-	@Nullable
-	private final long mId;
+	@NonNull private final long tripId;
+	@NonNull private final long timestamp;
+	@NonNull private final double latitude;
+	@NonNull private final double longitude;
+	@Nullable private final double altitude;
+	@Nullable private final double speed;
 
-	@NonNull
-	private final long tripId;
-
-	@NonNull
-	private final long timestamp;
-
-	@NonNull
-	private final double latitude;
-
-	@NonNull
-	private final double longitude;
-
-	@Nullable
-	private final double altitude;
-
-	@Nullable
-	private final double speed;
+	public LocationData()
+	{
+		super(-1, LocationDataPersistenceContract.LocationDataEntity.TABLE_NAME, LocationDataPersistenceContract.LocationDataEntity.COLUMNS);
+		this.tripId = -1;
+		this.timestamp = -1;
+		this.latitude = -1;
+		this.longitude = -1;
+		this.altitude = -1;
+		this.speed = -1;
+	}
 
 	/**
 	 * Default constructor
@@ -37,14 +41,14 @@ public final class LocationData
 	 * @param mId       gps data record id in the database
 	 * @param tripId    trip record id in the database
 	 * @param timestamp unix timestamp of the recorded data
-	 * @param latitude  recorded latitude from {@link LocationSensor}
-	 * @param longitude recorded longitude from {@link LocationSensor}
-	 * @param altitude  recorded altitude from {@link LocationSensor}
-	 * @param speed     recorded speed from {@link LocationSensor}
+	 * @param latitude  recorded latitude from {@link FusedLocationProvider}
+	 * @param longitude recorded longitude from {@link FusedLocationProvider}
+	 * @param altitude  recorded altitude from {@link FusedLocationProvider}
+	 * @param speed     recorded speed from {@link FusedLocationProvider}
 	 */
 	public LocationData(long mId, @NonNull long tripId, @NonNull long timestamp, @NonNull double latitude, @NonNull double longitude, double altitude, double speed)
 	{
-		this.mId = mId;
+		super(mId, LocationDataPersistenceContract.LocationDataEntity.TABLE_NAME, LocationDataPersistenceContract.LocationDataEntity.COLUMNS);
 		this.tripId = tripId;
 		this.timestamp = timestamp;
 		this.latitude = latitude;
@@ -58,10 +62,10 @@ public final class LocationData
 	 *
 	 * @param tripId    trip record id in the database
 	 * @param timestamp unix timestamp of the recorded data
-	 * @param latitude  recorded latitude from {@link LocationSensor}
-	 * @param longitude recorded longitude from {@link LocationSensor}
-	 * @param altitude  recorded altitude from {@link LocationSensor}
-	 * @param speed     recorded speed from {@link LocationSensor}
+	 * @param latitude  recorded latitude from {@link FusedLocationProvider}
+	 * @param longitude recorded longitude from {@link FusedLocationProvider}
+	 * @param altitude  recorded altitude from {@link FusedLocationProvider}
+	 * @param speed     recorded speed from {@link FusedLocationProvider}
 	 */
 	public LocationData(@NonNull long tripId, @NonNull long timestamp, @NonNull double latitude, @NonNull double longitude, double altitude, double speed)
 	{
@@ -177,5 +181,47 @@ public final class LocationData
 				", altitude=" + altitude +
 				", speed=" + speed +
 				'}';
+	}
+
+	@Override
+	public ContentValues getContentValues()
+	{
+		ContentValues values = new ContentValues();
+
+		values.put(LocationDataPersistenceContract.LocationDataEntity.COLUMN_NAME_TRIP_ID, tripId);
+		values.put(LocationDataPersistenceContract.LocationDataEntity.COLUMN_NAME_TIMESTAMP, timestamp);
+		values.put(LocationDataPersistenceContract.LocationDataEntity.COLUMN_NAME_LATITUDE, latitude);
+		values.put(LocationDataPersistenceContract.LocationDataEntity.COLUMN_NAME_LONGITUDE, longitude);
+		values.put(LocationDataPersistenceContract.LocationDataEntity.COLUMN_NAME_ALTITUDE, altitude);
+		values.put(LocationDataPersistenceContract.LocationDataEntity.COLUMN_NAME_SPEED, speed);
+
+		return values;
+	}
+
+	@NonNull
+	public static List<LocationData> buildFromContentValuesList(List<ContentValues> contentValuesList)
+	{
+		List<LocationData> locationDataList = new ArrayList<>();
+		if(contentValuesList != null)
+		{
+			for(ContentValues contentValues : contentValuesList)
+			{
+				locationDataList.add(buildFromContentValues(contentValues));
+			}
+		}
+		return locationDataList;
+	}
+
+	public static LocationData buildFromContentValues(ContentValues contentValues)
+	{
+		long id = contentValues.getAsLong(LocationDataPersistenceContract.LocationDataEntity._ID);
+		long mTripId = contentValues.getAsLong(LocationDataPersistenceContract.LocationDataEntity.COLUMN_NAME_TRIP_ID);
+		long timestamp = contentValues.getAsLong(LocationDataPersistenceContract.LocationDataEntity.COLUMN_NAME_TIMESTAMP);
+		double latitude = contentValues.getAsDouble(LocationDataPersistenceContract.LocationDataEntity.COLUMN_NAME_LATITUDE);
+		double longitude = contentValues.getAsDouble(LocationDataPersistenceContract.LocationDataEntity.COLUMN_NAME_LONGITUDE);
+		double altitude = contentValues.getAsDouble(LocationDataPersistenceContract.LocationDataEntity.COLUMN_NAME_ALTITUDE);
+		double speed = contentValues.getAsDouble(LocationDataPersistenceContract.LocationDataEntity.COLUMN_NAME_SPEED);
+
+		return new LocationData(id, mTripId, timestamp, latitude, longitude, altitude, speed);
 	}
 }

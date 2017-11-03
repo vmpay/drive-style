@@ -1,31 +1,35 @@
 package eu.vmpay.drivestyle.data;
 
+import android.content.ContentValues;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import eu.vmpay.drivestyle.data.source.local.AccelerometerDataPersistenceContract;
 
 /**
  * Created by andrew on 10/13/17.
  */
 
-public final class AccelerometerData
+public final class AccelerometerData extends BaseModel
 {
-	@Nullable
-	private final long mId;
+	@NonNull private final long tripId;
+	@NonNull private final long timestamp;
+	@NonNull private final double accX;
+	@NonNull private final double accY;
+	@NonNull private final double accZ;
 
-	@NonNull
-	private final long tripId;
-
-	@NonNull
-	private final long timestamp;
-
-	@NonNull
-	private final double accX;
-
-	@NonNull
-	private final double accY;
-
-	@NonNull
-	private final double accZ;
+	public AccelerometerData()
+	{
+		super(-1, AccelerometerDataPersistenceContract.AccelerometerDataEntity.TABLE_NAME, AccelerometerDataPersistenceContract.AccelerometerDataEntity.COLUMNS);
+		this.tripId = -1;
+		this.timestamp = -1;
+		this.accX = -1;
+		this.accY = -1;
+		this.accZ = -1;
+	}
 
 	/**
 	 * Default constructor
@@ -39,7 +43,7 @@ public final class AccelerometerData
 	 */
 	public AccelerometerData(long mId, @NonNull long tripId, @NonNull long timestamp, @NonNull double accX, @NonNull double accY, @NonNull double accZ)
 	{
-		this.mId = mId;
+		super(mId, AccelerometerDataPersistenceContract.AccelerometerDataEntity.TABLE_NAME, AccelerometerDataPersistenceContract.AccelerometerDataEntity.COLUMNS);
 		this.tripId = tripId;
 		this.timestamp = timestamp;
 		this.accX = accX;
@@ -148,5 +152,45 @@ public final class AccelerometerData
 				", accY=" + accY +
 				", accZ=" + accZ +
 				'}';
+	}
+
+	@Override
+	public ContentValues getContentValues()
+	{
+		ContentValues values = new ContentValues();
+
+		values.put(AccelerometerDataPersistenceContract.AccelerometerDataEntity.COLUMN_NAME_TRIP_ID, tripId);
+		values.put(AccelerometerDataPersistenceContract.AccelerometerDataEntity.COLUMN_NAME_TIMESTAMP, timestamp);
+		values.put(AccelerometerDataPersistenceContract.AccelerometerDataEntity.COLUMN_NAME_ACC_X, accX);
+		values.put(AccelerometerDataPersistenceContract.AccelerometerDataEntity.COLUMN_NAME_ACC_Y, accY);
+		values.put(AccelerometerDataPersistenceContract.AccelerometerDataEntity.COLUMN_NAME_ACC_Z, accZ);
+
+		return values;
+	}
+
+	@NonNull
+	public static List<AccelerometerData> buildFromContentValuesList(List<ContentValues> contentValuesList)
+	{
+		List<AccelerometerData> accelerometerDataList = new ArrayList<>();
+		if(contentValuesList != null)
+		{
+			for(ContentValues contentValues : contentValuesList)
+			{
+				accelerometerDataList.add(buildFromContentValues(contentValues));
+			}
+		}
+		return accelerometerDataList;
+	}
+
+	public static AccelerometerData buildFromContentValues(ContentValues contentValues)
+	{
+		long id = contentValues.getAsLong(AccelerometerDataPersistenceContract.AccelerometerDataEntity._ID);
+		long mTripId = contentValues.getAsLong(AccelerometerDataPersistenceContract.AccelerometerDataEntity.COLUMN_NAME_TRIP_ID);
+		long timestamp = contentValues.getAsLong(AccelerometerDataPersistenceContract.AccelerometerDataEntity.COLUMN_NAME_TIMESTAMP);
+		double accX = contentValues.getAsDouble(AccelerometerDataPersistenceContract.AccelerometerDataEntity.COLUMN_NAME_ACC_X);
+		double accY = contentValues.getAsDouble(AccelerometerDataPersistenceContract.AccelerometerDataEntity.COLUMN_NAME_ACC_Y);
+		double accZ = contentValues.getAsDouble(AccelerometerDataPersistenceContract.AccelerometerDataEntity.COLUMN_NAME_ACC_Z);
+
+		return new AccelerometerData(id, mTripId, timestamp, accX, accY, accZ);
 	}
 }
