@@ -191,12 +191,15 @@ public class AddTripFragment extends Fragment implements AddTripContract.View
 		tvThird.setTextColor(getResources().getColor(R.color.colorGrey));
 	}
 
-	@OnClick({ R.id.btnNext })
+	@OnClick({ R.id.btnNext, R.id.llSecondStep })
 	public void onClick(View v)
 	{
 		switch(v.getId())
 		{
 			case R.id.btnNext:
+				mPresenter.proceed();
+				break;
+			case R.id.llSecondStep:
 				mPresenter.proceed();
 				break;
 			default:

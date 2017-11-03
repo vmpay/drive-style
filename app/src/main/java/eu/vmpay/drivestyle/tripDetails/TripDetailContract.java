@@ -20,6 +20,8 @@ public interface TripDetailContract
 		boolean isActive();
 
 		void showLoadingDetailsError();
+
+		void showSnackMessage(String message);
 	}
 
 	interface Presenter extends BasePresenter<View>

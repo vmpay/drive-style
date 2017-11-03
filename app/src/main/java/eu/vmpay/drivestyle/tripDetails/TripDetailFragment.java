@@ -12,6 +12,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.Locale;
 
@@ -203,5 +204,11 @@ public class TripDetailFragment extends DaggerFragment implements TripDetailCont
 	{
 		hideTitle();
 		tripDetail.setText(getString(R.string.no_data));
+	}
+
+	@Override
+	public void showSnackMessage(String message)
+	{
+		Toast.makeText(getActivity(), message, Toast.LENGTH_SHORT).show();
 	}
 }

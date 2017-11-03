@@ -134,6 +134,10 @@ final class TripDetailPresenter implements TripDetailContract.Presenter
 							{
 								Log.d(TAG, entry.toString());
 							}
+							if(mTripDetailView != null && mTripDetailView.isActive())
+							{
+								mTripDetailView.showSnackMessage(Integer.toString(accelerometerDataList.size()));
+							}
 						}
 
 						@Override
@@ -141,41 +145,6 @@ final class TripDetailPresenter implements TripDetailContract.Presenter
 						{
 						}
 					});
-
-
-//					mTripsRepository.getLocations(trip.getId(), new TripDataSource.LoadLocationsCallback()
-//					{
-//						@Override
-//						public void onLocationsLoaded(List<LocationData> locationDataList)
-//						{
-//							for(LocationData entry : locationDataList)
-//							{
-//								Log.d("TAG", entry.toString());
-//							}
-//							// TODO: 10/13/17 add map
-//						}
-//
-//						@Override
-//						public void onDataNotAvailable()
-//						{
-//						}
-//					});
-//					mTripsRepository.getAccelerometerDataModels(trip.getId(), new TripDataSource.LoadAccelerometerDataModelsCallback()
-//					{
-//						@Override
-//						public void onAccelerometerDataModelsLoaded(List<AccelerometerData> accelerometerDataList)
-//						{
-//							for(AccelerometerData entry : accelerometerDataList)
-//							{
-//								Log.d("TAG", entry.toString());
-//							}
-//						}
-//
-//						@Override
-//						public void onDataNotAvailable()
-//						{
-//						}
-//					});
 				}
 			}
 
@@ -189,76 +158,6 @@ final class TripDetailPresenter implements TripDetailContract.Presenter
 				mTripDetailView.showLoadingDetailsError();
 			}
 		});
-
-//		mTripsRepository.getTrip(mTripId, new TripDataSource.GetTripCallback()
-//		{
-//			@Override
-//			public void onTripLoaded(Trip trip)
-//			{
-//				// The view may not be able to handle UI updates anymore
-//				if(mTripDetailView == null || !mTripDetailView.isActive())
-//				{
-//					return;
-//				}
-////				mTripDetailView.setLoadingIndicator(false);
-//				if(null == trip)
-//				{
-//					mTripDetailView.showLoadingDetailsError();
-//				}
-//				else
-//				{
-//					showTripDetails(trip);
-//				}
-//				if(trip != null)
-//				{
-//					mTripsRepository.getLocations(trip.getId(), new TripDataSource.LoadLocationsCallback()
-//					{
-//						@Override
-//						public void onLocationsLoaded(List<LocationData> locationDataList)
-//						{
-//							for(LocationData entry : locationDataList)
-//							{
-//								Log.d("TAG", entry.toString());
-//							}
-//							// TODO: 10/13/17 add map
-//						}
-//
-//						@Override
-//						public void onDataNotAvailable()
-//						{
-//						}
-//					});
-//					mTripsRepository.getAccelerometerDataModels(trip.getId(), new TripDataSource.LoadAccelerometerDataModelsCallback()
-//					{
-//						@Override
-//						public void onAccelerometerDataModelsLoaded(List<AccelerometerData> accelerometerDataList)
-//						{
-//							for(AccelerometerData entry : accelerometerDataList)
-//							{
-//								Log.d("TAG", entry.toString());
-//							}
-//						}
-//
-//						@Override
-//						public void onDataNotAvailable()
-//						{
-//						}
-//					});
-//				}
-//			}
-//
-//			@Override
-//			public void onDataNotAvailable()
-//			{
-//				// The view may not be able to handle UI updates anymore
-//				if(!mTripDetailView.isActive())
-//				{
-//					return;
-//				}
-//				mTripDetailView.showLoadingDetailsError();
-//			}
-//		});
-
 	}
 
 	private void showTripDetails(@NonNull Trip trip)
