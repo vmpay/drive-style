@@ -3,19 +3,24 @@ package eu.vmpay.drivestyle.tripList;
 import android.app.Activity;
 import android.content.ContentValues;
 import android.support.annotation.NonNull;
+import android.util.Log;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 
+import eu.vmpay.drivestyle.data.AccelerometerData;
+import eu.vmpay.drivestyle.data.LocationData;
 import eu.vmpay.drivestyle.data.Trip;
 import eu.vmpay.drivestyle.data.source.TripDataSource;
 import eu.vmpay.drivestyle.data.source.TripsRepository;
 import eu.vmpay.drivestyle.di.ActivityScoped;
 import eu.vmpay.drivestyle.sensors.location.FusedLocationProviderContract;
 import eu.vmpay.drivestyle.sensors.motion.AccelerometerSensor;
+import eu.vmpay.drivestyle.utils.ExportUtils;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static eu.vmpay.drivestyle.tripList.TripListFilterType.ALL;
@@ -36,6 +41,8 @@ import static eu.vmpay.drivestyle.tripList.TripListFilterType.ALL;
 @ActivityScoped
 public class TripListPresenter implements TripListContract.Presenter
 {
+	private static final String TAG = "TripListPresenter";
+
 	private final TripsRepository mTripsRepository;
 	private final AccelerometerSensor mAccelerometerSensor;
 	private FusedLocationProviderContract mFusedLocationProvider;
@@ -369,5 +376,77 @@ public class TripListPresenter implements TripListContract.Presenter
 	public void stopLocationRequest()
 	{
 		mFusedLocationProvider.stopLocationRequest();
+	}
+
+	@Override
+	public void exportCsv(final String filename)
+	{
+		// TODO: 11/6/17 check if filename is valid
+		Trip trip = new Trip();
+		mTripsRepository.getDataModels(trip, new TripDataSource.LoadModelsCallback()
+		{
+			@Override
+			public void onModelsLoaded(List<ContentValues> contentValuesList)
+			{
+				List<String[]> exportList = Trip.getExportListFromContentValuesList(contentValuesList);
+				try
+				{
+					ExportUtils.exportToCsv(filename + "_trip", exportList);
+				} catch(IOException e)
+				{
+					e.printStackTrace();
+				}
+			}
+
+			@Override
+			public void onDataNotAvailable()
+			{
+				Log.d(TAG, "Cannot load trip data for export");
+			}
+		});
+		LocationData locationData = new LocationData();
+		mTripsRepository.getDataModels(locationData, new TripDataSource.LoadModelsCallback()
+		{
+			@Override
+			public void onModelsLoaded(List<ContentValues> contentValuesList)
+			{
+				List<String[]> exportList = LocationData.getExportListFromContentValuesList(contentValuesList);
+				try
+				{
+					ExportUtils.exportToCsv(filename + "_location", exportList);
+				} catch(IOException e)
+				{
+					e.printStackTrace();
+				}
+			}
+
+			@Override
+			public void onDataNotAvailable()
+			{
+				Log.d(TAG, "Cannot load location data for export");
+			}
+		});
+		AccelerometerData accelerometerData = new AccelerometerData();
+		mTripsRepository.getDataModels(accelerometerData, new TripDataSource.LoadModelsCallback()
+		{
+			@Override
+			public void onModelsLoaded(List<ContentValues> contentValuesList)
+			{
+				List<String[]> exportList = AccelerometerData.getExportListFromContentValuesList(contentValuesList);
+				try
+				{
+					ExportUtils.exportToCsv(filename + "_accelerometer", exportList);
+				} catch(IOException e)
+				{
+					e.printStackTrace();
+				}
+			}
+
+			@Override
+			public void onDataNotAvailable()
+			{
+				Log.d(TAG, "Cannot load motion data for export");
+			}
+		});
 	}
 }

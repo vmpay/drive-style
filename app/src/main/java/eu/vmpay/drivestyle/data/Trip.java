@@ -209,4 +209,45 @@ public final class Trip extends BaseModel
 
 		return new Trip(id, title, startTime, finishTime, mark, type, TripListFilterType.values()[scenario]);
 	}
+
+	public static List<String[]> getExportListFromContentValuesList(List<ContentValues> contentValuesList)
+	{
+		List<String[]> result = new ArrayList<>();
+
+		String[] header = new String[7];
+		header[0] = TripPersistenceContract.TripEntry._ID;
+		header[1] = TripPersistenceContract.TripEntry.COLUMN_NAME_TITLE;
+		header[2] = TripPersistenceContract.TripEntry.COLUMN_NAME_START_TIME;
+		header[3] = TripPersistenceContract.TripEntry.COLUMN_NAME_FINISH_TIME;
+		header[4] = TripPersistenceContract.TripEntry.COLUMN_NAME_MARK;
+		header[5] = TripPersistenceContract.TripEntry.COLUMN_NAME_TYPE;
+		header[6] = TripPersistenceContract.TripEntry.COLUMN_NAME_SCENARIO;
+
+		result.add(header);
+
+		for(ContentValues entry : contentValuesList)
+		{
+			result.add(getExportListFromContentValues(entry));
+		}
+
+		return result;
+	}
+
+	public static String[] getExportListFromContentValues(ContentValues contentValues)
+	{
+		return exportModel(buildFromContentValues(contentValues));
+	}
+
+	public static String[] exportModel(Trip trip)
+	{
+		String[] result = new String[7];
+		result[0] = Long.toString(trip.mId);
+		result[1] = trip.mTitle;
+		result[2] = Long.toString(trip.mStartTime);
+		result[3] = Long.toString(trip.mFinishTime);
+		result[4] = Double.toString(trip.mMark);
+		result[5] = trip.mType;
+		result[6] = trip.mScenario.name();
+		return result;
+	}
 }

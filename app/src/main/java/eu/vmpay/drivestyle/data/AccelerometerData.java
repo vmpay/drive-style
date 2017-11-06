@@ -193,4 +193,43 @@ public final class AccelerometerData extends BaseModel
 
 		return new AccelerometerData(id, mTripId, timestamp, accX, accY, accZ);
 	}
+
+	public static List<String[]> getExportListFromContentValuesList(List<ContentValues> contentValuesList)
+	{
+		List<String[]> result = new ArrayList<>();
+
+		String[] header = new String[6];
+		header[0] = AccelerometerDataPersistenceContract.AccelerometerDataEntity._ID;
+		header[1] = AccelerometerDataPersistenceContract.AccelerometerDataEntity.COLUMN_NAME_TRIP_ID;
+		header[2] = AccelerometerDataPersistenceContract.AccelerometerDataEntity.COLUMN_NAME_TIMESTAMP;
+		header[3] = AccelerometerDataPersistenceContract.AccelerometerDataEntity.COLUMN_NAME_ACC_X;
+		header[4] = AccelerometerDataPersistenceContract.AccelerometerDataEntity.COLUMN_NAME_ACC_Y;
+		header[5] = AccelerometerDataPersistenceContract.AccelerometerDataEntity.COLUMN_NAME_ACC_Z;
+
+		result.add(header);
+
+		for(ContentValues entry : contentValuesList)
+		{
+			result.add(getExportListFromContentValues(entry));
+		}
+
+		return result;
+	}
+
+	public static String[] getExportListFromContentValues(ContentValues contentValues)
+	{
+		return exportModel(buildFromContentValues(contentValues));
+	}
+
+	public static String[] exportModel(AccelerometerData accelerometerData)
+	{
+		String[] result = new String[6];
+		result[0] = Long.toString(accelerometerData.mId);
+		result[1] = Long.toString(accelerometerData.tripId);
+		result[2] = Long.toString(accelerometerData.timestamp);
+		result[3] = Double.toString(accelerometerData.accX);
+		result[4] = Double.toString(accelerometerData.accY);
+		result[5] = Double.toString(accelerometerData.accZ);
+		return result;
+	}
 }

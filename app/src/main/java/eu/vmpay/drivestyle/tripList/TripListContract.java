@@ -50,6 +50,7 @@ public interface TripListContract
 		boolean isActive();
 
 		void showFilteringPopUpMenu();
+
 	}
 
 	interface Presenter extends BasePresenter<View>
@@ -79,5 +80,7 @@ public interface TripListContract
 		void requestLocation(Activity activity);
 
 		void stopLocationRequest();
+
+		void exportCsv(String filename);
 	}
 }

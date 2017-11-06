@@ -1,20 +1,25 @@
 package eu.vmpay.drivestyle.tripList;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
+import android.support.design.widget.TextInputLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.text.InputType;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -129,8 +134,6 @@ public class TripListFragment extends DaggerFragment implements TripListContract
 		switch(v.getId())
 		{
 			case R.id.fab:
-//				Snackbar.make(v, "Replace with your own action", Snackbar.LENGTH_LONG)
-//						.setAction("Action", null).show();
 				mPresenter.openAddTripDetails();
 				break;
 			default:
@@ -143,9 +146,29 @@ public class TripListFragment extends DaggerFragment implements TripListContract
 	{
 		switch(item.getItemId())
 		{
-//			case R.id.menu_clear:
-//				mPresenter.clearCompletedTrips();
-//				break;
+			case R.id.menu_export:
+				TextInputLayout textInputLayout = new TextInputLayout(getActivity());
+				final EditText input = new EditText(getActivity());
+				input.setInputType(InputType.TYPE_CLASS_TEXT);
+				input.setMaxLines(1);
+				input.setHint(R.string.filename);
+				textInputLayout.addView(input);
+				AlertDialog.Builder builder = new AlertDialog.Builder(getActivity())
+						.setTitle(R.string.export)
+						.setMessage(R.string.message_export_dialog)
+						.setCancelable(true)
+						.setNegativeButton(R.string.cancel, null)
+						.setPositiveButton(R.string.export, new DialogInterface.OnClickListener()
+						{
+							@Override
+							public void onClick(DialogInterface dialog, int which)
+							{
+								mPresenter.exportCsv(input.getText().toString());
+							}
+						})
+						.setView(textInputLayout);
+				builder.show();
+				break;
 			case R.id.menu_filter:
 				showFilteringPopUpMenu();
 				break;

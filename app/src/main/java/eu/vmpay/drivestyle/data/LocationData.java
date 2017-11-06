@@ -224,4 +224,45 @@ public final class LocationData extends BaseModel
 
 		return new LocationData(id, mTripId, timestamp, latitude, longitude, altitude, speed);
 	}
+
+	public static List<String[]> getExportListFromContentValuesList(List<ContentValues> contentValuesList)
+	{
+		List<String[]> result = new ArrayList<>();
+
+		String[] header = new String[7];
+		header[0] = LocationDataPersistenceContract.LocationDataEntity._ID;
+		header[1] = LocationDataPersistenceContract.LocationDataEntity.COLUMN_NAME_TRIP_ID;
+		header[2] = LocationDataPersistenceContract.LocationDataEntity.COLUMN_NAME_TIMESTAMP;
+		header[3] = LocationDataPersistenceContract.LocationDataEntity.COLUMN_NAME_LATITUDE;
+		header[4] = LocationDataPersistenceContract.LocationDataEntity.COLUMN_NAME_LONGITUDE;
+		header[5] = LocationDataPersistenceContract.LocationDataEntity.COLUMN_NAME_ALTITUDE;
+		header[6] = LocationDataPersistenceContract.LocationDataEntity.COLUMN_NAME_SPEED;
+
+		result.add(header);
+
+		for(ContentValues entry : contentValuesList)
+		{
+			result.add(getExportListFromContentValues(entry));
+		}
+
+		return result;
+	}
+
+	public static String[] getExportListFromContentValues(ContentValues contentValues)
+	{
+		return exportModel(buildFromContentValues(contentValues));
+	}
+
+	public static String[] exportModel(LocationData locationData)
+	{
+		String[] result = new String[7];
+		result[0] = Long.toString(locationData.mId);
+		result[1] = Long.toString(locationData.tripId);
+		result[2] = Long.toString(locationData.timestamp);
+		result[3] = Double.toString(locationData.latitude);
+		result[4] = Double.toString(locationData.longitude);
+		result[5] = Double.toString(locationData.altitude);
+		result[6] = Double.toString(locationData.speed);
+		return result;
+	}
 }
