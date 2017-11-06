@@ -4,6 +4,7 @@ apply plugin: 'com.neenbedankt.android-apt'
 android {
     compileSdkVersion rootProject.ext.compileSdkVersion
     buildToolsVersion rootProject.ext.buildToolsVersion
+
     defaultConfig {
         applicationId "eu.vmpay.drivestyle"
         minSdkVersion rootProject.ext.minSdkVersion
@@ -13,6 +14,7 @@ android {
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true
     }
+
     buildTypes {
         debug {
             minifyEnabled false
@@ -55,6 +57,15 @@ android {
         if (variant.buildType.name == 'release'
                 && variant.getFlavors().get(0).name == 'mock') {
             variant.setIgnore(true)
+        }
+    }
+
+    signingConfigs {
+        debug {
+            keyAlias 'DrivingStyleDebugKey'
+            keyPassword 'andrew12#$'
+            storeFile file('../../andrewprivatekeystore.jks')
+            storePassword 'AndrewKeyStore12#$'
         }
     }
 }
