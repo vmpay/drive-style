@@ -37,8 +37,7 @@ public class AddTripFragment extends Fragment implements AddTripContract.View
 {
 	private static final String TAG = "AddTripFragment";
 
-	@Inject
-	AddTripContract.Presenter mPresenter;
+	@Inject AddTripContract.Presenter mPresenter;
 
 	private Unbinder unbinder;
 	private int currentStep = 0;
@@ -60,7 +59,6 @@ public class AddTripFragment extends Fragment implements AddTripContract.View
 	@BindView(R.id.tvSecond) TextView tvSecond;
 	@BindView(R.id.tvThird) TextView tvThird;
 	@BindView(R.id.btnNext) Button btnNext;
-
 
 	@Inject
 	public AddTripFragment()
@@ -137,18 +135,6 @@ public class AddTripFragment extends Fragment implements AddTripContract.View
 				tvThird.setTextColor(getResources().getColor(R.color.colorAccent));
 				btnNext.setText(getString(R.string.button_done));
 				break;
-			case 4:
-				TripListFilterType scenario = TripListFilterType.BRAKE;
-				if(radioButtons[1].isChecked())
-				{
-					scenario = TripListFilterType.TURN;
-				}
-				if(radioButtons[2].isChecked())
-				{
-					scenario = TripListFilterType.LANE_CHANGE;
-				}
-				mPresenter.saveData(etName.getText().toString(), "OnGo", scenario);
-				break;
 			default:
 				llFirstStep.setVisibility(View.VISIBLE);
 				tvFirst.setText(R.string.stepper_marked);
@@ -197,7 +183,24 @@ public class AddTripFragment extends Fragment implements AddTripContract.View
 		switch(v.getId())
 		{
 			case R.id.btnNext:
-				mPresenter.proceed();
+				if(currentStep != 3)
+				{
+					mPresenter.proceed();
+				}
+				else
+				{
+					TripListFilterType scenario = TripListFilterType.BRAKE;
+					if(radioButtons[1].isChecked())
+					{
+						scenario = TripListFilterType.TURN;
+					}
+					if(radioButtons[2].isChecked())
+					{
+						scenario = TripListFilterType.LANE_CHANGE;
+					}
+					mPresenter.saveData(etName.getText().toString(), "OnGo", scenario);
+					getActivity().finish();
+				}
 				break;
 			case R.id.llSecondStep:
 				mPresenter.proceed();

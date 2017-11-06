@@ -2,7 +2,6 @@ package eu.vmpay.drivestyle.addTrip;
 
 import android.os.Handler;
 import android.support.annotation.Nullable;
-import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -32,8 +31,7 @@ final class AddTripPresenter implements AddTripContract.Presenter, Accelerometer
 	private final AccelerometerSensorContract accelerometerSensor;
 	private final FusedLocationProviderContract fusedLocationProvider;
 	private TripsRepository tripsRepository;
-	@Nullable
-	private AddTripContract.View addTripView;
+	@Nullable private AddTripContract.View addTripView;
 
 	private boolean accCalibrationFinished = false;
 	private HashMap<Long, Double[]> motionDataMap = new HashMap<>(), motionDataMapCopy = new HashMap<>();
@@ -71,17 +69,11 @@ final class AddTripPresenter implements AddTripContract.Presenter, Accelerometer
 				case 1:
 					currentStep++;
 					addTripView.showStep(currentStep);
-					Log.d(TAG, "recycleMap onAccDataReceived " + System.currentTimeMillis());
 					recyclerHandler.postDelayed(recycleMap, 5_000);
 					break;
 				case 2:
 					stopMotionSensor();
 					clearOldData();
-					currentStep++;
-					addTripView.showStep(currentStep);
-					break;
-				case 3:
-					// TODO: 11/2/17 finish activity
 					currentStep++;
 					addTripView.showStep(currentStep);
 					break;
@@ -132,7 +124,7 @@ final class AddTripPresenter implements AddTripContract.Presenter, Accelerometer
 		}
 
 		Trip trip = new Trip(tripTitle.isEmpty() ? "Trip " + new Date(startTimestamp).toString() : tripTitle, startTimestamp, stopTimestamp, type, scenario);
-		Log.d(TAG, trip.toString() + " readings " + motionDataMapCopy.size());
+//		Log.d(TAG, trip.toString() + " readings " + motionDataMapCopy.size());
 		long tripId = tripsRepository.saveDataModel(trip);
 
 		List<AccelerometerData> accelerometerDataList = new ArrayList<>();
@@ -152,7 +144,7 @@ final class AddTripPresenter implements AddTripContract.Presenter, Accelerometer
 
 		for(AccelerometerData entry : accelerometerDataList)
 		{
-			Log.d(TAG, entry.toString());
+//			Log.d(TAG, entry.toString());
 			tripsRepository.saveDataModel(entry);
 		}
 	}
@@ -202,7 +194,6 @@ final class AddTripPresenter implements AddTripContract.Presenter, Accelerometer
 		motionDataMapCopy.putAll(motionDataMap);
 		motionDataMap.clear();
 		long currentTimeStamp = System.currentTimeMillis();
-		Log.d(TAG, "clearOldData " + currentTimeStamp);
 		Iterator<Map.Entry<Long, Double[]>> it = motionDataMapCopy.entrySet().iterator();
 		while(it.hasNext())
 		{
