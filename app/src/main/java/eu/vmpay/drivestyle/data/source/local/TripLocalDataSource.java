@@ -88,7 +88,7 @@ public class TripLocalDataSource implements TripDataSource
 							}
 							break;
 						case Cursor.FIELD_TYPE_INTEGER:
-							Integer intValue = c.getInt(columnIndex);
+							Long intValue = c.getLong(columnIndex);
 							if(intValue != null)
 							{
 								contentValues.put(dataModel.getProjection()[i], intValue);
