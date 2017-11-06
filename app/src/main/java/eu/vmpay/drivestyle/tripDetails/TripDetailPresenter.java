@@ -44,10 +44,8 @@ final class TripDetailPresenter implements TripDetailContract.Presenter
 
 	private final TripsRepository mTripsRepository;
 	private final SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
-	@Nullable
-	private String mTripId;
-	@Nullable
-	private TripDetailContract.View mTripDetailView;
+	@Nullable private String mTripId;
+	@Nullable private TripDetailContract.View mTripDetailView;
 
 	private Trip actualTrip;
 	private List<LocationData> locationDataList;
@@ -139,10 +137,6 @@ final class TripDetailPresenter implements TripDetailContract.Presenter
 							for(AccelerometerData entry : accelerometerDataList)
 							{
 								Log.d(TAG, entry.toString());
-							}
-							if(mTripDetailView != null && mTripDetailView.isActive())
-							{
-								mTripDetailView.showSnackMessage("accdata size = " + Integer.toString(accelerometerDataList.size()));
 							}
 						}
 

@@ -51,6 +51,7 @@ public interface TripListContract
 
 		void showFilteringPopUpMenu();
 
+		void showInvalidFilename();
 	}
 
 	interface Presenter extends BasePresenter<View>

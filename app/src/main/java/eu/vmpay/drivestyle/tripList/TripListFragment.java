@@ -1,13 +1,17 @@
 package eu.vmpay.drivestyle.tripList;
 
+import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TextInputLayout;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
@@ -45,22 +49,16 @@ import eu.vmpay.drivestyle.tripDetails.TripDetailActivity;
 
 public class TripListFragment extends DaggerFragment implements TripListContract.View
 {
-	@Inject
-	TripListContract.Presenter mPresenter;
+	private static final int PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE = 3;
 
-	@BindView(R.id.track_list)
-	RecyclerView recyclerView;
-	@BindView(R.id.llTripList)
-	LinearLayout llTripList;
-	@BindView(R.id.llNoTrips)
-	LinearLayout llNoTrips;
-	@BindView(R.id.ivNoTrips)
-	ImageView ivNoTrips;
-	@BindView(R.id.tvNoTrips)
-	TextView tvNoTrips;
-	@BindView(R.id.tvInstruction)
-	TextView tvInstruction;
+	@Inject TripListContract.Presenter mPresenter;
 
+	@BindView(R.id.track_list) RecyclerView recyclerView;
+	@BindView(R.id.llTripList) LinearLayout llTripList;
+	@BindView(R.id.llNoTrips) LinearLayout llNoTrips;
+	@BindView(R.id.ivNoTrips) ImageView ivNoTrips;
+	@BindView(R.id.tvNoTrips) TextView tvNoTrips;
+	@BindView(R.id.tvInstruction) TextView tvInstruction;
 
 	TripItemListener mItemListener = new TripItemListener()
 	{
@@ -147,27 +145,17 @@ public class TripListFragment extends DaggerFragment implements TripListContract
 		switch(item.getItemId())
 		{
 			case R.id.menu_export:
-				TextInputLayout textInputLayout = new TextInputLayout(getActivity());
-				final EditText input = new EditText(getActivity());
-				input.setInputType(InputType.TYPE_CLASS_TEXT);
-				input.setMaxLines(1);
-				input.setHint(R.string.filename);
-				textInputLayout.addView(input);
-				AlertDialog.Builder builder = new AlertDialog.Builder(getActivity())
-						.setTitle(R.string.export)
-						.setMessage(R.string.message_export_dialog)
-						.setCancelable(true)
-						.setNegativeButton(R.string.cancel, null)
-						.setPositiveButton(R.string.export, new DialogInterface.OnClickListener()
-						{
-							@Override
-							public void onClick(DialogInterface dialog, int which)
-							{
-								mPresenter.exportCsv(input.getText().toString());
-							}
-						})
-						.setView(textInputLayout);
-				builder.show();
+				if(ContextCompat.checkSelfPermission(getActivity(),
+						Manifest.permission.WRITE_EXTERNAL_STORAGE)
+						!= PackageManager.PERMISSION_GRANTED)
+				{
+					requestPermissions(new String[] { Manifest.permission.WRITE_EXTERNAL_STORAGE },
+							PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE);
+				}
+				else
+				{
+					showExportDialog();
+				}
 				break;
 			case R.id.menu_filter:
 				showFilteringPopUpMenu();
@@ -183,6 +171,57 @@ public class TripListFragment extends DaggerFragment implements TripListContract
 	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater)
 	{
 		inflater.inflate(R.menu.menu_trip_list_fragment, menu);
+	}
+
+	@Override
+	public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults)
+	{
+		if(requestCode == PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE)
+		{
+			if(grantResults.length > 0
+					&& grantResults[0] == PackageManager.PERMISSION_GRANTED)
+			{
+				showExportDialog();
+				// permission was granted, yay! Do the
+				// contacts-related task you need to do.
+
+			}
+			else
+			{
+				showMessage(R.string.export_failed);
+				// permission denied, boo! Disable the
+				// functionality that depends on this permission.
+			}
+		}
+		else
+		{
+			super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+		}
+	}
+
+	private void showExportDialog()
+	{
+		TextInputLayout textInputLayout = new TextInputLayout(getActivity());
+		final EditText input = new EditText(getActivity());
+		input.setInputType(InputType.TYPE_CLASS_TEXT);
+		input.setMaxLines(1);
+		input.setHint(R.string.filename);
+		textInputLayout.addView(input);
+		AlertDialog.Builder builder = new AlertDialog.Builder(getActivity())
+				.setTitle(R.string.export)
+				.setMessage(R.string.message_export_dialog)
+				.setCancelable(true)
+				.setNegativeButton(R.string.cancel, null)
+				.setPositiveButton(R.string.export, new DialogInterface.OnClickListener()
+				{
+					@Override
+					public void onClick(DialogInterface dialog, int which)
+					{
+						mPresenter.exportCsv(input.getText().toString());
+					}
+				})
+				.setView(textInputLayout);
+		builder.show();
 	}
 
 	@Override
@@ -325,6 +364,11 @@ public class TripListFragment extends DaggerFragment implements TripListContract
 		return isAdded();
 	}
 
+	private void showMessage(int messageResId)
+	{
+		Snackbar.make(getView(), messageResId, Snackbar.LENGTH_LONG).show();
+	}
+
 	private void showMessage(String message)
 	{
 		Snackbar.make(getView(), message, Snackbar.LENGTH_LONG).show();
@@ -372,6 +416,12 @@ public class TripListFragment extends DaggerFragment implements TripListContract
 		});
 
 		popup.show();
+	}
+
+	@Override
+	public void showInvalidFilename()
+	{
+		showMessage(R.string.invalid_filename);
 	}
 
 	public interface TripItemListener

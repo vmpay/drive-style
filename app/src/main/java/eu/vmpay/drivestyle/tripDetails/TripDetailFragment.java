@@ -1,7 +1,11 @@
 package eu.vmpay.drivestyle.tripDetails;
 
+import android.Manifest;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
+import android.support.v4.content.ContextCompat;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -37,6 +41,7 @@ public class TripDetailFragment extends DaggerFragment implements TripDetailCont
 	@BindView(R.id.tvTripDetail) TextView tvTripDetail;
 	@BindView(R.id.tvTripTitle) TextView tvTripTitle;
 
+	private final int PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE = 3;
 	private Unbinder unbinder;
 
 	/**
@@ -80,10 +85,46 @@ public class TripDetailFragment extends DaggerFragment implements TripDetailCont
 		switch(item.getItemId())
 		{
 			case R.id.menu_export:
-				mPresenter.exportCsv();
+				if(ContextCompat.checkSelfPermission(getActivity(),
+						Manifest.permission.WRITE_EXTERNAL_STORAGE)
+						!= PackageManager.PERMISSION_GRANTED)
+				{
+					requestPermissions(new String[] { Manifest.permission.WRITE_EXTERNAL_STORAGE },
+							PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE);
+				}
+				else
+				{
+					mPresenter.exportCsv();
+				}
 				return true;
 			default:
 				return false;
+		}
+	}
+
+	@Override
+	public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults)
+	{
+		if(requestCode == PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE)
+		{
+			if(grantResults.length > 0
+					&& grantResults[0] == PackageManager.PERMISSION_GRANTED)
+			{
+				mPresenter.exportCsv();
+				// permission was granted, yay! Do the
+				// contacts-related task you need to do.
+
+			}
+			else
+			{
+				showExportFailed();
+				// permission denied, boo! Disable the
+				// functionality that depends on this permission.
+			}
+		}
+		else
+		{
+			super.onRequestPermissionsResult(requestCode, permissions, grantResults);
 		}
 	}
 

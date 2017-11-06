@@ -382,6 +382,14 @@ public class TripListPresenter implements TripListContract.Presenter
 	public void exportCsv(final String filename)
 	{
 		// TODO: 11/6/17 check if filename is valid
+		if(!ExportUtils.isFileNameValid(filename))
+		{
+			if(mTripListView != null)
+			{
+				mTripListView.showInvalidFilename();
+			}
+			return;
+		}
 		Trip trip = new Trip();
 		mTripsRepository.getDataModels(trip, new TripDataSource.LoadModelsCallback()
 		{
@@ -448,5 +456,17 @@ public class TripListPresenter implements TripListContract.Presenter
 				Log.d(TAG, "Cannot load motion data for export");
 			}
 		});
+
+//		if(mTripListView != null)
+//		{
+//			if(exportFailed)
+//			{
+//				mTripListView.showExportFailed();
+//			}
+//			else
+//			{
+//				mTripListView.showExportSucceeded();
+//			}
+//		}
 	}
 }
