@@ -62,10 +62,18 @@ android {
 
     signingConfigs {
         debug {
-            keyAlias 'DrivingStyleDebugKey'
+            keyAlias 'DriveStyleDebugKey'
             keyPassword 'andrew12#$'
             storeFile file('../../andrewprivatekeystore.jks')
             storePassword 'AndrewKeyStore12#$'
+        }
+    }
+
+    applicationVariants.all { variant ->
+        variant.outputs.each { output ->
+            output.outputFile = new File(
+                    output.outputFile.parent,
+                    output.outputFile.name.replace("app", "DriveStyle-app-v${variant.versionName}"))
         }
     }
 }
