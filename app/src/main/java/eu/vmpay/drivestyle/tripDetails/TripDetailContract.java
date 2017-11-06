@@ -22,10 +22,16 @@ public interface TripDetailContract
 		void showLoadingDetailsError();
 
 		void showSnackMessage(String message);
+
+		void showExportSucceeded();
+
+		void showExportFailed();
 	}
 
 	interface Presenter extends BasePresenter<View>
 	{
 		void deleteTrip();
+
+		void exportCsv();
 	}
 }

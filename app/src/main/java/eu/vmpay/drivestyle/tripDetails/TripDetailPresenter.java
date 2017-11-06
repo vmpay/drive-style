@@ -8,6 +8,7 @@ import android.util.Log;
 
 import com.google.common.base.Strings;
 
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
@@ -21,6 +22,7 @@ import eu.vmpay.drivestyle.data.source.TripDataSource;
 import eu.vmpay.drivestyle.data.source.TripsRepository;
 import eu.vmpay.drivestyle.data.source.local.AccelerometerDataPersistenceContract;
 import eu.vmpay.drivestyle.data.source.local.LocationDataPersistenceContract;
+import eu.vmpay.drivestyle.utils.ExportUtils;
 
 /**
  * Created by andrew on 9/26/17.
@@ -46,6 +48,10 @@ final class TripDetailPresenter implements TripDetailContract.Presenter
 	private String mTripId;
 	@Nullable
 	private TripDetailContract.View mTripDetailView;
+
+	private Trip actualTrip;
+	private List<LocationData> locationDataList;
+	private List<AccelerometerData> accelerometerDataList;
 
 	/**
 	 * Dagger strictly enforces that arguments not marked with {@code @Nullable} are not injected
@@ -89,7 +95,7 @@ final class TripDetailPresenter implements TripDetailContract.Presenter
 					return;
 				}
 
-
+				actualTrip = trip;
 				if(null == trip)
 				{
 					mTripDetailView.showLoadingDetailsError();
@@ -108,7 +114,7 @@ final class TripDetailPresenter implements TripDetailContract.Presenter
 						@Override
 						public void onModelsLoaded(List<ContentValues> contentValuesList)
 						{
-							List<LocationData> locationDataList = LocationData.buildFromContentValuesList(contentValuesList);
+							locationDataList = LocationData.buildFromContentValuesList(contentValuesList);
 							for(LocationData entry : locationDataList)
 							{
 								Log.d(TAG, entry.toString());
@@ -129,14 +135,14 @@ final class TripDetailPresenter implements TripDetailContract.Presenter
 						@Override
 						public void onModelsLoaded(List<ContentValues> contentValuesList)
 						{
-							List<AccelerometerData> accelerometerDataList = AccelerometerData.buildFromContentValuesList(contentValuesList);
+							accelerometerDataList = AccelerometerData.buildFromContentValuesList(contentValuesList);
 							for(AccelerometerData entry : accelerometerDataList)
 							{
 								Log.d(TAG, entry.toString());
 							}
 							if(mTripDetailView != null && mTripDetailView.isActive())
 							{
-								mTripDetailView.showSnackMessage(Integer.toString(accelerometerDataList.size()));
+								mTripDetailView.showSnackMessage("accdata size = " + Integer.toString(accelerometerDataList.size()));
 							}
 						}
 
@@ -218,5 +224,49 @@ final class TripDetailPresenter implements TripDetailContract.Presenter
 	public void deleteTrip()
 	{
 
+	}
+
+	@Override
+	public void exportCsv()
+	{
+		if(actualTrip != null)
+		{
+			boolean exportFailed = false;
+			if(locationDataList != null)
+			{
+				List<String[]> exportLocationList = LocationData.getExportListFromModelList(locationDataList);
+				try
+				{
+					ExportUtils.exportToCsv(actualTrip.getmTitle() + "_location", exportLocationList);
+				} catch(IOException e)
+				{
+					exportFailed = true;
+					e.printStackTrace();
+				}
+			}
+			if(accelerometerDataList != null)
+			{
+				List<String[]> exportMotionList = AccelerometerData.getExportListFromModelList(accelerometerDataList);
+				try
+				{
+					ExportUtils.exportToCsv(actualTrip.getmTitle() + "_accelerometer", exportMotionList);
+				} catch(IOException e)
+				{
+					exportFailed = true;
+					e.printStackTrace();
+				}
+			}
+			if(mTripDetailView != null)
+			{
+				if(exportFailed)
+				{
+					mTripDetailView.showExportFailed();
+				}
+				else
+				{
+					mTripDetailView.showExportSucceeded();
+				}
+			}
+		}
 	}
 }

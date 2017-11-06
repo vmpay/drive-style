@@ -216,6 +216,29 @@ public final class AccelerometerData extends BaseModel
 		return result;
 	}
 
+
+	public static List<String[]> getExportListFromModelList(List<AccelerometerData> accelerometerDataList)
+	{
+		List<String[]> result = new ArrayList<>();
+
+		String[] header = new String[6];
+		header[0] = AccelerometerDataPersistenceContract.AccelerometerDataEntity._ID;
+		header[1] = AccelerometerDataPersistenceContract.AccelerometerDataEntity.COLUMN_NAME_TRIP_ID;
+		header[2] = AccelerometerDataPersistenceContract.AccelerometerDataEntity.COLUMN_NAME_TIMESTAMP;
+		header[3] = AccelerometerDataPersistenceContract.AccelerometerDataEntity.COLUMN_NAME_ACC_X;
+		header[4] = AccelerometerDataPersistenceContract.AccelerometerDataEntity.COLUMN_NAME_ACC_Y;
+		header[5] = AccelerometerDataPersistenceContract.AccelerometerDataEntity.COLUMN_NAME_ACC_Z;
+
+		result.add(header);
+
+		for(AccelerometerData entry : accelerometerDataList)
+		{
+			result.add(exportModel(entry));
+		}
+
+		return result;
+	}
+
 	public static String[] getExportListFromContentValues(ContentValues contentValues)
 	{
 		return exportModel(buildFromContentValues(contentValues));
@@ -232,4 +255,5 @@ public final class AccelerometerData extends BaseModel
 		result[5] = Double.toString(accelerometerData.accZ);
 		return result;
 	}
+
 }

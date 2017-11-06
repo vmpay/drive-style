@@ -248,6 +248,29 @@ public final class LocationData extends BaseModel
 		return result;
 	}
 
+	public static List<String[]> getExportListFromModelList(List<LocationData> locationDataList)
+	{
+		List<String[]> result = new ArrayList<>();
+
+		String[] header = new String[7];
+		header[0] = LocationDataPersistenceContract.LocationDataEntity._ID;
+		header[1] = LocationDataPersistenceContract.LocationDataEntity.COLUMN_NAME_TRIP_ID;
+		header[2] = LocationDataPersistenceContract.LocationDataEntity.COLUMN_NAME_TIMESTAMP;
+		header[3] = LocationDataPersistenceContract.LocationDataEntity.COLUMN_NAME_LATITUDE;
+		header[4] = LocationDataPersistenceContract.LocationDataEntity.COLUMN_NAME_LONGITUDE;
+		header[5] = LocationDataPersistenceContract.LocationDataEntity.COLUMN_NAME_ALTITUDE;
+		header[6] = LocationDataPersistenceContract.LocationDataEntity.COLUMN_NAME_SPEED;
+
+		result.add(header);
+
+		for(LocationData entry : locationDataList)
+		{
+			result.add(exportModel(entry));
+		}
+
+		return result;
+	}
+
 	public static String[] getExportListFromContentValues(ContentValues contentValues)
 	{
 		return exportModel(buildFromContentValues(contentValues));

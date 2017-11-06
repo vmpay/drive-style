@@ -182,7 +182,7 @@ public class TripListFragment extends DaggerFragment implements TripListContract
 	@Override
 	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater)
 	{
-		inflater.inflate(R.menu.trip_list_fragment_menu, menu);
+		inflater.inflate(R.menu.menu_trip_list_fragment, menu);
 	}
 
 	@Override

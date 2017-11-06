@@ -1,9 +1,7 @@
 package eu.vmpay.drivestyle.tripDetails;
 
-import android.app.Activity;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
-import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -11,7 +9,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.util.Locale;
 
@@ -35,12 +32,11 @@ import eu.vmpay.drivestyle.tripList.TripListActivity;
 @ActivityScoped
 public class TripDetailFragment extends DaggerFragment implements TripDetailContract.View
 {
-	@Inject
-	String tripId;
-	@Inject
-	TripDetailContract.Presenter mPresenter;
-	@BindView(R.id.trip_detail)
-	TextView tripDetail;
+	@Inject String tripId;
+	@Inject TripDetailContract.Presenter mPresenter;
+	@BindView(R.id.tvTripDetail) TextView tvTripDetail;
+	@BindView(R.id.tvTripTitle) TextView tvTripTitle;
+
 	private Unbinder unbinder;
 
 	/**
@@ -81,7 +77,14 @@ public class TripDetailFragment extends DaggerFragment implements TripDetailCont
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item)
 	{
-		return false;
+		switch(item.getItemId())
+		{
+			case R.id.menu_export:
+				mPresenter.exportCsv();
+				return true;
+			default:
+				return false;
+		}
 	}
 
 	@OnClick({ R.id.fab })
@@ -102,35 +105,25 @@ public class TripDetailFragment extends DaggerFragment implements TripDetailCont
 	@Override
 	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater)
 	{
-		super.onCreateOptionsMenu(menu, inflater);
+		inflater.inflate(R.menu.menu_trip_detail_fragment, menu);
 	}
 
 	@Override
 	public void showTitle(String title)
 	{
-		Activity activity = this.getActivity();
-		Toolbar appBarLayout = activity.findViewById(R.id.detail_toolbar);
-		if(appBarLayout != null)
-		{
-			appBarLayout.setTitle(title);
-		}
+		tvTripTitle.setText(title);
 	}
 
 	@Override
 	public void hideTitle()
 	{
-		Activity activity = this.getActivity();
-		Toolbar appBarLayout = activity.findViewById(R.id.detail_toolbar);
-		if(appBarLayout != null)
-		{
-			appBarLayout.setTitle("");
-		}
+		tvTripTitle.setText("");
 	}
 
 	@Override
 	public void showDetails(String startTime, String finishTime, Double mark, String type, String scenario)
 	{
-		tripDetail.setText(String.format(Locale.US,
+		tvTripDetail.setText(String.format(Locale.US,
 				"Mark %.2f\nStart time %s\nFinishTime %s\nType %s\nScenario %s",
 				mark, startTime, finishTime, type, scenario));
 	}
@@ -145,12 +138,25 @@ public class TripDetailFragment extends DaggerFragment implements TripDetailCont
 	public void showLoadingDetailsError()
 	{
 		hideTitle();
-		tripDetail.setText(getString(R.string.no_data));
+		tvTripDetail.setText(getString(R.string.no_data));
 	}
 
 	@Override
 	public void showSnackMessage(String message)
 	{
-		Toast.makeText(getActivity(), message, Toast.LENGTH_SHORT).show();
+		Snackbar.make(getView(), message, Snackbar.LENGTH_SHORT).show();
+	}
+
+	@Override
+	public void showExportSucceeded()
+	{
+		Snackbar.make(getView(), R.string.export_succeeded, Snackbar.LENGTH_LONG).show();
+
+	}
+
+	@Override
+	public void showExportFailed()
+	{
+		Snackbar.make(getView(), R.string.export_failed, Snackbar.LENGTH_LONG).show();
 	}
 }
