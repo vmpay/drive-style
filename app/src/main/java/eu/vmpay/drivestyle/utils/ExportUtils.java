@@ -49,7 +49,7 @@ public class ExportUtils
 		}
 		Writer writer = new FileWriter(PATH + SEPARATOR + fileName + EXTENSION);
 		CSVWriter csvWriter = new CSVWriter(writer);
-		csvWriter.writeAll(list);
+		csvWriter.writeAll(list, false);
 		writer.close();
 		Log.d(TAG, "Exported successfully to " + PATH + SEPARATOR + fileName + EXTENSION);
 	}
