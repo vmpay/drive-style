@@ -49,6 +49,7 @@ public class FusedLocationProvider implements FusedLocationProviderContract, Goo
 	private Activity activity;
 	private boolean isServiceConnected = false;
 	private final int ACCESS_FINE_LOCATION_CODE = 2;
+	private LocationData locationData;
 
 	@Inject
 	public FusedLocationProvider(@Nullable Context mContext)
@@ -70,8 +71,8 @@ public class FusedLocationProvider implements FusedLocationProviderContract, Goo
 		Log.i(TAG, "GoogleApiClient connection has been established");
 		locationRequest = LocationRequest.create()
 				.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
-				.setInterval(1000)
-				.setFastestInterval(5000)
+				.setInterval(100)
+				.setFastestInterval(100)
 		;
 		isServiceConnected = true;
 	}
@@ -109,7 +110,7 @@ public class FusedLocationProvider implements FusedLocationProviderContract, Goo
 	}
 
 	@Override
-	public void requestLocation(final Activity activity)
+	public void requestLocation(final Activity activity, LocationData locationData)
 	{
 		if(!isServiceConnected)
 		{
@@ -117,6 +118,7 @@ public class FusedLocationProvider implements FusedLocationProviderContract, Goo
 		}
 
 		this.activity = activity;
+		this.locationData = locationData;
 
 		LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder()
 				.addLocationRequest(locationRequest);
@@ -188,5 +190,6 @@ public class FusedLocationProvider implements FusedLocationProviderContract, Goo
 	public void onLocationChanged(Location location)
 	{
 		Log.d(TAG, String.format(Locale.US, "Lat %f Long %f Alt %f Speed %f", location.getLatitude(), location.getLongitude(), location.getAltitude(), location.getSpeed()));
+		locationData.onLocationDataReceived(location);
 	}
 }

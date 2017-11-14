@@ -1,5 +1,6 @@
 package eu.vmpay.drivestyle.addTrip;
 
+import android.location.Location;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -52,6 +53,8 @@ public class AddTripFragment extends Fragment implements AddTripContract.View
 	@BindView(R.id.ivLocation) ImageView ivLocation;
 
 	@BindViews({ R.id.tvAccX, R.id.tvAccY, R.id.tvAccZ }) TextView[] tvAcceleration;
+	@BindViews({ R.id.tvLatitude, R.id.tvLongitude, R.id.tvAltitude,
+			R.id.tvSpeed }) TextView[] tvLocation;
 	@BindView(R.id.etName) EditText etName;
 	@BindViews({ R.id.rbnBrake, R.id.rbnTurn, R.id.rbnLaneChange }) RadioButton[] radioButtons;
 
@@ -84,6 +87,7 @@ public class AddTripFragment extends Fragment implements AddTripContract.View
 		super.onResume();
 		mPresenter.takeView(this);
 		mPresenter.startMotionSensor();
+		mPresenter.startLocationSensor(getActivity());
 	}
 
 	@Override
@@ -91,6 +95,7 @@ public class AddTripFragment extends Fragment implements AddTripContract.View
 	{
 		Log.d(TAG, "onPause");
 		mPresenter.stopMotionSensor();
+		mPresenter.stopLocationSensor();
 		super.onPause();
 	}
 
@@ -162,6 +167,22 @@ public class AddTripFragment extends Fragment implements AddTripContract.View
 				tvAcceleration[i].setText(String.format(Locale.US, "%.3f", acceleration[i]));
 			}
 		}
+	}
+
+	@Override
+	public void locationSensorCalibrated()
+	{
+		pbLocation.setVisibility(View.GONE);
+		ivLocation.setVisibility(View.VISIBLE);
+	}
+
+	@Override
+	public void showLocationData(Location location)
+	{
+		tvLocation[0].setText(String.format(Locale.US, "%f", location.getLatitude()));
+		tvLocation[1].setText(String.format(Locale.US, "%f", location.getLongitude()));
+		tvLocation[2].setText(String.format(Locale.US, "%f", location.getAltitude()));
+		tvLocation[3].setText(String.format(Locale.US, "%f", location.getSpeed()));
 	}
 
 	private void clearStepper()
