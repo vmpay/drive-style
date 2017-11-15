@@ -10,7 +10,7 @@ import eu.vmpay.drivestyle.data.source.local.TripLocalDataSource;
 
 /**
  * Created by andrew on 9/26/17.
- * This is used by Dagger to inject the required arguments into the {@link TripsRepository}.
+ * This is used by Dagger to inject the required arguments into the {@link TripLocalDataSource}.
  */
 @Module
 public class TripsRepositoryModule

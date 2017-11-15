@@ -8,7 +8,7 @@ import javax.inject.Inject;
 
 import dagger.android.AndroidInjector;
 import dagger.android.DaggerApplication;
-import eu.vmpay.drivestyle.data.source.TripsRepository;
+import eu.vmpay.drivestyle.data.source.local.TripLocalDataSource;
 import eu.vmpay.drivestyle.di.AppComponent;
 import eu.vmpay.drivestyle.di.DaggerAppComponent;
 import eu.vmpay.drivestyle.sensors.location.FusedLocationProviderContract;
@@ -24,7 +24,7 @@ import eu.vmpay.drivestyle.sensors.motion.AccelerometerSensorContract;
 public class DriveStyleApplication extends DaggerApplication
 {
 	@Inject
-	TripsRepository tripsRepository;
+	TripLocalDataSource tripsRepository;
 
 	@Inject
 	AccelerometerSensorContract accelerometerSensor;
@@ -48,7 +48,7 @@ public class DriveStyleApplication extends DaggerApplication
 	}
 
 	@VisibleForTesting
-	public TripsRepository getTripsRepository()
+	public TripLocalDataSource getTripsRepository()
 	{
 		return tripsRepository;
 	}

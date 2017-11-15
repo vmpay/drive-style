@@ -160,9 +160,6 @@ public class TripListFragment extends DaggerFragment implements TripListContract
 			case R.id.menu_filter:
 				showFilteringPopUpMenu();
 				break;
-			case R.id.menu_refresh:
-				mPresenter.loadTripList(true);
-				break;
 		}
 		return true;
 	}
@@ -222,12 +219,6 @@ public class TripListFragment extends DaggerFragment implements TripListContract
 				})
 				.setView(textInputLayout);
 		builder.show();
-	}
-
-	@Override
-	public void setLoadingIndicator(boolean active)
-	{
-
 	}
 
 	@Override
@@ -410,7 +401,7 @@ public class TripListFragment extends DaggerFragment implements TripListContract
 						mPresenter.setFiltering(TripListFilterType.ALL);
 						break;
 				}
-				mPresenter.loadTripList(false);
+				mPresenter.loadTripList();
 				return true;
 			}
 		});

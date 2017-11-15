@@ -10,8 +10,8 @@ import dagger.android.AndroidInjector;
 import dagger.android.DaggerApplication;
 import dagger.android.support.AndroidSupportInjectionModule;
 import eu.vmpay.drivestyle.DriveStyleApplication;
-import eu.vmpay.drivestyle.data.source.TripsRepository;
 import eu.vmpay.drivestyle.data.source.TripsRepositoryModule;
+import eu.vmpay.drivestyle.data.source.local.TripLocalDataSource;
 import eu.vmpay.drivestyle.sensors.SensorModule;
 import eu.vmpay.drivestyle.sensors.motion.AccelerometerSensor;
 
@@ -41,7 +41,7 @@ public interface AppComponent extends AndroidInjector<DaggerApplication>
 
 	void inject(DriveStyleApplication application);
 
-	TripsRepository getTripsRepository();
+	TripLocalDataSource getTripLocalDataSource();
 
 	AccelerometerSensor getAccelerometerSensor();
 

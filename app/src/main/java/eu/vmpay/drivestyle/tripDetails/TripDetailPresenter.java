@@ -17,9 +17,9 @@ import eu.vmpay.drivestyle.data.AccelerometerData;
 import eu.vmpay.drivestyle.data.LocationData;
 import eu.vmpay.drivestyle.data.Trip;
 import eu.vmpay.drivestyle.data.source.TripDataSource;
-import eu.vmpay.drivestyle.data.source.TripsRepository;
 import eu.vmpay.drivestyle.data.source.local.AccelerometerDataPersistenceContract;
 import eu.vmpay.drivestyle.data.source.local.LocationDataPersistenceContract;
+import eu.vmpay.drivestyle.data.source.local.TripLocalDataSource;
 import eu.vmpay.drivestyle.utils.ExportUtils;
 
 /**
@@ -40,7 +40,7 @@ final class TripDetailPresenter implements TripDetailContract.Presenter
 {
 	private final String TAG = "TripDetailPresenter";
 
-	private final TripsRepository mTripsRepository;
+	private final TripLocalDataSource mTripsRepository;
 	private final SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
 	@Nullable private String mTripId;
 	@Nullable private TripDetailContract.View mTripDetailView;
@@ -55,7 +55,7 @@ final class TripDetailPresenter implements TripDetailContract.Presenter
 	 */
 	@Inject
 	TripDetailPresenter(@Nullable String mTripId,
-	                    TripsRepository tripsRepository)
+	                    TripLocalDataSource tripsRepository)
 	{
 		this.mTripId = mTripId;
 		mTripsRepository = tripsRepository;

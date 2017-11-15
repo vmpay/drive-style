@@ -16,8 +16,6 @@ public interface TripListContract
 {
 	interface View extends BaseView<Presenter>
 	{
-		void setLoadingIndicator(boolean active);
-
 		void showTrips(List<Trip> trips);
 
 		void showAddTrip();
@@ -57,7 +55,7 @@ public interface TripListContract
 	{
 		void result(int requestCode, int resultCode);
 
-		void loadTripList(boolean forceUpdate);
+		void loadTripList();
 
 		void addNewTrip();
 

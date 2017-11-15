@@ -15,7 +15,7 @@ import eu.vmpay.drivestyle.data.AccelerometerData;
 import eu.vmpay.drivestyle.data.LocationData;
 import eu.vmpay.drivestyle.data.Trip;
 import eu.vmpay.drivestyle.data.source.TripDataSource;
-import eu.vmpay.drivestyle.data.source.TripsRepository;
+import eu.vmpay.drivestyle.data.source.local.TripLocalDataSource;
 import eu.vmpay.drivestyle.di.ActivityScoped;
 import eu.vmpay.drivestyle.utils.ExportUtils;
 
@@ -40,19 +40,17 @@ public class TripListPresenter implements TripListContract.Presenter
 {
 	private static final String TAG = "TripListPresenter";
 
-	private final TripsRepository mTripsRepository;
+	private final TripLocalDataSource mTripsRepository;
 	@Nullable private TripListContract.View mTripListView;
 
 	private TripListFilterType mCurrentFiltering = ALL;
-
-	private boolean mFirstLoad = true;
 
 	/**
 	 * Dagger strictly enforces that arguments not marked with {@code @Nullable} are not injected
 	 * with {@code @Nullable} values.
 	 */
 	@Inject
-	TripListPresenter(TripsRepository tripsRepository)
+	TripListPresenter(TripLocalDataSource tripsRepository)
 	{
 		mTripsRepository = tripsRepository;
 	}
@@ -70,31 +68,8 @@ public class TripListPresenter implements TripListContract.Presenter
 	}
 
 	@Override
-	public void loadTripList(boolean forceUpdate)
+	public void loadTripList()
 	{
-		// Simplification for sample: a network reload will be forced on first load.
-		loadTripList(forceUpdate || mFirstLoad, true);
-		mFirstLoad = false;
-	}
-
-	/**
-	 * @param forceUpdate   Pass in true to refresh the data in the {@link TripDataSource}
-	 * @param showLoadingUI Pass in true to display a loading icon in the UI
-	 */
-	private void loadTripList(boolean forceUpdate, final boolean showLoadingUI)
-	{
-		if(showLoadingUI)
-		{
-			if(mTripListView != null)
-			{
-				mTripListView.setLoadingIndicator(true);
-			}
-		}
-		if(forceUpdate)
-		{
-			mTripsRepository.refreshTrips();
-		}
-
 		Trip trip = new Trip();
 		mTripsRepository.getDataModels(trip, new TripDataSource.LoadModelsCallback()
 		{
@@ -130,10 +105,6 @@ public class TripListPresenter implements TripListContract.Presenter
 				if(mTripListView == null || !mTripListView.isActive())
 				{
 					return;
-				}
-				if(showLoadingUI)
-				{
-					mTripListView.setLoadingIndicator(false);
 				}
 
 				processTrips(tripsToShow);
@@ -283,7 +254,7 @@ public class TripListPresenter implements TripListContract.Presenter
 	public void takeView(TripListContract.View view)
 	{
 		this.mTripListView = view;
-		this.loadTripList(false);
+		this.loadTripList();
 	}
 
 	@Override

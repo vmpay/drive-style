@@ -19,7 +19,7 @@ import javax.inject.Inject;
 import eu.vmpay.drivestyle.data.AccelerometerData;
 import eu.vmpay.drivestyle.data.LocationData;
 import eu.vmpay.drivestyle.data.Trip;
-import eu.vmpay.drivestyle.data.source.TripsRepository;
+import eu.vmpay.drivestyle.data.source.local.TripLocalDataSource;
 import eu.vmpay.drivestyle.sensors.location.FusedLocationProviderContract;
 import eu.vmpay.drivestyle.sensors.motion.AccelerometerSensorContract;
 import eu.vmpay.drivestyle.tripList.TripListFilterType;
@@ -33,7 +33,7 @@ final class AddTripPresenter implements AddTripContract.Presenter, Accelerometer
 
 	private final AccelerometerSensorContract accelerometerSensor;
 	private final FusedLocationProviderContract fusedLocationProvider;
-	private TripsRepository tripsRepository;
+	private TripLocalDataSource tripsRepository;
 	@Nullable private AddTripContract.View addTripView;
 
 	private boolean accCalibrationFinished = false;
@@ -45,7 +45,7 @@ final class AddTripPresenter implements AddTripContract.Presenter, Accelerometer
 	private int currentStep = 1;
 
 	@Inject
-	public AddTripPresenter(AccelerometerSensorContract accelerometerSensor, FusedLocationProviderContract fusedLocationProvider, TripsRepository tripsRepository)
+	public AddTripPresenter(AccelerometerSensorContract accelerometerSensor, FusedLocationProviderContract fusedLocationProvider, TripLocalDataSource tripsRepository)
 	{
 		this.accelerometerSensor = accelerometerSensor;
 		this.fusedLocationProvider = fusedLocationProvider;
