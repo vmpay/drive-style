@@ -23,6 +23,7 @@ public class ExportUtils
 	private static final String TAG = "ExportUtils";
 
 	private static final File PATH = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
+	private static final String SUBDIRECTORY = "DriveStyle";
 	private static final String SEPARATOR = "/";
 	private static final String EXTENSION = ".csv";
 	private static final CharSequence[] ILLEGAL_CHARACTERS = { "/", "\n", "\r", "\t", "\0", "\f",
@@ -47,7 +48,12 @@ public class ExportUtils
 		{
 			fileName = new Date(System.currentTimeMillis()).toString();
 		}
-		Writer writer = new FileWriter(PATH + SEPARATOR + fileName + EXTENSION);
+		File directory = new File(PATH + SEPARATOR + SUBDIRECTORY);
+		if(!directory.exists())
+		{
+			directory.mkdirs();
+		}
+		Writer writer = new FileWriter(PATH + SEPARATOR + SUBDIRECTORY + SEPARATOR + fileName + EXTENSION);
 		CSVWriter csvWriter = new CSVWriter(writer);
 		csvWriter.writeAll(list, false);
 		writer.close();
