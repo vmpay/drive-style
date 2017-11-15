@@ -12,7 +12,7 @@ import java.util.Locale;
 import eu.vmpay.drivestyle.R;
 import eu.vmpay.drivestyle.data.Trip;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+import static dagger.internal.Preconditions.checkNotNull;
 
 /**
  * Created by andrew on 10/12/17.

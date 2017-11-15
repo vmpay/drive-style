@@ -6,8 +6,6 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
-import com.google.common.base.Strings;
-
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -65,7 +63,7 @@ final class TripDetailPresenter implements TripDetailContract.Presenter
 
 	private void loadDetails()
 	{
-		if(Strings.isNullOrEmpty(mTripId))
+		if(isNullOrEmpty(mTripId))
 		{
 			if(mTripDetailView != null)
 			{
@@ -160,6 +158,11 @@ final class TripDetailPresenter implements TripDetailContract.Presenter
 		});
 	}
 
+	private boolean isNullOrEmpty(String string)
+	{
+		return !(string != null && !string.isEmpty());
+	}
+
 	private void showTripDetails(@NonNull Trip trip)
 	{
 		String title = trip.getmTitle();
@@ -169,7 +172,7 @@ final class TripDetailPresenter implements TripDetailContract.Presenter
 		String type = trip.getmType();
 		String scenario = trip.getmScenario().name();
 
-		if(Strings.isNullOrEmpty(title))
+		if(isNullOrEmpty(title))
 		{
 			if(mTripDetailView != null)
 			{
@@ -212,12 +215,6 @@ final class TripDetailPresenter implements TripDetailContract.Presenter
 	public void dropView()
 	{
 		mTripDetailView = null;
-	}
-
-	@Override
-	public void deleteTrip()
-	{
-
 	}
 
 	@Override

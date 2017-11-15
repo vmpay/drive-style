@@ -1,6 +1,5 @@
 package eu.vmpay.drivestyle.tripList;
 
-import android.app.Activity;
 import android.content.ContentValues;
 import android.support.annotation.NonNull;
 import android.util.Log;
@@ -18,11 +17,9 @@ import eu.vmpay.drivestyle.data.Trip;
 import eu.vmpay.drivestyle.data.source.TripDataSource;
 import eu.vmpay.drivestyle.data.source.TripsRepository;
 import eu.vmpay.drivestyle.di.ActivityScoped;
-import eu.vmpay.drivestyle.sensors.location.FusedLocationProviderContract;
-import eu.vmpay.drivestyle.sensors.motion.AccelerometerSensor;
 import eu.vmpay.drivestyle.utils.ExportUtils;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+import static dagger.internal.Preconditions.checkNotNull;
 import static eu.vmpay.drivestyle.tripList.TripListFilterType.ALL;
 
 /**
@@ -44,10 +41,7 @@ public class TripListPresenter implements TripListContract.Presenter
 	private static final String TAG = "TripListPresenter";
 
 	private final TripsRepository mTripsRepository;
-	private final AccelerometerSensor mAccelerometerSensor;
-	private FusedLocationProviderContract mFusedLocationProvider;
-	@Nullable
-	private TripListContract.View mTripListView;
+	@Nullable private TripListContract.View mTripListView;
 
 	private TripListFilterType mCurrentFiltering = ALL;
 
@@ -58,11 +52,9 @@ public class TripListPresenter implements TripListContract.Presenter
 	 * with {@code @Nullable} values.
 	 */
 	@Inject
-	TripListPresenter(TripsRepository tripsRepository, AccelerometerSensor accelerometerSensor, FusedLocationProviderContract fusedLocationProvider)
+	TripListPresenter(TripsRepository tripsRepository)
 	{
 		mTripsRepository = tripsRepository;
-		mAccelerometerSensor = accelerometerSensor;
-		mFusedLocationProvider = fusedLocationProvider;
 	}
 
 	@Override
@@ -158,60 +150,6 @@ public class TripListPresenter implements TripListContract.Presenter
 				mTripListView.showLoadingTripsError();
 			}
 		});
-
-//		mTripsRepository.getTrips(new TripDataSource.LoadTripsCallback()
-//		{
-//			@Override
-//			public void onTripsLoaded(List<Trip> trips)
-//			{
-//				List<Trip> tripsToShow = new ArrayList<Trip>();
-//
-//				// We filter the tasks based on the requestType
-//				for(Trip trip : trips)
-//				{
-//					switch(mCurrentFiltering)
-//					{
-//						case ALL:
-//							tripsToShow.add(trip);
-//							break;
-//						case BRAKE:
-//						case TURN:
-//						case LANE_CHANGE:
-//							if(trip.getmScenario().equals(mCurrentFiltering))
-//							{
-//								tripsToShow.add(trip);
-//							}
-//							break;
-//						default:
-//							tripsToShow.add(trip);
-//							break;
-//					}
-//				}
-//
-//				// The view may not be able to handle UI updates anymore
-//				if(mTripListView == null || !mTripListView.isActive())
-//				{
-//					return;
-//				}
-//				if(showLoadingUI)
-//				{
-//					mTripListView.setLoadingIndicator(false);
-//				}
-//
-//				processTrips(tripsToShow);
-//			}
-//
-//			@Override
-//			public void onDataNotAvailable()
-//			{
-//				// The view may not be able to handle UI updates anymore
-//				if(!mTripListView.isActive())
-//				{
-//					return;
-//				}
-//				mTripListView.showLoadingTripsError();
-//			}
-//		});
 	}
 
 	private void processTrips(List<Trip> tripList)
@@ -355,33 +293,8 @@ public class TripListPresenter implements TripListContract.Presenter
 	}
 
 	@Override
-	public void registerSensor()
-	{
-//		mAccelerometerSensor.startSensor();
-	}
-
-	@Override
-	public void unregisterSensor()
-	{
-		mAccelerometerSensor.stopSensor();
-	}
-
-	@Override
-	public void requestLocation(Activity activity)
-	{
-//		mFusedLocationProvider.requestLocation(activity);
-	}
-
-	@Override
-	public void stopLocationRequest()
-	{
-		mFusedLocationProvider.stopLocationRequest();
-	}
-
-	@Override
 	public void exportCsv(final String filename)
 	{
-		// TODO: 11/6/17 check if filename is valid
 		if(!ExportUtils.isFileNameValid(filename))
 		{
 			if(mTripListView != null)

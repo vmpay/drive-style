@@ -28,7 +28,7 @@ import eu.vmpay.drivestyle.R;
 import eu.vmpay.drivestyle.di.ActivityScoped;
 import eu.vmpay.drivestyle.tripList.TripListFilterType;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+import static dagger.internal.Preconditions.checkNotNull;
 
 /**
  * A placeholder fragment containing a simple view.

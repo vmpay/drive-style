@@ -1,6 +1,5 @@
 package eu.vmpay.drivestyle.tripList;
 
-import android.app.Activity;
 import android.support.annotation.NonNull;
 
 import java.util.List;
@@ -73,14 +72,6 @@ public interface TripListContract
 		void takeView(TripListContract.View view);
 
 		void dropView();
-
-		void registerSensor();
-
-		void unregisterSensor();
-
-		void requestLocation(Activity activity);
-
-		void stopLocationRequest();
 
 		void exportCsv(String filename);
 	}

@@ -30,8 +30,6 @@ public interface TripDetailContract
 
 	interface Presenter extends BasePresenter<View>
 	{
-		void deleteTrip();
-
 		void exportCsv();
 	}
 }

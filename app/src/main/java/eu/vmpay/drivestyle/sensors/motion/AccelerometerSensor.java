@@ -10,7 +10,7 @@ import android.support.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+import static dagger.internal.Preconditions.checkNotNull;
 
 /**
  * Created by Andrew on 22/10/2017.
@@ -26,7 +26,6 @@ public class AccelerometerSensor implements SensorEventListener, AccelerometerSe
 
 	private double[] gravity = new double[3];
 	private double[] linear_acceleration = new double[3];
-	private int readoutCount;
 
 	@Inject
 	public AccelerometerSensor(@Nullable Context mContext)
@@ -43,7 +42,6 @@ public class AccelerometerSensor implements SensorEventListener, AccelerometerSe
 		{
 			return;
 		}
-		readoutCount++;
 
 		// In this example, alpha is calculated as t / (t + dT),
 		// where t is the low-pass filter's time-constant and
@@ -60,8 +58,6 @@ public class AccelerometerSensor implements SensorEventListener, AccelerometerSe
 		linear_acceleration[0] = event.values[0] - gravity[0];
 		linear_acceleration[1] = event.values[1] - gravity[1];
 		linear_acceleration[2] = event.values[2] - gravity[2];
-
-		// TODO: 22/10/2017 publish event
 
 //		Log.d(TAG, String.format(Locale.US, "event \t%.2f\t%.2f\t%.2f",
 //				event.values[0], event.values[1], event.values[2]));
@@ -87,7 +83,6 @@ public class AccelerometerSensor implements SensorEventListener, AccelerometerSe
 		callback = IAccDataReceived;
 		if(mSensorManager != null && mSensor != null)
 		{
-			readoutCount = 0;
 			mSensorManager.registerListener(this, mSensor, SensorManager.SENSOR_DELAY_UI);
 		}
 	}
@@ -98,7 +93,6 @@ public class AccelerometerSensor implements SensorEventListener, AccelerometerSe
 		if(mSensorManager != null)
 		{
 			mSensorManager.unregisterListener(this);
-//			Log.d(TAG, "total readouts " + readoutCount);
 		}
 	}
 }
