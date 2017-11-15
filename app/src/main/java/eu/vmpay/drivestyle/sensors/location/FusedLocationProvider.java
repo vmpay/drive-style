@@ -17,7 +17,6 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.PendingResult;
 import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.Status;
-import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
@@ -31,7 +30,7 @@ import java.util.Locale;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+import static dagger.internal.Preconditions.checkNotNull;
 
 /**
  * Created by andrew on 10/23/17.
@@ -42,7 +41,6 @@ public class FusedLocationProvider implements FusedLocationProviderContract, Goo
 	private final String TAG = "FusedLocationProvider";
 
 	private Context mContext;
-	private FusedLocationProviderClient fusedLocationProviderClient;
 	private GoogleApiClient googleApiClient;
 	private LocationRequest locationRequest;
 	private final int REQUEST_CHECK_SETTINGS = 0x1;
@@ -62,7 +60,6 @@ public class FusedLocationProvider implements FusedLocationProviderContract, Goo
 				.addConnectionCallbacks(this)
 				.addOnConnectionFailedListener(this)
 				.build();
-		fusedLocationProviderClient = new FusedLocationProviderClient(mContext);
 	}
 
 	@Override

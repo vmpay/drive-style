@@ -52,4 +52,9 @@
 	<string name="export_failed">Export failed</string>
 	<string name="button_open">Open</string>
 	<string name="invalid_filename">Invalid filename</string>
+	<string name="crashes_sent">Crash report has been sent</string>
+	<string name="crashes_not_sent">Crash report hasn\'t been sent</string>
+	<string name="yes">Yes</string>
+	<string name="no">No</string>
+	<string name="dialog_uninstall_old_package">In order to work correctly the old application have to be uninstalled. Uninstall it now?</string>
 </resources>

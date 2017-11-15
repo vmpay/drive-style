@@ -9,10 +9,11 @@ android {
         applicationId "eu.vmpay.drivestyle"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 1
-        versionName "1.0"
+        versionCode 146
+        versionName "2.0.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true
+        manifestPlaceholders = [HOCKEYAPP_APP_ID: "c513d6c3a63e4c02823441e5417833d2", HOCKEYAPP_APP_SECRET: "a1e05b48a0e9f8643583ccfedc3bed89"]
     }
 
     buildTypes {
@@ -89,11 +90,9 @@ dependencies {
     compile "com.android.support:design:$rootProject.supportLibraryVersion"
     compile "com.android.support:recyclerview-v7:$rootProject.supportLibraryVersion"
     compile "com.android.support:support-v4:$rootProject.supportLibraryVersion"
-    compile "com.google.guava:guava:$rootProject.guavaVersion"
     compile "com.google.android.gms:play-services-location:$rootProject.googlePlayServicesVersion"
     compile "com.jakewharton:butterknife:$rootProject.butterKnifeVersion"
     apt "com.jakewharton:butterknife-compiler:$rootProject.butterKnifeVersion"
-    compile 'com.stepstone.stepper:material-stepper:4.3.1'
 
     // Dagger dependencies
     apt "com.google.dagger:dagger-compiler:$rootProject.daggerVersion"
@@ -109,6 +108,7 @@ dependencies {
     compile "io.reactivex.rxjava2:rxjava:$rootProject.rxjavaVersion"
 
     compile "com.opencsv:opencsv:$rootProject.openCsvVersion"
+    compile "net.hockeyapp.android:HockeySDK:$rootProject.hockeyappVersion"
 
     testCompile 'junit:junit:4.12'
 }

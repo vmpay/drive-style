@@ -1,9 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest package="eu.vmpay.drivestyle"
-		  xmlns:android="http://schemas.android.com/apk/res/android">
+		  xmlns:android="http://schemas.android.com/apk/res/android"
+		  xmlns:tools="http://schemas.android.com/tools">
 
 	<uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
-	<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+	<uses-permission
+		android:name="android.permission.WRITE_EXTERNAL_STORAGE"
+		tools:node="replace"/>
 
 	<uses-feature
 		android:name="android.hardware.sensor.accelerometer"
@@ -51,6 +54,13 @@
 				android:name="android.support.PARENT_ACTIVITY"
 				android:value="eu.vmpay.drivestyle.tripList.TripListActivity"/>
 		</activity>
+
+		<meta-data
+			android:name="net.hockeyapp.android.appIdentifier"
+			android:value="${HOCKEYAPP_APP_ID}"/>
+		<meta-data
+			android:name="net.hockeyapp.android.appSecret"
+			android:value="${HOCKEYAPP_APP_SECRET}"/>
 	</application>
 
 </manifest>

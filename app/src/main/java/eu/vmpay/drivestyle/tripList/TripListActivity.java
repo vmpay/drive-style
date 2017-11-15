@@ -15,6 +15,7 @@ import dagger.android.support.DaggerAppCompatActivity;
 import eu.vmpay.drivestyle.R;
 import eu.vmpay.drivestyle.tripDetails.TripDetailActivity;
 import eu.vmpay.drivestyle.utils.ActivityUtils;
+import eu.vmpay.drivestyle.utils.BugTrackingUtils;
 
 /**
  * An activity representing a list of Tracks. This activity
@@ -38,6 +39,13 @@ public class TripListActivity extends DaggerAppCompatActivity
 	 * device.
 	 */
 	private boolean mTwoPane;
+
+	@Override
+	protected void onResume()
+	{
+		super.onResume();
+		BugTrackingUtils.checkForCrashes(getApplication(), this);
+	}
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
@@ -79,6 +87,23 @@ public class TripListActivity extends DaggerAppCompatActivity
 					(TripListFilterType) savedInstanceState.getSerializable(CURRENT_FILTERING_KEY);
 			mTripListPresenter.setFiltering(currentFiltering);
 		}
+
+		BugTrackingUtils.checkOldPackage(this);
+		BugTrackingUtils.checkForUpdates(this);
+	}
+
+	@Override
+	protected void onPause()
+	{
+		super.onPause();
+		BugTrackingUtils.unregisterUpdateManager();
+	}
+
+	@Override
+	protected void onDestroy()
+	{
+		super.onDestroy();
+		BugTrackingUtils.unregisterUpdateManager();
 	}
 
 	@Override
@@ -105,7 +130,6 @@ public class TripListActivity extends DaggerAppCompatActivity
 	private void setupDrawerContent(NavigationView navigationView)
 	{
 		navigationView.getMenu().getItem(0).setChecked(true);
-//		((MenuItem) navigationView.findViewById(R.id.list_navigation_menu_item)).setChecked(true);
 		navigationView.setNavigationItemSelectedListener(
 				new NavigationView.OnNavigationItemSelectedListener()
 				{
