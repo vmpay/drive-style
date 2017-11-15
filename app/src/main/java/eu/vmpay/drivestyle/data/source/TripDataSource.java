@@ -18,8 +18,6 @@ public interface TripDataSource
 
 	<T extends BaseModel> void getDataModels(@NonNull T dataModel, @NonNull LoadModelsCallback callback);
 
-	<T extends BaseModel> void getDataModel(@NonNull T dataModel, @NonNull LoadModelCallback callback);
-
 	interface LoadModelsCallback
 	{
 		void onModelsLoaded(List<ContentValues> contentValuesList);
@@ -27,29 +25,5 @@ public interface TripDataSource
 		void onDataNotAvailable();
 	}
 
-	interface LoadModelCallback
-	{
-		void onModelsLoaded(ContentValues contentValues);
-
-		void onDataNotAvailable();
-	}
-
-	//---------------------------------------------------------------TRIPS---------------------------------------------------------------
-
-	void deleteAllTrips();
-
-	void deleteTrip(@NonNull long tripId);
-
-	//---------------------------------------------------------------LOCATIONS---------------------------------------------------------------
-
-	void deleteAllLocations();
-
-	void deleteLocation(@NonNull long locationDataId);
-
-	//---------------------------------------------------------------ACCELEROMETER---------------------------------------------------------------
-
-	void deleteAllAccelerometerDataModels();
-
-	void deleteAccelerometerDataModel(@NonNull long accelerometerDataId);
-
+	<T extends BaseModel> int deleteDataModel(@NonNull T dataModel);
 }

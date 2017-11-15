@@ -1,6 +1,7 @@
 package eu.vmpay.drivestyle.tripDetails;
 
 import android.Manifest;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -96,6 +97,9 @@ public class TripDetailFragment extends DaggerFragment implements TripDetailCont
 				{
 					mPresenter.exportCsv();
 				}
+				return true;
+			case R.id.menu_delete:
+				mPresenter.deleteTrip();
 				return true;
 			default:
 				return false;
@@ -199,5 +203,11 @@ public class TripDetailFragment extends DaggerFragment implements TripDetailCont
 	public void showExportFailed()
 	{
 		Snackbar.make(getView(), R.string.export_failed, Snackbar.LENGTH_LONG).show();
+	}
+
+	@Override
+	public void goUp()
+	{
+		getActivity().navigateUpTo(new Intent(getContext(), TripListActivity.class));
 	}
 }

@@ -72,19 +72,15 @@ final class TripDetailPresenter implements TripDetailContract.Presenter
 			return;
 		}
 
-//		if (mTripDetailView != null) {
-//			mTripDetailView.setLoadingIndicator(true);
-//		}
-
 		Trip trip = new Trip();
 		trip.setWhereClause(BaseColumns._ID + " LIKE " + mTripId);
 
-		mTripsRepository.getDataModel(trip, new TripDataSource.LoadModelCallback()
+		mTripsRepository.getDataModels(trip, new TripDataSource.LoadModelsCallback()
 		{
 			@Override
-			public void onModelsLoaded(ContentValues contentValues)
+			public void onModelsLoaded(List<ContentValues> contentValuesList)
 			{
-				Trip trip = Trip.buildFromContentValues(contentValues);
+				Trip trip = Trip.buildFromContentValues(contentValuesList.get(0));
 				// The view may not be able to handle UI updates anymore
 				if(mTripDetailView == null || !mTripDetailView.isActive())
 				{
@@ -258,6 +254,19 @@ final class TripDetailPresenter implements TripDetailContract.Presenter
 					mTripDetailView.showExportSucceeded();
 				}
 			}
+		}
+	}
+
+	@Override
+	public void deleteTrip()
+	{
+		Trip trip = new Trip();
+		trip.setWhereClause(BaseColumns._ID + " LIKE " + mTripId);
+		int result = mTripsRepository.deleteDataModel(trip);
+		Log.d(TAG, "Deleting tripId = " + mTripId + " result = " + result);
+		if(result > 0 && mTripDetailView != null)
+		{
+			mTripDetailView.goUp();
 		}
 	}
 }

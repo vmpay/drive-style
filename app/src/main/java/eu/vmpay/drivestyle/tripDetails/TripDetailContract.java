@@ -26,10 +26,14 @@ public interface TripDetailContract
 		void showExportSucceeded();
 
 		void showExportFailed();
+
+		void goUp();
 	}
 
 	interface Presenter extends BasePresenter<View>
 	{
 		void exportCsv();
+
+		void deleteTrip();
 	}
 }

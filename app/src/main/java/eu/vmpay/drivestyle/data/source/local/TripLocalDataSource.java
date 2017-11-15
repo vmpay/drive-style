@@ -13,7 +13,6 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import eu.vmpay.drivestyle.data.BaseModel;
-import eu.vmpay.drivestyle.data.Trip;
 import eu.vmpay.drivestyle.data.source.TripDataSource;
 import eu.vmpay.drivestyle.data.source.TripsRepositoryModule;
 import eu.vmpay.drivestyle.di.AppComponent;
@@ -150,156 +149,14 @@ public class TripLocalDataSource implements TripDataSource
 		}
 	}
 
-	/**
-	 * Note: {@link LoadModelCallback#onDataNotAvailable()} is fired if the {@link Trip} isn't
-	 * found.
-	 */
 	@Override
-	public <T extends BaseModel> void getDataModel(@NonNull T dataModel, @NonNull LoadModelCallback callback)
-	{
-		checkNotNull(dataModel);
-		checkNotNull(callback);
-
-		ContentValues contentValues = null;
-		SQLiteDatabase db = mDbHelper.getReadableDatabase();
-
-		Cursor c = db.query(
-				dataModel.getTableName(), dataModel.getProjection(), dataModel.getWhereClause(), null, null, null, null);
-
-
-		if(c != null && c.getCount() > 0)
-		{
-			c.moveToFirst();
-			contentValues = new ContentValues();
-			for(int i = 0; i < dataModel.getProjection().length; i++)
-			{
-				int columnIndex = c.getColumnIndex(dataModel.getProjection()[i]);
-				switch(c.getType(columnIndex))
-				{
-					case Cursor.FIELD_TYPE_STRING:
-						String stringValue = c.getString(columnIndex);
-						if(stringValue != null)
-						{
-							contentValues.put(dataModel.getProjection()[i], stringValue);
-						}
-						break;
-					case Cursor.FIELD_TYPE_BLOB:
-						byte[] blobValue = c.getBlob(columnIndex);
-						if(blobValue != null)
-						{
-							contentValues.put(dataModel.getProjection()[i], blobValue);
-						}
-						break;
-					case Cursor.FIELD_TYPE_INTEGER:
-						Integer intValue = c.getInt(columnIndex);
-						if(intValue != null)
-						{
-							contentValues.put(dataModel.getProjection()[i], intValue);
-						}
-						break;
-					case Cursor.FIELD_TYPE_FLOAT:
-						Float floatValue = c.getFloat(columnIndex);
-						if(floatValue != null)
-						{
-							contentValues.put(dataModel.getProjection()[i], floatValue);
-						}
-						break;
-					case Cursor.FIELD_TYPE_NULL:
-						contentValues.putNull(dataModel.getProjection()[i]);
-						break;
-				}
-			}
-		}
-
-		if(c != null)
-		{
-			c.close();
-		}
-
-		db.close();
-
-		if(contentValues != null)
-		{
-			callback.onModelsLoaded(contentValues);
-		}
-		else
-		{
-			callback.onDataNotAvailable();
-		}
-	}
-
-	//---------------------------------------------------------------TRIPS---------------------------------------------------------------
-
-	@Override
-	public void deleteAllTrips()
+	public <T extends BaseModel> int deleteDataModel(@NonNull T dataModel)
 	{
 		SQLiteDatabase db = mDbHelper.getWritableDatabase();
 
-		db.delete(TripPersistenceContract.TripEntry.TABLE_NAME, null, null);
+		int success = db.delete(dataModel.getTableName(), dataModel.getWhereClause(), null);
 
 		db.close();
-	}
-
-	@Override
-	public void deleteTrip(@NonNull long tripId)
-	{
-		SQLiteDatabase db = mDbHelper.getWritableDatabase();
-
-		String selection = TripPersistenceContract.TripEntry._ID + " LIKE ?";
-		String[] selectionArgs = { Long.toString(tripId) };
-
-		db.delete(TripPersistenceContract.TripEntry.TABLE_NAME, selection, selectionArgs);
-
-		db.close();
-	}
-
-	//---------------------------------------------------------------LOCATION---------------------------------------------------------------
-
-	@Override
-	public void deleteAllLocations()
-	{
-		SQLiteDatabase db = mDbHelper.getWritableDatabase();
-
-		db.delete(LocationDataPersistenceContract.LocationDataEntity.TABLE_NAME, null, null);
-
-		db.close();
-	}
-
-	@Override
-	public void deleteLocation(@NonNull long locationDataId)
-	{
-		SQLiteDatabase db = mDbHelper.getWritableDatabase();
-
-		String selection = LocationDataPersistenceContract.LocationDataEntity._ID + " LIKE ?";
-		String[] selectionArgs = { Long.toString(locationDataId) };
-
-		db.delete(LocationDataPersistenceContract.LocationDataEntity.TABLE_NAME, selection, selectionArgs);
-
-		db.close();
-	}
-
-	//---------------------------------------------------------------ACCELEROMETER---------------------------------------------------------------
-
-	@Override
-	public void deleteAllAccelerometerDataModels()
-	{
-		SQLiteDatabase db = mDbHelper.getWritableDatabase();
-
-		db.delete(AccelerometerDataPersistenceContract.AccelerometerDataEntity.TABLE_NAME, null, null);
-
-		db.close();
-	}
-
-	@Override
-	public void deleteAccelerometerDataModel(@NonNull long accelerometerDataId)
-	{
-		SQLiteDatabase db = mDbHelper.getWritableDatabase();
-
-		String selection = AccelerometerDataPersistenceContract.AccelerometerDataEntity._ID + " LIKE ?";
-		String[] selectionArgs = { Long.toString(accelerometerDataId) };
-
-		db.delete(AccelerometerDataPersistenceContract.AccelerometerDataEntity.TABLE_NAME, selection, selectionArgs);
-
-		db.close();
+		return success;
 	}
 }
