@@ -21,6 +21,7 @@ import eu.vmpay.drivestyle.data.source.local.AccelerometerDataPersistenceContrac
 import eu.vmpay.drivestyle.data.source.local.LocationDataPersistenceContract;
 import eu.vmpay.drivestyle.data.source.local.TripLocalDataSource;
 import eu.vmpay.drivestyle.utils.ExportUtils;
+import io.reactivex.subscribers.DisposableSubscriber;
 
 /**
  * Created by andrew on 9/26/17.
@@ -262,11 +263,27 @@ final class TripDetailPresenter implements TripDetailContract.Presenter
 	{
 		Trip trip = new Trip();
 		trip.setWhereClause(BaseColumns._ID + " LIKE " + mTripId);
-		int result = mTripsRepository.deleteDataModel(trip);
-		Log.d(TAG, "Deleting tripId = " + mTripId + " result = " + result);
-		if(result > 0 && mTripDetailView != null)
+		mTripsRepository.deleteDataModelRx(trip).subscribeWith(new DisposableSubscriber<Integer>()
 		{
-			mTripDetailView.goUp();
-		}
+			@Override
+			public void onNext(Integer integer)
+			{
+				Log.d(TAG, "Deleting tripId = " + mTripId + " result = " + integer);
+				if(integer > 0 && mTripDetailView != null)
+				{
+					mTripDetailView.goUp();
+				}
+			}
+
+			@Override
+			public void onError(Throwable t)
+			{
+			}
+
+			@Override
+			public void onComplete()
+			{
+			}
+		});
 	}
 }

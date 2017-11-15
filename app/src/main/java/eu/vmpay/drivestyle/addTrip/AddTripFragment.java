@@ -46,6 +46,7 @@ public class AddTripFragment extends Fragment implements AddTripContract.View
 	@BindView(R.id.llFirstStep) LinearLayout llFirstStep;
 	@BindView(R.id.llSecondStep) LinearLayout llSecondStep;
 	@BindView(R.id.llThirdStep) LinearLayout llThirdStep;
+	@BindView(R.id.llSavingData) LinearLayout llSavingData;
 
 	@BindView(R.id.pbAcc) ProgressBar pbAcc;
 	@BindView(R.id.pbLocation) ProgressBar pbLocation;
@@ -185,6 +186,14 @@ public class AddTripFragment extends Fragment implements AddTripContract.View
 		tvLocation[3].setText(String.format(Locale.US, "%f", location.getSpeed()));
 	}
 
+	@Override
+	public void closeView()
+	{
+		btnNext.setEnabled(true);
+		llSavingData.setVisibility(View.GONE);
+		getActivity().finish();
+	}
+
 	private void clearStepper()
 	{
 		llFirstStep.setVisibility(View.GONE);
@@ -219,8 +228,9 @@ public class AddTripFragment extends Fragment implements AddTripContract.View
 					{
 						scenario = TripListFilterType.LANE_CHANGE;
 					}
+					btnNext.setEnabled(false);
+					llSavingData.setVisibility(View.VISIBLE);
 					mPresenter.saveData(etName.getText().toString(), "OnGo", scenario);
-					getActivity().finish();
 				}
 				break;
 			case R.id.llSecondStep:

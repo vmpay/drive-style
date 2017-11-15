@@ -23,6 +23,7 @@ import eu.vmpay.drivestyle.data.source.local.TripLocalDataSource;
 import eu.vmpay.drivestyle.sensors.location.FusedLocationProviderContract;
 import eu.vmpay.drivestyle.sensors.motion.AccelerometerSensorContract;
 import eu.vmpay.drivestyle.tripList.TripListFilterType;
+import io.reactivex.subscribers.DisposableSubscriber;
 
 /**
  * Created by andrew on 10/26/17.
@@ -130,48 +131,95 @@ final class AddTripPresenter implements AddTripContract.Presenter, Accelerometer
 		}
 
 		Trip trip = new Trip(tripTitle.isEmpty() ? "Trip " + new Date(startTimestamp).toString() : tripTitle, startTimestamp, stopTimestamp, type, scenario);
-//		Log.d(TAG, trip.toString() + " readings " + motionDataMapCopy.size());
-		long tripId = tripsRepository.saveDataModel(trip);
-
-		List<AccelerometerData> accelerometerDataList = new ArrayList<>();
-		for(Map.Entry<Long, Double[]> entry : motionDataMapCopy.entrySet())
-		{
-			AccelerometerData accelerometerData = new AccelerometerData(tripId, entry.getKey(), entry.getValue()[0], entry.getValue()[1], entry.getValue()[2]);
-			accelerometerDataList.add(accelerometerData);
-		}
-		Collections.sort(accelerometerDataList, new Comparator<AccelerometerData>()
+		tripsRepository.saveDataModelRx(trip).subscribeWith(new DisposableSubscriber<Long>()
 		{
 			@Override
-			public int compare(AccelerometerData o1, AccelerometerData o2)
+			public void onNext(Long aLong)
 			{
-				return (int) (o1.getTimestamp() - o2.getTimestamp());
+				final boolean[] motionSavingFinished = { false };
+				final boolean[] locationSavingFinished = { false };
+				final long tripId = aLong;
+
+				List<AccelerometerData> accelerometerDataList = new ArrayList<>();
+				for(Map.Entry<Long, Double[]> entry : motionDataMapCopy.entrySet())
+				{
+					AccelerometerData accelerometerData = new AccelerometerData(tripId, entry.getKey(), entry.getValue()[0], entry.getValue()[1], entry.getValue()[2]);
+					accelerometerDataList.add(accelerometerData);
+				}
+				Collections.sort(accelerometerDataList, new Comparator<AccelerometerData>()
+				{
+					@Override
+					public int compare(AccelerometerData o1, AccelerometerData o2)
+					{
+						return (int) (o1.getTimestamp() - o2.getTimestamp());
+					}
+				});
+
+				tripsRepository.saveDataModelListRx(accelerometerDataList).subscribeWith(new DisposableSubscriber<Long>()
+				{
+					@Override
+					public void onNext(Long aLong)
+					{
+					}
+
+					@Override
+					public void onError(Throwable t)
+					{
+					}
+
+					@Override
+					public void onComplete()
+					{
+						List<LocationData> locationDataList = new ArrayList<>();
+						for(Map.Entry<Long, Location> entry : locationDataMapCopy.entrySet())
+						{
+							LocationData locationData = new LocationData(tripId, entry.getKey(), entry.getValue());
+							locationDataList.add(locationData);
+						}
+						Collections.sort(locationDataList, new Comparator<LocationData>()
+						{
+							@Override
+							public int compare(LocationData o1, LocationData o2)
+							{
+								return (int) (o1.getTimestamp() - o2.getTimestamp());
+							}
+						});
+
+						tripsRepository.saveDataModelListRx(locationDataList).subscribeWith(new DisposableSubscriber<Long>()
+						{
+							@Override
+							public void onNext(Long aLong)
+							{
+							}
+
+							@Override
+							public void onError(Throwable t)
+							{
+							}
+
+							@Override
+							public void onComplete()
+							{
+								if(addTripView != null)
+								{
+									addTripView.closeView();
+								}
+							}
+						});
+					}
+				});
 			}
-		});
 
-		for(AccelerometerData entry : accelerometerDataList)
-		{
-			tripsRepository.saveDataModel(entry);
-		}
-
-		List<LocationData> locationDataList = new ArrayList<>();
-		for(Map.Entry<Long, Location> entry : locationDataMapCopy.entrySet())
-		{
-			LocationData locationData = new LocationData(tripId, entry.getKey(), entry.getValue());
-			locationDataList.add(locationData);
-		}
-		Collections.sort(locationDataList, new Comparator<LocationData>()
-		{
 			@Override
-			public int compare(LocationData o1, LocationData o2)
+			public void onError(Throwable t)
 			{
-				return (int) (o1.getTimestamp() - o2.getTimestamp());
+			}
+
+			@Override
+			public void onComplete()
+			{
 			}
 		});
-
-		for(LocationData entry : locationDataList)
-		{
-			tripsRepository.saveDataModel(entry);
-		}
 	}
 
 	@Override

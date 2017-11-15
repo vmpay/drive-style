@@ -26,6 +26,8 @@ public interface AddTripContract
 		void locationSensorCalibrated();
 
 		void showLocationData(Location location);
+
+		void closeView();
 	}
 
 	interface Presenter extends BasePresenter<View>

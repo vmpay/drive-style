@@ -16,6 +16,12 @@ import eu.vmpay.drivestyle.data.BaseModel;
 import eu.vmpay.drivestyle.data.source.TripDataSource;
 import eu.vmpay.drivestyle.data.source.TripsRepositoryModule;
 import eu.vmpay.drivestyle.di.AppComponent;
+import io.reactivex.BackpressureStrategy;
+import io.reactivex.Flowable;
+import io.reactivex.FlowableEmitter;
+import io.reactivex.FlowableOnSubscribe;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.schedulers.Schedulers;
 
 import static dagger.internal.Preconditions.checkNotNull;
 
@@ -55,8 +61,7 @@ public class TripLocalDataSource implements TripDataSource
 		mDbHelper = new TripDbHelper(context);
 	}
 
-	@Override
-	public <T extends BaseModel> long saveDataModel(@NonNull T dataModel)
+	private <T extends BaseModel> long saveDataModel(@NonNull T dataModel)
 	{
 		checkNotNull(dataModel);
 		SQLiteDatabase db = mDbHelper.getWritableDatabase();
@@ -78,6 +83,21 @@ public class TripLocalDataSource implements TripDataSource
 		checkNotNull(dataModel);
 		checkNotNull(callback);
 
+		List<ContentValues> modelList = getDataContentValuesList(dataModel);
+
+		if(modelList.isEmpty())
+		{
+			// This will be called if the table is new or just empty.
+			callback.onDataNotAvailable();
+		}
+		else
+		{
+			callback.onModelsLoaded(modelList);
+		}
+	}
+
+	private <T extends BaseModel> List<ContentValues> getDataContentValuesList(@NonNull T dataModel)
+	{
 		List<ContentValues> modelList = new ArrayList<>();
 		SQLiteDatabase db = mDbHelper.getReadableDatabase();
 
@@ -138,19 +158,10 @@ public class TripLocalDataSource implements TripDataSource
 
 		db.close();
 
-		if(modelList.isEmpty())
-		{
-			// This will be called if the table is new or just empty.
-			callback.onDataNotAvailable();
-		}
-		else
-		{
-			callback.onModelsLoaded(modelList);
-		}
+		return modelList;
 	}
 
-	@Override
-	public <T extends BaseModel> int deleteDataModel(@NonNull T dataModel)
+	private <T extends BaseModel> int deleteDataModel(@NonNull T dataModel)
 	{
 		SQLiteDatabase db = mDbHelper.getWritableDatabase();
 
@@ -158,5 +169,79 @@ public class TripLocalDataSource implements TripDataSource
 
 		db.close();
 		return success;
+	}
+
+	@Override
+	public <T extends BaseModel> Flowable<Long> saveDataModelRx(@NonNull final T dataModel)
+	{
+		return Flowable.create(new FlowableOnSubscribe<Long>()
+		{
+			@Override
+			public void subscribe(@io.reactivex.annotations.NonNull FlowableEmitter<Long> e) throws Exception
+			{
+				Long success = saveDataModel(dataModel);
+				e.onNext(success);
+				e.onComplete();
+			}
+		}, BackpressureStrategy.BUFFER)
+				.subscribeOn(Schedulers.io())
+				.observeOn(AndroidSchedulers.mainThread());
+	}
+
+	@Override
+	public <T extends BaseModel> Flowable<Long> saveDataModelListRx(final List<T> dataList)
+	{
+		return Flowable.create(new FlowableOnSubscribe<Long>()
+		{
+			@Override
+			public void subscribe(@io.reactivex.annotations.NonNull FlowableEmitter<Long> e) throws Exception
+			{
+				for(T entry : dataList)
+				{
+					e.onNext(saveDataModel(entry));
+				}
+				e.onComplete();
+			}
+		}, BackpressureStrategy.BUFFER)
+				.subscribeOn(Schedulers.io())
+				.observeOn(AndroidSchedulers.mainThread());
+	}
+
+	@Override
+	public <T extends BaseModel> Flowable<ContentValues> getDataModelsRx(@NonNull final T dataModel)
+	{
+		checkNotNull(dataModel);
+		return Flowable.create(new FlowableOnSubscribe<ContentValues>()
+		{
+			@Override
+			public void subscribe(@io.reactivex.annotations.NonNull FlowableEmitter<ContentValues> e) throws Exception
+			{
+				List<ContentValues> contentValuesList = getDataContentValuesList(dataModel);
+				for(ContentValues entry : contentValuesList)
+				{
+					e.onNext(entry);
+				}
+				e.onComplete();
+			}
+		}, BackpressureStrategy.BUFFER)
+				.subscribeOn(Schedulers.io())
+				.observeOn(AndroidSchedulers.mainThread());
+	}
+
+	@Override
+	public <T extends BaseModel> Flowable<Integer> deleteDataModelRx(@NonNull final T dataModel)
+	{
+		return Flowable.create(new FlowableOnSubscribe<Integer>()
+		{
+			@Override
+			public void subscribe(@io.reactivex.annotations.NonNull FlowableEmitter<Integer> e) throws Exception
+			{
+				Integer success = deleteDataModel(dataModel);
+				e.onNext(success);
+				e.onComplete();
+			}
+		}, BackpressureStrategy.BUFFER)
+				.subscribeOn(Schedulers.io())
+				.observeOn(AndroidSchedulers.mainThread());
 	}
 }
