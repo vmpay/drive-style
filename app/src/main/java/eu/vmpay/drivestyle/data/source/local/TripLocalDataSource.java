@@ -68,7 +68,7 @@ public class TripLocalDataSource implements TripDataSource
 
 		long success = db.insert(dataModel.getTableName(), null, dataModel.getContentValues());
 
-		db.close();
+//		db.close();
 
 		return success;
 	}
@@ -156,7 +156,7 @@ public class TripLocalDataSource implements TripDataSource
 			c.close();
 		}
 
-		db.close();
+//		db.close();
 
 		return modelList;
 	}
@@ -167,7 +167,7 @@ public class TripLocalDataSource implements TripDataSource
 
 		int success = db.delete(dataModel.getTableName(), dataModel.getWhereClause(), null);
 
-		db.close();
+//		db.close();
 		return success;
 	}
 
