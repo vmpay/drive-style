@@ -42,7 +42,9 @@ public interface TripListContract
 
 		void showNoLaneChangeTrips();
 
-		void showSuccessfullySavedMessage();
+		void showExportSucceeded();
+
+		void showExportFailed();
 
 		boolean isActive();
 

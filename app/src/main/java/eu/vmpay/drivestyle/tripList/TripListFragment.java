@@ -344,9 +344,15 @@ public class TripListFragment extends DaggerFragment implements TripListContract
 	}
 
 	@Override
-	public void showSuccessfullySavedMessage()
+	public void showExportSucceeded()
 	{
-		showMessage(getString(R.string.successfully_saved_trip_message));
+		showMessage(getString(R.string.export_succeeded));
+	}
+
+	@Override
+	public void showExportFailed()
+	{
+		showMessage(getString(R.string.export_failed));
 	}
 
 	@Override

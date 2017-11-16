@@ -8,6 +8,7 @@ import android.util.Log;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -16,7 +17,6 @@ import javax.inject.Inject;
 import eu.vmpay.drivestyle.data.AccelerometerData;
 import eu.vmpay.drivestyle.data.LocationData;
 import eu.vmpay.drivestyle.data.Trip;
-import eu.vmpay.drivestyle.data.source.TripDataSource;
 import eu.vmpay.drivestyle.data.source.local.AccelerometerDataPersistenceContract;
 import eu.vmpay.drivestyle.data.source.local.LocationDataPersistenceContract;
 import eu.vmpay.drivestyle.data.source.local.TripLocalDataSource;
@@ -66,7 +66,7 @@ final class TripDetailPresenter implements TripDetailContract.Presenter
 	{
 		if(isNullOrEmpty(mTripId))
 		{
-			if(mTripDetailView != null)
+			if(mTripDetailView != null && mTripDetailView.isActive())
 			{
 				mTripDetailView.showLoadingDetailsError();
 			}
@@ -76,67 +76,78 @@ final class TripDetailPresenter implements TripDetailContract.Presenter
 		Trip trip = new Trip();
 		trip.setWhereClause(BaseColumns._ID + " LIKE " + mTripId);
 
-		mTripsRepository.getDataModels(trip, new TripDataSource.LoadModelsCallback()
+		mTripsRepository.getDataModelsRx(trip).subscribeWith(new DisposableSubscriber<ContentValues>()
 		{
 			@Override
-			public void onModelsLoaded(List<ContentValues> contentValuesList)
+			public void onNext(ContentValues contentValues)
 			{
-				Trip trip = Trip.buildFromContentValues(contentValuesList.get(0));
+				Trip currentTrip = Trip.buildFromContentValues(contentValues);
 				// The view may not be able to handle UI updates anymore
 				if(mTripDetailView == null || !mTripDetailView.isActive())
 				{
 					return;
 				}
 
-				actualTrip = trip;
-				if(null == trip)
+				actualTrip = currentTrip;
+				if(currentTrip == null)
 				{
 					mTripDetailView.showLoadingDetailsError();
 				}
 				else
 				{
-					showTripDetails(trip);
-				}
+					showTripDetails(currentTrip);
 
-				if(trip != null)
-				{
+					locationDataList = new ArrayList<LocationData>();
 					LocationData locationData = new LocationData();
-					locationData.setWhereClause(LocationDataPersistenceContract.LocationDataEntity.COLUMN_NAME_TRIP_ID + " LIKE " + trip.getmId());
-					mTripsRepository.getDataModels(locationData, new TripDataSource.LoadModelsCallback()
+					locationData.setWhereClause(LocationDataPersistenceContract.LocationDataEntity.COLUMN_NAME_TRIP_ID + " LIKE " + currentTrip.getmId());
+					mTripsRepository.getDataModelsRx(locationData).subscribeWith(new DisposableSubscriber<ContentValues>()
 					{
 						@Override
-						public void onModelsLoaded(List<ContentValues> contentValuesList)
+						public void onNext(ContentValues contentValues)
 						{
-							locationDataList = LocationData.buildFromContentValuesList(contentValuesList);
-							for(LocationData entry : locationDataList)
-							{
-								Log.d(TAG, entry.toString());
-							}
-							// TODO: 10/13/17 add map
+							LocationData entry = LocationData.buildFromContentValues(contentValues);
+							Log.d(TAG, entry.toString());
+							locationDataList.add(entry);
 						}
 
 						@Override
-						public void onDataNotAvailable()
+						public void onError(Throwable t)
 						{
+							t.printStackTrace();
+							if(mTripDetailView != null && mTripDetailView.isActive())
+							{
+								mTripDetailView.showLoadingLocationDataError();
+							}
+						}
+
+						@Override
+						public void onComplete()
+						{
+							// TODO: 10/13/17 add map
 						}
 					});
 
+					accelerometerDataList = new ArrayList<AccelerometerData>();
 					AccelerometerData accelerometerData = new AccelerometerData();
-					accelerometerData.setWhereClause(AccelerometerDataPersistenceContract.AccelerometerDataEntity.COLUMN_NAME_TRIP_ID + " LIKE " + trip.getmId());
-					mTripsRepository.getDataModels(accelerometerData, new TripDataSource.LoadModelsCallback()
+					accelerometerData.setWhereClause(AccelerometerDataPersistenceContract.AccelerometerDataEntity.COLUMN_NAME_TRIP_ID + " LIKE " + currentTrip.getmId());
+					mTripsRepository.getDataModelsRx(accelerometerData).subscribeWith(new DisposableSubscriber<ContentValues>()
 					{
 						@Override
-						public void onModelsLoaded(List<ContentValues> contentValuesList)
+						public void onNext(ContentValues contentValues)
 						{
-							accelerometerDataList = AccelerometerData.buildFromContentValuesList(contentValuesList);
-							for(AccelerometerData entry : accelerometerDataList)
-							{
-								Log.d(TAG, entry.toString());
-							}
+							AccelerometerData entry = AccelerometerData.buildFromContentValues(contentValues);
+							accelerometerDataList.add(entry);
+							Log.d(TAG, entry.toString());
 						}
 
 						@Override
-						public void onDataNotAvailable()
+						public void onError(Throwable t)
+						{
+							t.printStackTrace();
+						}
+
+						@Override
+						public void onComplete()
 						{
 						}
 					});
@@ -144,13 +155,18 @@ final class TripDetailPresenter implements TripDetailContract.Presenter
 			}
 
 			@Override
-			public void onDataNotAvailable()
+			public void onError(Throwable t)
 			{
-				if(!mTripDetailView.isActive())
+				t.printStackTrace();
+				if(mTripDetailView != null && mTripDetailView.isActive())
 				{
-					return;
+					mTripDetailView.showLoadingDetailsError();
 				}
-				mTripDetailView.showLoadingDetailsError();
+			}
+
+			@Override
+			public void onComplete()
+			{
 			}
 		});
 	}

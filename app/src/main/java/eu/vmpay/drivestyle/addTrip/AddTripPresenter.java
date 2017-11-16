@@ -136,9 +136,9 @@ final class AddTripPresenter implements AddTripContract.Presenter, Accelerometer
 			@Override
 			public void onNext(Long aLong)
 			{
-				final boolean[] motionSavingFinished = { false };
-				final boolean[] locationSavingFinished = { false };
 				final long tripId = aLong;
+				final boolean[] locationSaveFinished = { false };
+				final boolean[] motionSaveFinished = { false };
 
 				List<AccelerometerData> accelerometerDataList = new ArrayList<>();
 				for(Map.Entry<Long, Double[]> entry : motionDataMapCopy.entrySet())
@@ -154,7 +154,6 @@ final class AddTripPresenter implements AddTripContract.Presenter, Accelerometer
 						return (int) (o1.getTimestamp() - o2.getTimestamp());
 					}
 				});
-
 				tripsRepository.saveDataModelListRx(accelerometerDataList).subscribeWith(new DisposableSubscriber<Long>()
 				{
 					@Override
@@ -170,42 +169,50 @@ final class AddTripPresenter implements AddTripContract.Presenter, Accelerometer
 					@Override
 					public void onComplete()
 					{
-						List<LocationData> locationDataList = new ArrayList<>();
-						for(Map.Entry<Long, Location> entry : locationDataMapCopy.entrySet())
+						motionSaveFinished[0] = true;
+						if(addTripView != null && addTripView.isActive()
+								&& locationSaveFinished[0] && motionSaveFinished[0])
 						{
-							LocationData locationData = new LocationData(tripId, entry.getKey(), entry.getValue());
-							locationDataList.add(locationData);
+							addTripView.closeView();
 						}
-						Collections.sort(locationDataList, new Comparator<LocationData>()
+					}
+				});
+
+				List<LocationData> locationDataList = new ArrayList<>();
+				for(Map.Entry<Long, Location> entry : locationDataMapCopy.entrySet())
+				{
+					LocationData locationData = new LocationData(tripId, entry.getKey(), entry.getValue());
+					locationDataList.add(locationData);
+				}
+				Collections.sort(locationDataList, new Comparator<LocationData>()
+				{
+					@Override
+					public int compare(LocationData o1, LocationData o2)
+					{
+						return (int) (o1.getTimestamp() - o2.getTimestamp());
+					}
+				});
+				tripsRepository.saveDataModelListRx(locationDataList).subscribeWith(new DisposableSubscriber<Long>()
+				{
+					@Override
+					public void onNext(Long aLong)
+					{
+					}
+
+					@Override
+					public void onError(Throwable t)
+					{
+					}
+
+					@Override
+					public void onComplete()
+					{
+						locationSaveFinished[0] = true;
+						if(addTripView != null && addTripView.isActive()
+								&& locationSaveFinished[0] && motionSaveFinished[0])
 						{
-							@Override
-							public int compare(LocationData o1, LocationData o2)
-							{
-								return (int) (o1.getTimestamp() - o2.getTimestamp());
-							}
-						});
-
-						tripsRepository.saveDataModelListRx(locationDataList).subscribeWith(new DisposableSubscriber<Long>()
-						{
-							@Override
-							public void onNext(Long aLong)
-							{
-							}
-
-							@Override
-							public void onError(Throwable t)
-							{
-							}
-
-							@Override
-							public void onComplete()
-							{
-								if(addTripView != null)
-								{
-									addTripView.closeView();
-								}
-							}
-						});
+							addTripView.closeView();
+						}
 					}
 				});
 			}

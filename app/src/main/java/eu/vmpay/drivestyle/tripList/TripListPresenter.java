@@ -2,7 +2,6 @@ package eu.vmpay.drivestyle.tripList;
 
 import android.content.ContentValues;
 import android.support.annotation.NonNull;
-import android.util.Log;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -14,10 +13,10 @@ import javax.inject.Inject;
 import eu.vmpay.drivestyle.data.AccelerometerData;
 import eu.vmpay.drivestyle.data.LocationData;
 import eu.vmpay.drivestyle.data.Trip;
-import eu.vmpay.drivestyle.data.source.TripDataSource;
 import eu.vmpay.drivestyle.data.source.local.TripLocalDataSource;
 import eu.vmpay.drivestyle.di.ActivityScoped;
 import eu.vmpay.drivestyle.utils.ExportUtils;
+import io.reactivex.subscribers.DisposableSubscriber;
 
 import static dagger.internal.Preconditions.checkNotNull;
 import static eu.vmpay.drivestyle.tripList.TripListFilterType.ALL;
@@ -62,7 +61,7 @@ public class TripListPresenter implements TripListContract.Presenter
 //		if (AddEditTaskActivity.REQUEST_ADD_TASK == requestCode
 //				&& Activity.RESULT_OK == resultCode) {
 //			if (mTripListView != null) {
-//				mTripListView.showSuccessfullySavedMessage();
+//				mTripListView.showExportSucceeded();
 //			}
 //		}
 	}
@@ -71,54 +70,48 @@ public class TripListPresenter implements TripListContract.Presenter
 	public void loadTripList()
 	{
 		Trip trip = new Trip();
-		mTripsRepository.getDataModels(trip, new TripDataSource.LoadModelsCallback()
+		final List<Trip> tripsToShow = new ArrayList<Trip>();
+		mTripsRepository.getDataModelsRx(trip).subscribeWith(new DisposableSubscriber<ContentValues>()
 		{
 			@Override
-			public void onModelsLoaded(List<ContentValues> contentValuesList)
+			public void onNext(ContentValues contentValues)
 			{
-				List<Trip> trips = Trip.buildFromContentValuesList(contentValuesList);
-				List<Trip> tripsToShow = new ArrayList<Trip>();
-
-				// We filter the tasks based on the requestType
-				for(Trip trip : trips)
+				Trip entry = Trip.buildFromContentValues(contentValues);
+				switch(mCurrentFiltering)
 				{
-					switch(mCurrentFiltering)
-					{
-						case ALL:
-							tripsToShow.add(trip);
-							break;
-						case BRAKE:
-						case TURN:
-						case LANE_CHANGE:
-							if(trip.getmScenario().equals(mCurrentFiltering))
-							{
-								tripsToShow.add(trip);
-							}
-							break;
-						default:
-							tripsToShow.add(trip);
-							break;
-					}
+					case ALL:
+						tripsToShow.add(entry);
+						break;
+					case BRAKE:
+					case TURN:
+					case LANE_CHANGE:
+						if(entry.getmScenario().equals(mCurrentFiltering))
+						{
+							tripsToShow.add(entry);
+						}
+						break;
+					default:
+						tripsToShow.add(entry);
+						break;
 				}
-
-				// The view may not be able to handle UI updates anymore
-				if(mTripListView == null || !mTripListView.isActive())
-				{
-					return;
-				}
-
-				processTrips(tripsToShow);
 			}
 
 			@Override
-			public void onDataNotAvailable()
+			public void onError(Throwable t)
 			{
-				// The view may not be able to handle UI updates anymore
-				if(!mTripListView.isActive())
+				if(mTripListView != null && mTripListView.isActive())
 				{
-					return;
+					mTripListView.showLoadingTripsError();
 				}
-				mTripListView.showLoadingTripsError();
+			}
+
+			@Override
+			public void onComplete()
+			{
+				if(mTripListView != null && mTripListView.isActive())
+				{
+					processTrips(tripsToShow);
+				}
 			}
 		});
 	}
@@ -268,89 +261,144 @@ public class TripListPresenter implements TripListContract.Presenter
 	{
 		if(!ExportUtils.isFileNameValid(filename))
 		{
-			if(mTripListView != null)
+			if(mTripListView != null && mTripListView.isActive())
 			{
 				mTripListView.showInvalidFilename();
 			}
 			return;
 		}
+		final boolean[] tripsExportFinished = { false };
+		final boolean[] locationExportFinished = { false };
+		final boolean[] motionExportFinished = { false };
+		final List<ContentValues> tripValuesArrayList = new ArrayList<>();
+		final List<ContentValues> locationValuesArrayList = new ArrayList<>();
+		final List<ContentValues> motionValuesArrayList = new ArrayList<>();
+
 		Trip trip = new Trip();
-		mTripsRepository.getDataModels(trip, new TripDataSource.LoadModelsCallback()
+
+		mTripsRepository.getDataModelsRx(trip).subscribeWith(new DisposableSubscriber<ContentValues>()
 		{
 			@Override
-			public void onModelsLoaded(List<ContentValues> contentValuesList)
+			public void onNext(ContentValues contentValues)
 			{
-				List<String[]> exportList = Trip.getExportListFromContentValuesList(contentValuesList);
+				tripValuesArrayList.add(contentValues);
+			}
+
+			@Override
+			public void onError(Throwable t)
+			{
+				if(mTripListView != null && mTripListView.isActive())
+				{
+					mTripListView.showExportFailed();
+				}
+			}
+
+			@Override
+			public void onComplete()
+			{
+				List<String[]> exportList = Trip.getExportListFromContentValuesList(tripValuesArrayList);
 				try
 				{
 					ExportUtils.exportToCsv(filename + "_trip", exportList);
+					tripsExportFinished[0] = true;
+					if(mTripListView != null && mTripListView.isActive()
+							&& tripsExportFinished[0] && motionExportFinished[0] && locationExportFinished[0])
+					{
+						mTripListView.showExportSucceeded();
+					}
 				} catch(IOException e)
 				{
 					e.printStackTrace();
+					if(mTripListView != null && mTripListView.isActive())
+					{
+						mTripListView.showExportFailed();
+					}
+				}
+			}
+		});
+
+		LocationData locationData = new LocationData();
+		mTripsRepository.getDataModelsRx(locationData).subscribeWith(new DisposableSubscriber<ContentValues>()
+		{
+			@Override
+			public void onNext(ContentValues contentValues)
+			{
+				locationValuesArrayList.add(contentValues);
+			}
+
+			@Override
+			public void onError(Throwable t)
+			{
+				if(mTripListView != null && mTripListView.isActive())
+				{
+					mTripListView.showExportFailed();
 				}
 			}
 
 			@Override
-			public void onDataNotAvailable()
+			public void onComplete()
 			{
-				Log.d(TAG, "Cannot load trip data for export");
-			}
-		});
-		LocationData locationData = new LocationData();
-		mTripsRepository.getDataModels(locationData, new TripDataSource.LoadModelsCallback()
-		{
-			@Override
-			public void onModelsLoaded(List<ContentValues> contentValuesList)
-			{
-				List<String[]> exportList = LocationData.getExportListFromContentValuesList(contentValuesList);
+				List<String[]> exportList = LocationData.getExportListFromContentValuesList(locationValuesArrayList);
 				try
 				{
 					ExportUtils.exportToCsv(filename + "_location", exportList);
+					locationExportFinished[0] = true;
+					if(mTripListView != null && mTripListView.isActive()
+							&& tripsExportFinished[0] && motionExportFinished[0] && locationExportFinished[0])
+					{
+						mTripListView.showExportSucceeded();
+					}
 				} catch(IOException e)
 				{
 					e.printStackTrace();
+					if(mTripListView != null && mTripListView.isActive())
+					{
+						mTripListView.showExportFailed();
+					}
+				}
+			}
+		});
+
+		AccelerometerData accelerometerData = new AccelerometerData();
+		mTripsRepository.getDataModelsRx(accelerometerData).subscribeWith(new DisposableSubscriber<ContentValues>()
+		{
+			@Override
+			public void onNext(ContentValues contentValues)
+			{
+				motionValuesArrayList.add(contentValues);
+			}
+
+			@Override
+			public void onError(Throwable t)
+			{
+				if(mTripListView != null && mTripListView.isActive())
+				{
+					mTripListView.showExportFailed();
 				}
 			}
 
 			@Override
-			public void onDataNotAvailable()
+			public void onComplete()
 			{
-				Log.d(TAG, "Cannot load location data for export");
-			}
-		});
-		AccelerometerData accelerometerData = new AccelerometerData();
-		mTripsRepository.getDataModels(accelerometerData, new TripDataSource.LoadModelsCallback()
-		{
-			@Override
-			public void onModelsLoaded(List<ContentValues> contentValuesList)
-			{
-				List<String[]> exportList = AccelerometerData.getExportListFromContentValuesList(contentValuesList);
+				List<String[]> exportList = AccelerometerData.getExportListFromContentValuesList(motionValuesArrayList);
 				try
 				{
 					ExportUtils.exportToCsv(filename + "_accelerometer", exportList);
+					motionExportFinished[0] = true;
+					if(mTripListView != null && mTripListView.isActive()
+							&& tripsExportFinished[0] && motionExportFinished[0] && locationExportFinished[0])
+					{
+						mTripListView.showExportSucceeded();
+					}
 				} catch(IOException e)
 				{
 					e.printStackTrace();
+					if(mTripListView != null && mTripListView.isActive())
+					{
+						mTripListView.showExportFailed();
+					}
 				}
 			}
-
-			@Override
-			public void onDataNotAvailable()
-			{
-				Log.d(TAG, "Cannot load motion data for export");
-			}
 		});
-
-//		if(mTripListView != null)
-//		{
-//			if(exportFailed)
-//			{
-//				mTripListView.showExportFailed();
-//			}
-//			else
-//			{
-//				mTripListView.showExportSucceeded();
-//			}
-//		}
 	}
 }

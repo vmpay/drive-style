@@ -59,4 +59,5 @@
 	<string name="dialog_uninstall_old_package">In order to work correctly the old application have to be uninstalled. Uninstall it now?</string>
 	<string name="menu_delete">Delete</string>
 	<string name="saving_data">Saving data</string>
+	<string name="location_data_error">Location data error</string>
 </resources>

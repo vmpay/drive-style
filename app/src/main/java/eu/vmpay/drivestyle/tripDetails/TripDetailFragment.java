@@ -187,9 +187,14 @@ public class TripDetailFragment extends DaggerFragment implements TripDetailCont
 	}
 
 	@Override
-	public void showSnackMessage(String message)
+	public void showLoadingLocationDataError()
 	{
-		Snackbar.make(getView(), message, Snackbar.LENGTH_SHORT).show();
+		showSnackMessage(R.string.location_data_error);
+	}
+
+	private void showSnackMessage(int messageId)
+	{
+		Snackbar.make(getView(), messageId, Snackbar.LENGTH_SHORT).show();
 	}
 
 	@Override

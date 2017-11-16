@@ -21,7 +21,7 @@ public interface TripDetailContract
 
 		void showLoadingDetailsError();
 
-		void showSnackMessage(String message);
+		void showLoadingLocationDataError();
 
 		void showExportSucceeded();
 
