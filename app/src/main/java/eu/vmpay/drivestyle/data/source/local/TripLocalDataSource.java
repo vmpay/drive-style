@@ -61,39 +61,20 @@ public class TripLocalDataSource implements TripDataSource
 		mDbHelper = new TripDbHelper(context);
 	}
 
-	private <T extends BaseModel> long saveDataModel(@NonNull T dataModel)
+	private <T extends BaseModel> long insertDataModel(@NonNull T dataModel)
 	{
 		checkNotNull(dataModel);
 		SQLiteDatabase db = mDbHelper.getWritableDatabase();
 
-		long success = db.insert(dataModel.getTableName(), null, dataModel.getContentValues());
-
-//		db.close();
-
-		return success;
+		return db.insert(dataModel.getTableName(), null, dataModel.getContentValues());
 	}
 
-	/**
-	 * Note: {@link LoadModelsCallback#onDataNotAvailable()} is fired if the database doesn't exist
-	 * or the table is empty.
-	 */
-	@Override
-	public <T extends BaseModel> void getDataModels(@NonNull T dataModel, @NonNull LoadModelsCallback callback)
+	private <T extends BaseModel> int updateDataModel(@NonNull T dataModel)
 	{
 		checkNotNull(dataModel);
-		checkNotNull(callback);
+		SQLiteDatabase db = mDbHelper.getWritableDatabase();
 
-		List<ContentValues> modelList = getDataContentValuesList(dataModel);
-
-		if(modelList.isEmpty())
-		{
-			// This will be called if the table is new or just empty.
-			callback.onDataNotAvailable();
-		}
-		else
-		{
-			callback.onModelsLoaded(modelList);
-		}
+		return db.update(dataModel.getTableName(), dataModel.getContentValues(), dataModel.getWhereClause(), null);
 	}
 
 	private <T extends BaseModel> List<ContentValues> getDataContentValuesList(@NonNull T dataModel)
@@ -156,8 +137,6 @@ public class TripLocalDataSource implements TripDataSource
 			c.close();
 		}
 
-//		db.close();
-
 		return modelList;
 	}
 
@@ -165,21 +144,18 @@ public class TripLocalDataSource implements TripDataSource
 	{
 		SQLiteDatabase db = mDbHelper.getWritableDatabase();
 
-		int success = db.delete(dataModel.getTableName(), dataModel.getWhereClause(), null);
-
-//		db.close();
-		return success;
+		return db.delete(dataModel.getTableName(), dataModel.getWhereClause(), null);
 	}
 
 	@Override
-	public <T extends BaseModel> Flowable<Long> saveDataModelRx(@NonNull final T dataModel)
+	public <T extends BaseModel> Flowable<Long> insertDataModelRx(@NonNull final T dataModel)
 	{
 		return Flowable.create(new FlowableOnSubscribe<Long>()
 		{
 			@Override
 			public void subscribe(@io.reactivex.annotations.NonNull FlowableEmitter<Long> e) throws Exception
 			{
-				Long success = saveDataModel(dataModel);
+				Long success = insertDataModel(dataModel);
 				e.onNext(success);
 				e.onComplete();
 			}
@@ -189,7 +165,7 @@ public class TripLocalDataSource implements TripDataSource
 	}
 
 	@Override
-	public <T extends BaseModel> Flowable<Long> saveDataModelListRx(final List<T> dataList)
+	public <T extends BaseModel> Flowable<Long> insertDataModelListRx(final List<T> dataList)
 	{
 		return Flowable.create(new FlowableOnSubscribe<Long>()
 		{
@@ -198,8 +174,25 @@ public class TripLocalDataSource implements TripDataSource
 			{
 				for(T entry : dataList)
 				{
-					e.onNext(saveDataModel(entry));
+					e.onNext(insertDataModel(entry));
 				}
+				e.onComplete();
+			}
+		}, BackpressureStrategy.BUFFER)
+				.subscribeOn(Schedulers.io())
+				.observeOn(AndroidSchedulers.mainThread());
+	}
+
+	@Override
+	public <T extends BaseModel> Flowable<Integer> updateDataModelRx(@NonNull final T dataModel)
+	{
+		return Flowable.create(new FlowableOnSubscribe<Integer>()
+		{
+			@Override
+			public void subscribe(@io.reactivex.annotations.NonNull FlowableEmitter<Integer> e) throws Exception
+			{
+				Integer success = updateDataModel(dataModel);
+				e.onNext(success);
 				e.onComplete();
 			}
 		}, BackpressureStrategy.BUFFER)

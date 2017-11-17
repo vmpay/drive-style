@@ -35,5 +35,7 @@ public interface TripDetailContract
 		void exportCsv();
 
 		void deleteTrip();
+
+		void editTrip();
 	}
 }

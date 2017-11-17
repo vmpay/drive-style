@@ -131,7 +131,7 @@ final class AddTripPresenter implements AddTripContract.Presenter, Accelerometer
 		}
 
 		Trip trip = new Trip(tripTitle.isEmpty() ? "Trip " + new Date(startTimestamp).toString() : tripTitle, startTimestamp, stopTimestamp, type, scenario);
-		tripsRepository.saveDataModelRx(trip).subscribeWith(new DisposableSubscriber<Long>()
+		tripsRepository.insertDataModelRx(trip).subscribeWith(new DisposableSubscriber<Long>()
 		{
 			@Override
 			public void onNext(Long aLong)
@@ -154,7 +154,7 @@ final class AddTripPresenter implements AddTripContract.Presenter, Accelerometer
 						return (int) (o1.getTimestamp() - o2.getTimestamp());
 					}
 				});
-				tripsRepository.saveDataModelListRx(accelerometerDataList).subscribeWith(new DisposableSubscriber<Long>()
+				tripsRepository.insertDataModelListRx(accelerometerDataList).subscribeWith(new DisposableSubscriber<Long>()
 				{
 					@Override
 					public void onNext(Long aLong)
@@ -192,7 +192,7 @@ final class AddTripPresenter implements AddTripContract.Presenter, Accelerometer
 						return (int) (o1.getTimestamp() - o2.getTimestamp());
 					}
 				});
-				tripsRepository.saveDataModelListRx(locationDataList).subscribeWith(new DisposableSubscriber<Long>()
+				tripsRepository.insertDataModelListRx(locationDataList).subscribeWith(new DisposableSubscriber<Long>()
 				{
 					@Override
 					public void onNext(Long aLong)

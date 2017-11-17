@@ -141,6 +141,7 @@ public class TripDetailFragment extends DaggerFragment implements TripDetailCont
 				Snackbar.make(v, "Replace with your own action", Snackbar.LENGTH_LONG)
 						.setAction("Action", null).show();
 				// TODO: launch edit trip activity
+				mPresenter.editTrip();
 				break;
 			default:
 

@@ -15,18 +15,11 @@ import io.reactivex.Flowable;
 
 public interface TripDataSource
 {
-	interface LoadModelsCallback
-	{
-		void onModelsLoaded(List<ContentValues> contentValuesList);
+	<T extends BaseModel> Flowable<Long> insertDataModelRx(@NonNull T dataModel);
 
-		void onDataNotAvailable();
-	}
+	<T extends BaseModel> Flowable<Long> insertDataModelListRx(List<T> dataList);
 
-	<T extends BaseModel> void getDataModels(@NonNull T dataModel, @NonNull LoadModelsCallback callback);
-
-	<T extends BaseModel> Flowable<Long> saveDataModelRx(@NonNull T dataModel);
-
-	<T extends BaseModel> Flowable<Long> saveDataModelListRx(List<T> dataList);
+	<T extends BaseModel> Flowable<Integer> updateDataModelRx(@NonNull T dataModel);
 
 	<T extends BaseModel> Flowable<ContentValues> getDataModelsRx(@NonNull T dataModel);
 

@@ -11,6 +11,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Random;
 
 import javax.inject.Inject;
 
@@ -299,6 +300,35 @@ final class TripDetailPresenter implements TripDetailContract.Presenter
 			@Override
 			public void onComplete()
 			{
+			}
+		});
+	}
+
+	@Override
+	public void editTrip()
+	{
+		Random r = new Random();
+		double randomValue = r.nextDouble() * 5;
+		Trip editedTrip = new Trip(actualTrip.getmId(), actualTrip.getmTitle(),
+				actualTrip.getmStartTime(), actualTrip.getmFinishTime(), randomValue,
+				actualTrip.getmType(), actualTrip.getmScenario());
+		mTripsRepository.updateDataModelRx(editedTrip).subscribeWith(new DisposableSubscriber<Integer>()
+		{
+			@Override
+			public void onNext(Integer integer)
+			{
+				Log.d(TAG, "Updated " + integer + " entities");
+			}
+
+			@Override
+			public void onError(Throwable t)
+			{
+			}
+
+			@Override
+			public void onComplete()
+			{
+				loadDetails();
 			}
 		});
 	}
