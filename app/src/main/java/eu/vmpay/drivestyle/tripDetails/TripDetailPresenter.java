@@ -312,6 +312,7 @@ final class TripDetailPresenter implements TripDetailContract.Presenter
 		Trip editedTrip = new Trip(actualTrip.getmId(), actualTrip.getmTitle(),
 				actualTrip.getmStartTime(), actualTrip.getmFinishTime(), randomValue,
 				actualTrip.getmType(), actualTrip.getmScenario());
+		editedTrip.setThisIdWhereClause();
 		mTripsRepository.updateDataModelRx(editedTrip).subscribeWith(new DisposableSubscriber<Integer>()
 		{
 			@Override

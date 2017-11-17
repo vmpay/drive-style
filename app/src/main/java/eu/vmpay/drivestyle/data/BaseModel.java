@@ -1,6 +1,7 @@
 package eu.vmpay.drivestyle.data;
 
 import android.content.ContentValues;
+import android.provider.BaseColumns;
 import android.support.annotation.Nullable;
 
 import javax.annotation.Nonnull;
@@ -46,4 +47,11 @@ public abstract class BaseModel
 	{
 		this.whereClause = whereClause;
 	}
+
+	public void setThisIdWhereClause()
+	{
+		setWhereClause(BaseColumns._ID + " LIKE " + mId);
+	}
+
+
 }
