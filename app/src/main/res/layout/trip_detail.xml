@@ -15,30 +15,16 @@
 		android:orientation="vertical"
 		android:padding="@dimen/list_item_padding">
 
-		<LinearLayout
-
+		<TextView
+			android:id="@+id/tvTripTitle"
+			style="@style/TitleStyle"
 			android:layout_width="match_parent"
-			android:layout_height="wrap_content"
-			android:orientation="horizontal">
+			android:layout_height="wrap_content"/>
 
-			<TextView
-				style="?android:attr/textAppearanceLarge"
-				android:layout_width="wrap_content"
-				android:layout_height="wrap_content"
-				android:paddingEnd="@dimen/list_item_padding"
-				android:text="@string/title"/>
-
-			<TextView
-				android:id="@+id/tvTripTitle"
-				style="?android:attr/textAppearanceLarge"
-				android:layout_width="match_parent"
-				android:layout_height="wrap_content"/>
-
-		</LinearLayout>
 
 		<TextView
 			android:id="@+id/tvTripDetail"
-			style="?android:attr/textAppearanceLarge"
+			style="@style/CommonTextStyle"
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"/>
 

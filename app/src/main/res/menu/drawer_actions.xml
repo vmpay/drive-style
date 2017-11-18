@@ -7,6 +7,7 @@
 			android:title="@string/trip_list_title"/>
 		<item
 			android:id="@+id/settings_navigation_menu_item"
+			android:enabled="false"
 			android:icon="@drawable/ic_settings_black_24dp"
 			android:title="@string/settings_title"/>
 		<!--<item-->

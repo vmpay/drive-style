@@ -49,6 +49,7 @@
 			android:name=".addTrip.AddTripActivity"
 			android:label="@string/title_activity_add_trip_activty"
 			android:parentActivityName=".tripList.TripListActivity"
+			android:screenOrientation="portrait"
 			android:theme="@style/AppTheme.NoActionBar">
 			<meta-data
 				android:name="android.support.PARENT_ACTIVITY"

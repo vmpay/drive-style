@@ -60,4 +60,6 @@
 	<string name="menu_delete">Delete</string>
 	<string name="saving_data">Saving data</string>
 	<string name="location_data_error">Location data error</string>
+	<string name="calibrating_instruction">Wait till Accelerometer sensor is calibrated. Location sensor calibration is not obligatory.</string>
+	<string name="pending">Pending...</string>
 </resources>

@@ -35,14 +35,26 @@
 		<item name="android:drawableLeft">@drawable/ic_keyboard_arrow_left_black_24dp</item>
 	</style>
 
-	<style name="StepTitleStyle">
+	<style name="RadioButtonStyle" parent="Widget.AppCompat.CompoundButton.RadioButton">
+		<item name="android:textColor">@color/colorGrey</item>
+		<item name="android:textSize">@dimen/common_text_size</item>
+	</style>
+
+	<style name="CommonTextStyle">
+		<item name="android:textColor">@color/colorGrey</item>
+		<item name="android:textSize">@dimen/common_text_size</item>
+	</style>
+
+	<style name="TitleStyle" parent="CommonTextStyle">
+		<item name="android:textAlignment">center</item>
+		<item name="android:textColor">@color/colorAccent</item>
+		<item name="android:textSize">@dimen/title_text_size</item>
+	</style>
+
+	<style name="StepTitleStyle" parent="CommonTextStyle">
 		<item name="android:textAlignment">center</item>
 		<item name="android:padding">@dimen/medium_padding</item>
 		<item name="android:textSize">@dimen/text_header</item>
-	</style>
-
-	<style name="RadioButtonStyle" parent="Widget.AppCompat.CompoundButton.RadioButton">
-		<item name="android:textColor">@color/colorGrey</item>
 	</style>
 
 </resources>

@@ -170,7 +170,7 @@ public class TripDetailFragment extends DaggerFragment implements TripDetailCont
 	public void showDetails(String startTime, String finishTime, Double mark, String type, String scenario)
 	{
 		tvTripDetail.setText(String.format(Locale.US,
-				"Mark %.2f\nStart time %s\nFinishTime %s\nType %s\nScenario %s",
+				"Mark %.2f\nStart time %s\nFinish time %s\nType %s\nScenario %s",
 				mark, startTime, finishTime, type, scenario));
 	}
 

@@ -48,6 +48,7 @@
 					app:srcCompat="@drawable/ic_done_black_24dp"/>
 
 				<TextView
+					style="@style/CommonTextStyle"
 					android:layout_width="wrap_content"
 					android:layout_height="wrap_content"
 					android:text="@string/accelerometer_sensor"/>
@@ -75,6 +76,7 @@
 					app:srcCompat="@drawable/ic_done_black_24dp"/>
 
 				<TextView
+					style="@style/CommonTextStyle"
 					android:layout_width="wrap_content"
 					android:layout_height="wrap_content"
 					android:text="@string/location_sensor"/>
@@ -82,9 +84,10 @@
 			</LinearLayout>
 
 			<TextView
+				style="@style/CommonTextStyle"
 				android:layout_width="match_parent"
 				android:layout_height="wrap_content"
-				android:text="Some instructions"/>
+				android:text="@string/calibrating_instruction"/>
 
 		</LinearLayout>
 
@@ -107,36 +110,43 @@
 					android:orientation="vertical">
 
 					<TextView
+						style="@style/CommonTextStyle"
 						android:layout_width="match_parent"
 						android:layout_height="wrap_content"
 						android:text="@string/latitude"/>
 
 					<TextView
+						style="@style/CommonTextStyle"
 						android:layout_width="match_parent"
 						android:layout_height="wrap_content"
 						android:text="@string/longitude"/>
 
 					<TextView
+						style="@style/CommonTextStyle"
 						android:layout_width="match_parent"
 						android:layout_height="wrap_content"
 						android:text="@string/altitude"/>
 
 					<TextView
+						style="@style/CommonTextStyle"
 						android:layout_width="match_parent"
 						android:layout_height="wrap_content"
 						android:text="@string/speed"/>
 
 					<TextView
+						style="@style/CommonTextStyle"
 						android:layout_width="match_parent"
 						android:layout_height="wrap_content"
 						android:text="@string/acceleration_x"/>
 
 					<TextView
+						style="@style/CommonTextStyle"
 						android:layout_width="match_parent"
 						android:layout_height="wrap_content"
 						android:text="@string/acceleration_y"/>
 
 					<TextView
+						style="@style/CommonTextStyle"
 						android:layout_width="match_parent"
 						android:layout_height="wrap_content"
 						android:text="@string/acceleration_z"/>
@@ -153,45 +163,52 @@
 
 					<TextView
 						android:id="@+id/tvLatitude"
+						style="@style/CommonTextStyle"
 						android:layout_width="match_parent"
 						android:layout_height="wrap_content"
-						android:text="qwerty"/>
+						android:text="@string/pending"/>
 
 					<TextView
 						android:id="@+id/tvLongitude"
+						style="@style/CommonTextStyle"
 						android:layout_width="match_parent"
 						android:layout_height="wrap_content"
-						android:text="qwerty"/>
+						android:text="@string/pending"/>
 
 					<TextView
 						android:id="@+id/tvAltitude"
+						style="@style/CommonTextStyle"
 						android:layout_width="match_parent"
 						android:layout_height="wrap_content"
-						android:text="qwerty"/>
+						android:text="@string/pending"/>
 
 					<TextView
 						android:id="@+id/tvSpeed"
+						style="@style/CommonTextStyle"
 						android:layout_width="match_parent"
 						android:layout_height="wrap_content"
-						android:text="qwerty"/>
+						android:text="@string/pending"/>
 
 					<TextView
 						android:id="@+id/tvAccX"
+						style="@style/CommonTextStyle"
 						android:layout_width="match_parent"
 						android:layout_height="wrap_content"
-						android:text="qwerty"/>
+						android:text="@string/pending"/>
 
 					<TextView
 						android:id="@+id/tvAccY"
+						style="@style/CommonTextStyle"
 						android:layout_width="match_parent"
 						android:layout_height="wrap_content"
-						android:text="qwerty"/>
+						android:text="@string/pending"/>
 
 					<TextView
 						android:id="@+id/tvAccZ"
+						style="@style/CommonTextStyle"
 						android:layout_width="match_parent"
 						android:layout_height="wrap_content"
-						android:text="qwerty"/>
+						android:text="@string/pending"/>
 
 				</LinearLayout>
 
