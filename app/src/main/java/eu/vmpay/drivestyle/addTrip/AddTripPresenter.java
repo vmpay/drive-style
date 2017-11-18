@@ -44,6 +44,10 @@ final class AddTripPresenter implements AddTripContract.Presenter, Accelerometer
 	private Handler recyclerHandler = new Handler();
 
 	private int currentStep = 1;
+	private Trip actualTrip;
+	private boolean tripUpdateFinished;
+	private boolean locationSaveFinished;
+	private boolean motionSaveFinished;
 
 	@Inject
 	public AddTripPresenter(AccelerometerSensorContract accelerometerSensor, FusedLocationProviderContract fusedLocationProvider, TripLocalDataSource tripsRepository)
@@ -81,6 +85,7 @@ final class AddTripPresenter implements AddTripContract.Presenter, Accelerometer
 					stopMotionSensor();
 					stopLocationSensor();
 					clearOldMotionData();
+					saveData();
 					currentStep++;
 					addTripView.showStep(currentStep);
 					break;
@@ -106,12 +111,50 @@ final class AddTripPresenter implements AddTripContract.Presenter, Accelerometer
 	}
 
 	@Override
-	public void saveData(String tripTitle, String type, TripListFilterType scenario)
+	public void updateData(String tripTitle, String type, TripListFilterType scenario)
+	{
+		if(actualTrip != null)
+		{
+			Trip updatedTrip = new Trip(actualTrip.getmId(), tripTitle.isEmpty() ? actualTrip.getmTitle() : tripTitle,
+					actualTrip.getmStartTime(),
+					actualTrip.getmFinishTime(), actualTrip.getmMark(), type, scenario);
+			updatedTrip.setThisIdWhereClause();
+			tripsRepository.updateDataModelRx(updatedTrip).subscribeWith(new DisposableSubscriber<Integer>()
+			{
+				@Override
+				public void onNext(Integer integer)
+				{
+				}
+
+				@Override
+				public void onError(Throwable t)
+				{
+				}
+
+				@Override
+				public void onComplete()
+				{
+					tripUpdateFinished = true;
+					if(addTripView != null && addTripView.isActive()
+							&& locationSaveFinished && motionSaveFinished && tripUpdateFinished)
+					{
+						addTripView.closeView();
+					}
+				}
+			});
+		}
+	}
+
+	private void saveData()
 	{
 		if(motionDataMapCopy.isEmpty())
 		{
 			return;
 		}
+
+		tripUpdateFinished = false;
+		locationSaveFinished = false;
+		motionSaveFinished = false;
 
 		long startTimestamp = motionDataMapCopy.keySet().iterator().next();
 		long stopTimestamp = motionDataMapCopy.keySet().iterator().next();
@@ -130,15 +173,14 @@ final class AddTripPresenter implements AddTripContract.Presenter, Accelerometer
 			}
 		}
 
-		Trip trip = new Trip(tripTitle.isEmpty() ? "Trip " + new Date(startTimestamp).toString() : tripTitle, startTimestamp, stopTimestamp, type, scenario);
+		final Trip trip = new Trip("Trip " + new Date(startTimestamp).toString(), startTimestamp, stopTimestamp, "", TripListFilterType.ALL);
 		tripsRepository.insertDataModelRx(trip).subscribeWith(new DisposableSubscriber<Long>()
 		{
 			@Override
 			public void onNext(Long aLong)
 			{
 				final long tripId = aLong;
-				final boolean[] locationSaveFinished = { false };
-				final boolean[] motionSaveFinished = { false };
+				actualTrip = new Trip(tripId, trip.getmTitle(), trip.getmStartTime(), trip.getmFinishTime(), trip.getmMark(), trip.getmType(), trip.getmScenario());
 
 				List<AccelerometerData> accelerometerDataList = new ArrayList<>();
 				for(Map.Entry<Long, Double[]> entry : motionDataMapCopy.entrySet())
@@ -169,9 +211,9 @@ final class AddTripPresenter implements AddTripContract.Presenter, Accelerometer
 					@Override
 					public void onComplete()
 					{
-						motionSaveFinished[0] = true;
+						motionSaveFinished = true;
 						if(addTripView != null && addTripView.isActive()
-								&& locationSaveFinished[0] && motionSaveFinished[0])
+								&& locationSaveFinished && motionSaveFinished && tripUpdateFinished)
 						{
 							addTripView.closeView();
 						}
@@ -207,9 +249,9 @@ final class AddTripPresenter implements AddTripContract.Presenter, Accelerometer
 					@Override
 					public void onComplete()
 					{
-						locationSaveFinished[0] = true;
+						locationSaveFinished = true;
 						if(addTripView != null && addTripView.isActive()
-								&& locationSaveFinished[0] && motionSaveFinished[0])
+								&& locationSaveFinished && motionSaveFinished && tripUpdateFinished)
 						{
 							addTripView.closeView();
 						}

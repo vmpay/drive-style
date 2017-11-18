@@ -38,7 +38,7 @@ public interface AddTripContract
 
 		void stopMotionSensor();
 
-		void saveData(String tripTitle, String type, TripListFilterType scenario);
+		void updateData(String tripTitle, String type, TripListFilterType scenario);
 
 		void startLocationSensor(Activity activity);
 

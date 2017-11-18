@@ -230,7 +230,7 @@ public class AddTripFragment extends Fragment implements AddTripContract.View
 					}
 					btnNext.setEnabled(false);
 					llSavingData.setVisibility(View.VISIBLE);
-					mPresenter.saveData(etName.getText().toString(), "OnGo", scenario);
+					mPresenter.updateData(etName.getText().toString(), "OnGo", scenario);
 				}
 				break;
 			case R.id.llSecondStep:
