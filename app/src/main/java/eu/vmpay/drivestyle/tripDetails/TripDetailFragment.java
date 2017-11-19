@@ -15,6 +15,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.google.android.gms.maps.SupportMapFragment;
+
 import java.util.Locale;
 
 import javax.inject.Inject;
@@ -41,6 +43,7 @@ public class TripDetailFragment extends DaggerFragment implements TripDetailCont
 	@Inject TripDetailContract.Presenter mPresenter;
 	@BindView(R.id.tvTripDetail) TextView tvTripDetail;
 	@BindView(R.id.tvTripTitle) TextView tvTripTitle;
+	SupportMapFragment supportMapFragment;
 
 	private final int PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE = 3;
 	private Unbinder unbinder;
@@ -61,6 +64,12 @@ public class TripDetailFragment extends DaggerFragment implements TripDetailCont
 		View rootView = inflater.inflate(R.layout.trip_detail, container, false);
 		setHasOptionsMenu(true);
 		unbinder = ButterKnife.bind(this, rootView);
+		supportMapFragment = (SupportMapFragment) getChildFragmentManager()
+				.findFragmentById(R.id.map);
+		if(supportMapFragment != null)
+		{
+			hideMap();
+		}
 
 		return rootView;
 	}
@@ -215,5 +224,26 @@ public class TripDetailFragment extends DaggerFragment implements TripDetailCont
 	public void goUp()
 	{
 		getActivity().navigateUpTo(new Intent(getContext(), TripListActivity.class));
+	}
+
+	@Override
+	public void hideMap()
+	{
+		View mapView = supportMapFragment.getView();
+		if(mapView != null)
+		{
+			mapView.setVisibility(View.GONE);
+		}
+	}
+
+	@Override
+	public void showMap()
+	{
+		View mapView = supportMapFragment.getView();
+		if(mapView != null)
+		{
+			mapView.setVisibility(View.VISIBLE);
+		}
+		supportMapFragment.getMapAsync(mPresenter);
 	}
 }

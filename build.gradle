@@ -54,7 +54,7 @@ ext {
     rxandroidVersion = '2.0.1'
     sqlbriteVersion = '2.0.0'
     butterKnifeVersion = '8.8.1'
-    googlePlayServicesVersion = '11.4.2'
+    googlePlayServicesVersion = '11.6.0'
     openCsvVersion = '4.0'
     hockeyappVersion = '5.0.3'
 }

@@ -6,6 +6,12 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Polyline;
+import com.google.android.gms.maps.model.PolylineOptions;
+
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -124,7 +130,10 @@ final class TripDetailPresenter implements TripDetailContract.Presenter
 						@Override
 						public void onComplete()
 						{
-							// TODO: 10/13/17 add map
+							if(mTripDetailView != null && mTripDetailView.isActive() && locationDataList != null && !locationDataList.isEmpty())
+							{
+								mTripDetailView.showMap();
+							}
 						}
 					});
 
@@ -302,6 +311,12 @@ final class TripDetailPresenter implements TripDetailContract.Presenter
 			{
 			}
 		});
+		LocationData locationData = new LocationData();
+		locationData.setWhereClause(LocationDataPersistenceContract.LocationDataEntity.COLUMN_NAME_TRIP_ID + " LIKE " + mTripId);
+		mTripsRepository.deleteDataModelRx(locationData).subscribe();
+		AccelerometerData accelerometerData = new AccelerometerData();
+		accelerometerData.setWhereClause(AccelerometerDataPersistenceContract.AccelerometerDataEntity.COLUMN_NAME_TRIP_ID + " LIKE " + mTripId);
+		mTripsRepository.deleteDataModelRx(accelerometerData).subscribe();
 	}
 
 	@Override
@@ -332,5 +347,32 @@ final class TripDetailPresenter implements TripDetailContract.Presenter
 				loadDetails();
 			}
 		});
+	}
+
+	@Override
+	public void onMapReady(GoogleMap googleMap)
+	{
+		if(locationDataList == null || locationDataList.isEmpty())
+		{
+			if(mTripDetailView != null && mTripDetailView.isActive())
+			{
+				mTripDetailView.hideMap();
+			}
+			return;
+		}
+
+		List<LatLng> latLngList = new ArrayList<>();
+		for(LocationData entry : locationDataList)
+		{
+			latLngList.add(new LatLng(entry.getLatitude(), entry.getLongitude()));
+		}
+
+		Polyline polyline1 = googleMap.addPolyline(new PolylineOptions()
+				.clickable(true)
+				.addAll(latLngList));
+
+		// Position the map's camera near Alice Springs in the center of Australia,
+		// and set the zoom factor so most of Australia shows on the screen.
+		googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(locationDataList.get(0).getLatitude(), locationDataList.get(0).getLongitude()), 18));
 	}
 }

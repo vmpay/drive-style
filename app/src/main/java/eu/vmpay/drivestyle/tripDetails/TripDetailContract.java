@@ -1,5 +1,7 @@
 package eu.vmpay.drivestyle.tripDetails;
 
+import com.google.android.gms.maps.OnMapReadyCallback;
+
 import eu.vmpay.drivestyle.BasePresenter;
 import eu.vmpay.drivestyle.BaseView;
 
@@ -28,9 +30,13 @@ public interface TripDetailContract
 		void showExportFailed();
 
 		void goUp();
+
+		void hideMap();
+
+		void showMap();
 	}
 
-	interface Presenter extends BasePresenter<View>
+	interface Presenter extends BasePresenter<View>, OnMapReadyCallback
 	{
 		void exportCsv();
 

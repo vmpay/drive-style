@@ -85,6 +85,7 @@ final class AddTripPresenter implements AddTripContract.Presenter, Accelerometer
 					stopMotionSensor();
 					stopLocationSensor();
 					clearOldMotionData();
+					clearOldLocationData();
 					saveData();
 					currentStep++;
 					addTripView.showStep(currentStep);
