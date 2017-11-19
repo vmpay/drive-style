@@ -25,6 +25,7 @@ public class TripDbHelper extends SQLiteOpenHelper
 		db.execSQL(LocationDataPersistenceContract.LocationDataEntity.CREATE_TABLE);
 		db.execSQL(AccelerometerDataPersistenceContract.AccelerometerDataEntity.CREATE_TABLE);
 		db.execSQL(MotionTripViewPersistenceContract.MotionTripEntry.CREATE_TABLE);
+		db.execSQL(LocationTripViewPersistenceContract.LocationTripEntry.CREATE_TABLE);
 	}
 
 	public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion)
@@ -34,6 +35,7 @@ public class TripDbHelper extends SQLiteOpenHelper
 		db.execSQL("DROP TABLE IF EXISTS " + LocationDataPersistenceContract.LocationDataEntity.TABLE_NAME);
 		db.execSQL("DROP TABLE IF EXISTS " + AccelerometerDataPersistenceContract.AccelerometerDataEntity.TABLE_NAME);
 		db.execSQL("DROP VIEW IF EXISTS " + MotionTripViewPersistenceContract.MotionTripEntry.TABLE_NAME);
+		db.execSQL("DROP VIEW IF EXISTS " + LocationTripViewPersistenceContract.LocationTripEntry.TABLE_NAME);
 
 		onCreate(db);
 	}

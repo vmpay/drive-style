@@ -22,10 +22,12 @@ import javax.inject.Inject;
 
 import eu.vmpay.drivestyle.data.AccelerometerData;
 import eu.vmpay.drivestyle.data.LocationData;
+import eu.vmpay.drivestyle.data.LocationTripView;
 import eu.vmpay.drivestyle.data.MotionTripView;
 import eu.vmpay.drivestyle.data.Trip;
 import eu.vmpay.drivestyle.data.source.local.AccelerometerDataPersistenceContract;
 import eu.vmpay.drivestyle.data.source.local.LocationDataPersistenceContract;
+import eu.vmpay.drivestyle.data.source.local.LocationTripViewPersistenceContract;
 import eu.vmpay.drivestyle.data.source.local.MotionTripViewPersistenceContract;
 import eu.vmpay.drivestyle.data.source.local.TripLocalDataSource;
 import eu.vmpay.drivestyle.data.source.local.TripPersistenceContract;
@@ -247,10 +249,10 @@ final class TripDetailPresenter implements TripDetailContract.Presenter
 	{
 		if(actualTrip != null)
 		{
+			final boolean[] exportFailed = { false };
+
 			MotionTripView motionTripView = new MotionTripView();
 			motionTripView.setWhereClause(MotionTripViewPersistenceContract.MotionTripEntry._ID + " LIKE " + mTripId);
-
-			final boolean[] exportFailed = { false };
 			final List<ContentValues> motionTripViewList = new ArrayList<>();
 			mTripsRepository.getDataModelsRx(motionTripView).subscribeWith(new DisposableSubscriber<ContentValues>()
 			{
@@ -271,26 +273,59 @@ final class TripDetailPresenter implements TripDetailContract.Presenter
 				{
 					try
 					{
-						ExportUtils.exportToCsv(actualTrip.getmTitle() + "_data",
+						ExportUtils.exportToCsv(actualTrip.getmTitle() + "_motion",
 								MotionTripView.getExportListFromContentValuesList(motionTripViewList));
 					} catch(IOException e)
 					{
 						exportFailed[0] = true;
 						e.printStackTrace();
 					}
-					if(mTripDetailView != null)
+				}
+			});
+
+			LocationTripView locationTripView = new LocationTripView();
+			locationTripView.setWhereClause(LocationTripViewPersistenceContract.LocationTripEntry._ID + " LIKE " + mTripId);
+			final List<ContentValues> locationTripViewList = new ArrayList<>();
+			mTripsRepository.getDataModelsRx(locationTripView).subscribeWith(new DisposableSubscriber<ContentValues>()
+			{
+				@Override
+				public void onNext(ContentValues contentValues)
+				{
+					locationTripViewList.add(contentValues);
+				}
+
+				@Override
+				public void onError(Throwable t)
+				{
+					exportFailed[0] = true;
+				}
+
+				@Override
+				public void onComplete()
+				{
+					try
 					{
-						if(exportFailed[0])
-						{
-							mTripDetailView.showExportFailed();
-						}
-						else
-						{
-							mTripDetailView.showExportSucceeded();
-						}
+						ExportUtils.exportToCsv(actualTrip.getmTitle() + "_location",
+								LocationTripView.getExportListFromContentValuesList(locationTripViewList));
+					} catch(IOException e)
+					{
+						exportFailed[0] = true;
+						e.printStackTrace();
 					}
 				}
 			});
+
+			if(mTripDetailView != null)
+			{
+				if(exportFailed[0])
+				{
+					mTripDetailView.showExportFailed();
+				}
+				else
+				{
+					mTripDetailView.showExportSucceeded();
+				}
+			}
 		}
 	}
 
