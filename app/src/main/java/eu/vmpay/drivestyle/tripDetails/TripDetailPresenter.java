@@ -17,16 +17,18 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Random;
 
 import javax.inject.Inject;
 
 import eu.vmpay.drivestyle.data.AccelerometerData;
 import eu.vmpay.drivestyle.data.LocationData;
+import eu.vmpay.drivestyle.data.MotionTripView;
 import eu.vmpay.drivestyle.data.Trip;
 import eu.vmpay.drivestyle.data.source.local.AccelerometerDataPersistenceContract;
 import eu.vmpay.drivestyle.data.source.local.LocationDataPersistenceContract;
+import eu.vmpay.drivestyle.data.source.local.MotionTripViewPersistenceContract;
 import eu.vmpay.drivestyle.data.source.local.TripLocalDataSource;
+import eu.vmpay.drivestyle.data.source.local.TripPersistenceContract;
 import eu.vmpay.drivestyle.utils.ExportUtils;
 import io.reactivex.subscribers.DisposableSubscriber;
 
@@ -245,42 +247,50 @@ final class TripDetailPresenter implements TripDetailContract.Presenter
 	{
 		if(actualTrip != null)
 		{
-			boolean exportFailed = false;
-			if(locationDataList != null && !locationDataList.isEmpty())
+			MotionTripView motionTripView = new MotionTripView();
+			motionTripView.setWhereClause(MotionTripViewPersistenceContract.MotionTripEntry._ID + " LIKE " + mTripId);
+
+			final boolean[] exportFailed = { false };
+			final List<ContentValues> motionTripViewList = new ArrayList<>();
+			mTripsRepository.getDataModelsRx(motionTripView).subscribeWith(new DisposableSubscriber<ContentValues>()
 			{
-				List<String[]> exportLocationList = LocationData.getExportListFromModelList(locationDataList);
-				try
+				@Override
+				public void onNext(ContentValues contentValues)
 				{
-					ExportUtils.exportToCsv(actualTrip.getmTitle() + "_location", exportLocationList);
-				} catch(IOException e)
-				{
-					exportFailed = true;
-					e.printStackTrace();
+					motionTripViewList.add(contentValues);
 				}
-			}
-			if(accelerometerDataList != null && !accelerometerDataList.isEmpty())
-			{
-				List<String[]> exportMotionList = AccelerometerData.getExportListFromModelList(accelerometerDataList);
-				try
+
+				@Override
+				public void onError(Throwable t)
 				{
-					ExportUtils.exportToCsv(actualTrip.getmTitle() + "_accelerometer", exportMotionList);
-				} catch(IOException e)
-				{
-					exportFailed = true;
-					e.printStackTrace();
+					exportFailed[0] = true;
 				}
-			}
-			if(mTripDetailView != null)
-			{
-				if(exportFailed)
+
+				@Override
+				public void onComplete()
 				{
-					mTripDetailView.showExportFailed();
+					try
+					{
+						ExportUtils.exportToCsv(actualTrip.getmTitle() + "_data",
+								MotionTripView.getExportListFromContentValuesList(motionTripViewList));
+					} catch(IOException e)
+					{
+						exportFailed[0] = true;
+						e.printStackTrace();
+					}
+					if(mTripDetailView != null)
+					{
+						if(exportFailed[0])
+						{
+							mTripDetailView.showExportFailed();
+						}
+						else
+						{
+							mTripDetailView.showExportSucceeded();
+						}
+					}
 				}
-				else
-				{
-					mTripDetailView.showExportSucceeded();
-				}
-			}
+			});
 		}
 	}
 
@@ -288,7 +298,7 @@ final class TripDetailPresenter implements TripDetailContract.Presenter
 	public void deleteTrip()
 	{
 		Trip trip = new Trip();
-		trip.setWhereClause(BaseColumns._ID + " LIKE " + mTripId);
+		trip.setWhereClause(TripPersistenceContract.TripEntry._ID + " LIKE " + mTripId);
 		mTripsRepository.deleteDataModelRx(trip).subscribeWith(new DisposableSubscriber<Integer>()
 		{
 			@Override
@@ -322,31 +332,31 @@ final class TripDetailPresenter implements TripDetailContract.Presenter
 	@Override
 	public void editTrip()
 	{
-		Random r = new Random();
-		double randomValue = r.nextDouble() * 5;
-		Trip editedTrip = new Trip(actualTrip.getmId(), actualTrip.getmTitle(),
-				actualTrip.getmStartTime(), actualTrip.getmFinishTime(), randomValue,
-				actualTrip.getmType(), actualTrip.getmScenario());
-		editedTrip.setThisIdWhereClause();
-		mTripsRepository.updateDataModelRx(editedTrip).subscribeWith(new DisposableSubscriber<Integer>()
-		{
-			@Override
-			public void onNext(Integer integer)
-			{
-				Log.d(TAG, "Updated " + integer + " entities");
-			}
-
-			@Override
-			public void onError(Throwable t)
-			{
-			}
-
-			@Override
-			public void onComplete()
-			{
-				loadDetails();
-			}
-		});
+//		Random r = new Random();
+//		double randomValue = r.nextDouble() * 5;
+//		Trip editedTrip = new Trip(actualTrip.getmId(), actualTrip.getmTitle(),
+//				actualTrip.getmStartTime(), actualTrip.getmFinishTime(), randomValue,
+//				actualTrip.getmType(), actualTrip.getmScenario());
+//		editedTrip.setThisIdWhereClause();
+//		mTripsRepository.updateDataModelRx(editedTrip).subscribeWith(new DisposableSubscriber<Integer>()
+//		{
+//			@Override
+//			public void onNext(Integer integer)
+//			{
+//				Log.d(TAG, "Updated " + integer + " entities");
+//			}
+//
+//			@Override
+//			public void onError(Throwable t)
+//			{
+//			}
+//
+//			@Override
+//			public void onComplete()
+//			{
+//				loadDetails();
+//			}
+//		});
 	}
 
 	@Override

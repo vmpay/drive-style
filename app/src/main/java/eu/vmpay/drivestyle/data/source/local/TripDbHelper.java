@@ -10,12 +10,9 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 public class TripDbHelper extends SQLiteOpenHelper
 {
-	public static final int DATABASE_VERSION = 1;
+	public static final int DATABASE_VERSION = 2;
 
 	public static final String DATABASE_NAME = "Trips.db";
-
-//	private static final String SQL_CREATE_ENTRIES =
-//			TripPersistenceContract.TripEntry.CREATE_TABLE;
 
 	public TripDbHelper(Context context)
 	{
@@ -27,6 +24,7 @@ public class TripDbHelper extends SQLiteOpenHelper
 		db.execSQL(TripPersistenceContract.TripEntry.CREATE_TABLE);
 		db.execSQL(LocationDataPersistenceContract.LocationDataEntity.CREATE_TABLE);
 		db.execSQL(AccelerometerDataPersistenceContract.AccelerometerDataEntity.CREATE_TABLE);
+		db.execSQL(MotionTripViewPersistenceContract.MotionTripEntry.CREATE_TABLE);
 	}
 
 	public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion)
@@ -35,6 +33,9 @@ public class TripDbHelper extends SQLiteOpenHelper
 		db.execSQL("DROP TABLE IF EXISTS " + TripPersistenceContract.TripEntry.TABLE_NAME);
 		db.execSQL("DROP TABLE IF EXISTS " + LocationDataPersistenceContract.LocationDataEntity.TABLE_NAME);
 		db.execSQL("DROP TABLE IF EXISTS " + AccelerometerDataPersistenceContract.AccelerometerDataEntity.TABLE_NAME);
+		db.execSQL("DROP VIEW IF EXISTS " + MotionTripViewPersistenceContract.MotionTripEntry.TABLE_NAME);
+
+		onCreate(db);
 	}
 
 	public void onDowngrade(SQLiteDatabase db, int oldVersion, int newVersion)

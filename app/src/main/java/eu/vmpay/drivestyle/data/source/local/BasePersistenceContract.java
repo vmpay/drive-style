@@ -11,6 +11,7 @@ public abstract class BasePersistenceContract
 	protected static final String TEXT_TYPE = " TEXT";
 	protected static final String BOOLEAN_TYPE = " INTEGER";
 	protected static final String COMMA_SEP = ",";
+	protected static final String DOT_SEP = ".";
 
 	// To prevent someone from accidentally instantiating the contract class,
 	// give it an empty constructor.
