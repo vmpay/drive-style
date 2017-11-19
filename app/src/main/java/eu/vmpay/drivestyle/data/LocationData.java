@@ -6,6 +6,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import eu.vmpay.drivestyle.data.source.local.LocationDataPersistenceContract;
@@ -281,7 +282,7 @@ public final class LocationData extends BaseModel
 		String[] result = new String[7];
 		result[0] = Long.toString(locationData.mId);
 		result[1] = Long.toString(locationData.tripId);
-		result[2] = Long.toString(locationData.timestamp);
+		result[2] = dateFormat.format(new Date(locationData.timestamp));
 		result[3] = Double.toString(locationData.latitude);
 		result[4] = Double.toString(locationData.longitude);
 		result[5] = Double.toString(locationData.altitude);

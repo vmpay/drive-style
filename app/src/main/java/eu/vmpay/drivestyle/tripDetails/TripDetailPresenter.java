@@ -246,7 +246,7 @@ final class TripDetailPresenter implements TripDetailContract.Presenter
 		if(actualTrip != null)
 		{
 			boolean exportFailed = false;
-			if(locationDataList != null)
+			if(locationDataList != null && !locationDataList.isEmpty())
 			{
 				List<String[]> exportLocationList = LocationData.getExportListFromModelList(locationDataList);
 				try
@@ -258,7 +258,7 @@ final class TripDetailPresenter implements TripDetailContract.Presenter
 					e.printStackTrace();
 				}
 			}
-			if(accelerometerDataList != null)
+			if(accelerometerDataList != null && !accelerometerDataList.isEmpty())
 			{
 				List<String[]> exportMotionList = AccelerometerData.getExportListFromModelList(accelerometerDataList);
 				try

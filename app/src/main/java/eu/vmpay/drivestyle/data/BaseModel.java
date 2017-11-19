@@ -4,6 +4,9 @@ import android.content.ContentValues;
 import android.provider.BaseColumns;
 import android.support.annotation.Nullable;
 
+import java.text.SimpleDateFormat;
+import java.util.Locale;
+
 import javax.annotation.Nonnull;
 
 /**
@@ -17,6 +20,8 @@ public abstract class BaseModel
 	@Nonnull protected final String tableName;
 	@Nonnull protected final String[] projection;
 	@Nullable protected String whereClause;
+
+	protected static final SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss.SSS", Locale.US);
 
 	public BaseModel(long mId, @Nonnull String tableName, @Nonnull String[] projection)
 	{

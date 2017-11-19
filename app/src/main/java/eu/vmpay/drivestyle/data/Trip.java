@@ -5,6 +5,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import eu.vmpay.drivestyle.data.source.local.TripPersistenceContract;
@@ -243,8 +244,8 @@ public final class Trip extends BaseModel
 		String[] result = new String[7];
 		result[0] = Long.toString(trip.mId);
 		result[1] = trip.mTitle;
-		result[2] = Long.toString(trip.mStartTime);
-		result[3] = Long.toString(trip.mFinishTime);
+		result[2] = dateFormat.format(new Date(trip.mStartTime));
+		result[3] = dateFormat.format(new Date(trip.mFinishTime));
 		result[4] = Double.toString(trip.mMark);
 		result[5] = trip.mType;
 		result[6] = trip.mScenario.name();

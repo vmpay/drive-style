@@ -5,6 +5,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import eu.vmpay.drivestyle.data.source.local.AccelerometerDataPersistenceContract;
@@ -249,7 +250,7 @@ public final class AccelerometerData extends BaseModel
 		String[] result = new String[6];
 		result[0] = Long.toString(accelerometerData.mId);
 		result[1] = Long.toString(accelerometerData.tripId);
-		result[2] = Long.toString(accelerometerData.timestamp);
+		result[2] = dateFormat.format(new Date(accelerometerData.timestamp));
 		result[3] = Double.toString(accelerometerData.accX);
 		result[4] = Double.toString(accelerometerData.accY);
 		result[5] = Double.toString(accelerometerData.accZ);
