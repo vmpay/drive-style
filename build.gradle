@@ -8,7 +8,7 @@ buildscript {
         }
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:2.3.3'
+        classpath 'com.android.tools.build:gradle:3.0.1'
 
         // Better IDE support for annotations (so Android Studio interacts better with Dagger)
         classpath 'com.neenbedankt.gradle.plugins:android-apt:1.8'
@@ -39,7 +39,7 @@ ext {
     buildToolsVersion = '26.0.3'
 
     // App dependencies
-    supportLibraryVersion = '26.1.0'
+    supportLibraryVersion = '27.0.2'
     guavaVersion = '18.0'
     junitVersion = '4.12'
     mockitoVersion = '1.10.19'
@@ -54,7 +54,7 @@ ext {
     rxandroidVersion = '2.0.1'
     sqlbriteVersion = '2.0.0'
     butterKnifeVersion = '8.8.1'
-    googlePlayServicesVersion = '11.6.0'
+    googlePlayServicesVersion = '11.6.2'
     openCsvVersion = '4.0'
     hockeyappVersion = '5.0.3'
 }

@@ -1,5 +1,4 @@
 apply plugin: 'com.android.application'
-apply plugin: 'com.neenbedankt.android-apt'
 
 android {
     compileSdkVersion rootProject.ext.compileSdkVersion
@@ -45,6 +44,7 @@ android {
     }
 
     // If you need to add more flavors, consider using flavor dimensions.
+    flavorDimensions "default"
     productFlavors {
         mock {
             applicationIdSuffix = ".mock"
@@ -72,10 +72,8 @@ android {
     }
 
     applicationVariants.all { variant ->
-        variant.outputs.each { output ->
-            output.outputFile = new File(
-                    output.outputFile.parent,
-                    output.outputFile.name.replace("app", "DriveStyle-app-v${variant.versionName}"))
+        variant.outputs.all {
+            outputFileName = "DriveStyle-app-v${variant.versionName}-${variant.flavorName}.apk"
         }
     }
 }
@@ -94,14 +92,14 @@ dependencies {
     compile "com.google.android.gms:play-services-location:$rootProject.googlePlayServicesVersion"
     compile "com.google.android.gms:play-services-maps:$rootProject.googlePlayServicesVersion"
     compile "com.jakewharton:butterknife:$rootProject.butterKnifeVersion"
-    apt "com.jakewharton:butterknife-compiler:$rootProject.butterKnifeVersion"
+    annotationProcessor "com.jakewharton:butterknife-compiler:$rootProject.butterKnifeVersion"
 
     // Dagger dependencies
-    apt "com.google.dagger:dagger-compiler:$rootProject.daggerVersion"
+    annotationProcessor "com.google.dagger:dagger-compiler:$rootProject.daggerVersion"
     compile "com.google.dagger:dagger:$rootProject.daggerVersion"
     compile "com.google.dagger:dagger-android:$rootProject.daggerVersion"
     compile "com.google.dagger:dagger-android-support:$rootProject.daggerVersion"
-    apt "com.google.dagger:dagger-android-processor:$rootProject.daggerVersion"
+    annotationProcessor "com.google.dagger:dagger-android-processor:$rootProject.daggerVersion"
 
     // RxAndroid dependencies
     compile "io.reactivex.rxjava2:rxandroid:$rootProject.rxandroidVersion"
