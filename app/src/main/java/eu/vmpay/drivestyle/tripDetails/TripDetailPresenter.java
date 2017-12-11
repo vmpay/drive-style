@@ -12,11 +12,14 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 
+import org.apache.commons.lang3.tuple.Pair;
+
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 import javax.inject.Inject;
 
@@ -32,6 +35,7 @@ import eu.vmpay.drivestyle.data.source.local.MotionTripViewPersistenceContract;
 import eu.vmpay.drivestyle.data.source.local.TripLocalDataSource;
 import eu.vmpay.drivestyle.data.source.local.TripPersistenceContract;
 import eu.vmpay.drivestyle.utils.ExportUtils;
+import eu.vmpay.drivestyle.utils.FilteringUtils;
 import io.reactivex.subscribers.DisposableSubscriber;
 
 /**
@@ -367,6 +371,27 @@ final class TripDetailPresenter implements TripDetailContract.Presenter
 	@Override
 	public void editTrip()
 	{
+// 4 8 6 -1 -2 -3 -1 3 4 5
+		List<Pair<Number, Number>> originalValues = new ArrayList<>();
+		originalValues.add(Pair.<Number, Number>of(1, 4));
+		originalValues.add(Pair.<Number, Number>of(2, 8));
+		originalValues.add(Pair.<Number, Number>of(3, 6));
+		originalValues.add(Pair.<Number, Number>of(4, -1));
+		originalValues.add(Pair.<Number, Number>of(5, -2));
+		originalValues.add(Pair.<Number, Number>of(6, -3));
+		originalValues.add(Pair.<Number, Number>of(7, -1));
+		originalValues.add(Pair.<Number, Number>of(8, 3));
+		originalValues.add(Pair.<Number, Number>of(9, 4));
+		originalValues.add(Pair.<Number, Number>of(10, 5));
+		List<Pair<Number, Number>> result = FilteringUtils.calculateFilter(originalValues, 3, false);
+		for(int i = 0; i < result.size(); i++)
+		{
+			Log.d(TAG, String.format(Locale.US, "%d.\t%s\t%s",
+					i,
+					result.get(i).getLeft().toString(),
+					result.get(i).getRight().toString()
+			));
+		}
 //		Random r = new Random();
 //		double randomValue = r.nextDouble() * 5;
 //		Trip editedTrip = new Trip(actualTrip.getmId(), actualTrip.getmTitle(),
