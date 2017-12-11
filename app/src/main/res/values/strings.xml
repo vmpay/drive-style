@@ -43,7 +43,7 @@
 	<string name="title">Title</string>
 	<string name="button_done">Done</string>
 	<string name="menu_export">Export</string>
-	<string name="message_export_dialog">Enter the file name. The file will be exported into /Download/</string>
+	<string name="message_export_dialog">Enter the file name. The file will be exported into /Download/DriveStyle/</string>
 	<string name="cancel">Cancel</string>
 	<string name="filename">Filename</string>
 	<string name="export">Export</string>
@@ -60,6 +60,6 @@
 	<string name="menu_delete">Delete</string>
 	<string name="saving_data">Saving data</string>
 	<string name="location_data_error">Location data error</string>
-	<string name="calibrating_instruction">Wait till Accelerometer sensor is calibrated. Location sensor calibration is not obligatory.</string>
+	<string name="calibrating_instruction">The device will record last 5 seconds of the trip. Wait till Accelerometer sensor is calibrated. Location sensor calibration is not obligatory.</string>
 	<string name="pending">Pending...</string>
 </resources>
