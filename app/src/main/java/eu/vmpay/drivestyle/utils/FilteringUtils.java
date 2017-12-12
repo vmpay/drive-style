@@ -1,6 +1,6 @@
 package eu.vmpay.drivestyle.utils;
 
-import android.support.annotation.Nullable;
+import android.util.Log;
 
 import org.apache.commons.lang3.tuple.Pair;
 
@@ -26,20 +26,72 @@ public class FilteringUtils
 	 * sliding window is truncated at the endpoints where there are fewer than
 	 * k elements from a to fill the window.
 	 *
-	 * @param a input vector
-	 * @param k positive integer scalar
+	 * @param originalValues input vector
+	 * @param slidingWindow  positive integer scalar
 	 * @return
 	 */
-	@Nullable
-	public static double[] movMedian(@Nonnull double[] a, int k)
+	@Nonnull
+	public static List<Double> movMedian(@Nonnull List<Double> originalValues, int slidingWindow)
 	{
-		if(k < 1)
+		List<Double> calculatedValues = new ArrayList<>();
+		if(originalValues.isEmpty())
 		{
-			return null;
+			throw new RuntimeException("No measurement values provided");
 		}
-		double[] m = new double[a.length];
+		if(slidingWindow > originalValues.size())
+		{
+			throw new RuntimeException("Sliding window cannot exceed the number of measurements provided");
+		}
 
-		return m;
+		if(slidingWindow < 1)
+		{
+			return originalValues;
+		}
+
+		for(int i = 0; i < originalValues.size(); i++)
+		{
+			//iterate through the list and get the windows
+			int startIndex = i - slidingWindow + 1 > 0 ? i - slidingWindow + 1 : 0;
+			List<Double> window = originalValues.subList(startIndex, i + 1);
+
+			//Calculate medians for each window and store the values
+			Double median = calculateMedian(window);
+
+			if(i > 190)
+			{
+				Log.d("TAG", "median " + median);
+			}
+
+			//Store the calculated value
+			calculatedValues.add(median);
+		}
+
+		return calculatedValues;
+	}
+
+	private static Double calculateMedian(List<Double> window)
+	{
+		//Sort the collection
+		Collections.sort(window, new Comparator<Double>()
+		{
+			@Override
+			public int compare(Double o1, Double o2)
+			{
+				return o1.compareTo(o2);
+			}
+		});
+
+		final int size = window.size();
+		if(size % 2 == 1)
+		{
+			//Odd
+			return window.get((int) Math.ceil(size / 2));
+		}
+		else
+		{
+			//Even
+			return (window.get(size / 2 - 1) + window.get(size / 2)) / 2;
+		}
 	}
 
 	/**
@@ -76,8 +128,8 @@ public class FilteringUtils
 			List<Number> yValues = getYValues(window, weighted);
 
 			//Calculate medians for each window and store the values
-			Number x = calculateMedian(xValues);
-			Number y = calculateMedian(yValues);
+			Number x = calculateMedianOld(xValues);
+			Number y = calculateMedianOld(yValues);
 
 			//Store the calculated value
 			Pair<Number, Number> value = Pair.of(x, y);
@@ -172,7 +224,7 @@ public class FilteringUtils
 	 * @param values
 	 * @return
 	 */
-	private static Number calculateMedian(List<Number> values)
+	private static Number calculateMedianOld(List<Number> values)
 	{
 		//Sort the collection
 		Collections.sort(values, new Comparator<Number>()

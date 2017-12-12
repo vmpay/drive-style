@@ -9,6 +9,7 @@ import android.net.Uri;
 import android.support.v7.app.AlertDialog;
 import android.widget.Toast;
 
+import net.hockeyapp.android.CrashManager;
 import net.hockeyapp.android.CrashManagerListener;
 import net.hockeyapp.android.LoginManager;
 import net.hockeyapp.android.Tracking;
@@ -113,7 +114,7 @@ public class BugTrackingUtils
 	public static void checkForCrashes(Application application, Activity activity)
 	{
 		currentActivity = activity;
-//		CrashManager.register(application, listener);
+		CrashManager.register(application, listener);
 	}
 
 	public static void checkForUpdates(Activity activity)

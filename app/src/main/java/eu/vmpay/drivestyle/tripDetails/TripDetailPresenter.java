@@ -371,22 +371,13 @@ final class TripDetailPresenter implements TripDetailContract.Presenter
 	@Override
 	public void editTrip()
 	{
-// 4 8 6 -1 -2 -3 -1 3 4 5
+		List<Double> originalDoubleValues = new ArrayList<>();
 		List<Pair<Number, Number>> originalValues = new ArrayList<>();
-//		originalValues.add(Pair.<Number, Number>of(1, 4));
-//		originalValues.add(Pair.<Number, Number>of(2, 8));
-//		originalValues.add(Pair.<Number, Number>of(3, 6));
-//		originalValues.add(Pair.<Number, Number>of(4, -1));
-//		originalValues.add(Pair.<Number, Number>of(5, -2));
-//		originalValues.add(Pair.<Number, Number>of(6, -3));
-//		originalValues.add(Pair.<Number, Number>of(7, -1));
-//		originalValues.add(Pair.<Number, Number>of(8, 3));
-//		originalValues.add(Pair.<Number, Number>of(9, 4));
-//		originalValues.add(Pair.<Number, Number>of(10, 5));
 
 		for(int i = 0; i < accelerometerDataList.size(); i++)
 		{
 			originalValues.add(Pair.<Number, Number>of(i, accelerometerDataList.get(i).getAccZ()));
+			originalDoubleValues.add(accelerometerDataList.get(i).getAccZ());
 		}
 
 		List<Pair<Number, Number>> result = FilteringUtils.calculateFilter(originalValues, 30, false);
@@ -403,9 +394,19 @@ final class TripDetailPresenter implements TripDetailContract.Presenter
 			exportList.add(export);
 		}
 
+		List<Double> resultDouble = FilteringUtils.movMedian(originalDoubleValues, 30);
+		List<String[]> exportDoubleList = new ArrayList<>();
+		for(int i = 0; i < resultDouble.size(); i++)
+		{
+			String[] tmp = new String[1];
+			tmp[0] = resultDouble.get(i).toString();
+			exportDoubleList.add(tmp);
+		}
+
 		try
 		{
 			ExportUtils.exportToCsv(actualTrip.getmTitle() + "_filtered", exportList);
+			ExportUtils.exportToCsv(actualTrip.getmTitle() + "_filtered_median", exportDoubleList);
 		} catch(IOException e)
 		{
 			e.printStackTrace();
