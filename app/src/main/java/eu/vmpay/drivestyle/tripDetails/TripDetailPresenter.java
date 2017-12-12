@@ -373,17 +373,24 @@ final class TripDetailPresenter implements TripDetailContract.Presenter
 	{
 // 4 8 6 -1 -2 -3 -1 3 4 5
 		List<Pair<Number, Number>> originalValues = new ArrayList<>();
-		originalValues.add(Pair.<Number, Number>of(1, 4));
-		originalValues.add(Pair.<Number, Number>of(2, 8));
-		originalValues.add(Pair.<Number, Number>of(3, 6));
-		originalValues.add(Pair.<Number, Number>of(4, -1));
-		originalValues.add(Pair.<Number, Number>of(5, -2));
-		originalValues.add(Pair.<Number, Number>of(6, -3));
-		originalValues.add(Pair.<Number, Number>of(7, -1));
-		originalValues.add(Pair.<Number, Number>of(8, 3));
-		originalValues.add(Pair.<Number, Number>of(9, 4));
-		originalValues.add(Pair.<Number, Number>of(10, 5));
-		List<Pair<Number, Number>> result = FilteringUtils.calculateFilter(originalValues, 3, false);
+//		originalValues.add(Pair.<Number, Number>of(1, 4));
+//		originalValues.add(Pair.<Number, Number>of(2, 8));
+//		originalValues.add(Pair.<Number, Number>of(3, 6));
+//		originalValues.add(Pair.<Number, Number>of(4, -1));
+//		originalValues.add(Pair.<Number, Number>of(5, -2));
+//		originalValues.add(Pair.<Number, Number>of(6, -3));
+//		originalValues.add(Pair.<Number, Number>of(7, -1));
+//		originalValues.add(Pair.<Number, Number>of(8, 3));
+//		originalValues.add(Pair.<Number, Number>of(9, 4));
+//		originalValues.add(Pair.<Number, Number>of(10, 5));
+
+		for(int i = 0; i < accelerometerDataList.size(); i++)
+		{
+			originalValues.add(Pair.<Number, Number>of(i, accelerometerDataList.get(i).getAccZ()));
+		}
+
+		List<Pair<Number, Number>> result = FilteringUtils.calculateFilter(originalValues, 30, false);
+		List<String[]> exportList = new ArrayList<>();
 		for(int i = 0; i < result.size(); i++)
 		{
 			Log.d(TAG, String.format(Locale.US, "%d.\t%s\t%s",
@@ -391,32 +398,18 @@ final class TripDetailPresenter implements TripDetailContract.Presenter
 					result.get(i).getLeft().toString(),
 					result.get(i).getRight().toString()
 			));
+			String[] export = new String[1];
+			export[0] = result.get(i).getRight().toString();
+			exportList.add(export);
 		}
-//		Random r = new Random();
-//		double randomValue = r.nextDouble() * 5;
-//		Trip editedTrip = new Trip(actualTrip.getmId(), actualTrip.getmTitle(),
-//				actualTrip.getmStartTime(), actualTrip.getmFinishTime(), randomValue,
-//				actualTrip.getmType(), actualTrip.getmScenario());
-//		editedTrip.setThisIdWhereClause();
-//		mTripsRepository.updateDataModelRx(editedTrip).subscribeWith(new DisposableSubscriber<Integer>()
-//		{
-//			@Override
-//			public void onNext(Integer integer)
-//			{
-//				Log.d(TAG, "Updated " + integer + " entities");
-//			}
-//
-//			@Override
-//			public void onError(Throwable t)
-//			{
-//			}
-//
-//			@Override
-//			public void onComplete()
-//			{
-//				loadDetails();
-//			}
-//		});
+
+		try
+		{
+			ExportUtils.exportToCsv(actualTrip.getmTitle() + "_filtered", exportList);
+		} catch(IOException e)
+		{
+			e.printStackTrace();
+		}
 	}
 
 	@Override
