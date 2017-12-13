@@ -8,8 +8,8 @@ android {
         applicationId "eu.vmpay.drivestyle"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 146
-        versionName "2.0.0"
+        versionCode 147
+        versionName "2.0.1"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true
         manifestPlaceholders = [HOCKEYAPP_APP_ID: "c513d6c3a63e4c02823441e5417833d2", HOCKEYAPP_APP_SECRET: "a1e05b48a0e9f8643583ccfedc3bed89"]
