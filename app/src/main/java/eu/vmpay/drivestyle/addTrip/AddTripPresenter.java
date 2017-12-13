@@ -5,6 +5,8 @@ import android.location.Location;
 import android.os.Handler;
 import android.support.annotation.Nullable;
 
+import org.apache.commons.lang3.tuple.Pair;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -23,6 +25,7 @@ import eu.vmpay.drivestyle.data.source.local.TripLocalDataSource;
 import eu.vmpay.drivestyle.sensors.location.FusedLocationProviderContract;
 import eu.vmpay.drivestyle.sensors.motion.AccelerometerSensorContract;
 import eu.vmpay.drivestyle.tripList.TripListFilterType;
+import eu.vmpay.drivestyle.utils.FilteringUtils;
 import io.reactivex.subscribers.DisposableSubscriber;
 
 /**
@@ -197,6 +200,9 @@ final class AddTripPresenter implements AddTripContract.Presenter, Accelerometer
 						return (int) (o1.getTimestamp() - o2.getTimestamp());
 					}
 				});
+
+				filterData(accelerometerDataList);
+
 				tripsRepository.insertDataModelListRx(accelerometerDataList).subscribeWith(new DisposableSubscriber<Long>()
 				{
 					@Override
@@ -270,6 +276,38 @@ final class AddTripPresenter implements AddTripContract.Presenter, Accelerometer
 			{
 			}
 		});
+	}
+
+	private void filterData(List<AccelerometerData> accelerometerDataList)
+	{
+		final int slidingWindow = accelerometerDataList.size() / 6;
+		List<AccelerometerData> accelerometerDataListCopy = new ArrayList<>();
+		accelerometerDataListCopy.addAll(accelerometerDataList);
+		accelerometerDataList.clear();
+		List<Pair<Number, Number>> originalX = new ArrayList<>();
+		List<Pair<Number, Number>> originalY = new ArrayList<>();
+		List<Pair<Number, Number>> originalZ = new ArrayList<>();
+
+		for(int i = 0; i < accelerometerDataListCopy.size(); i++)
+		{
+			originalX.add(Pair.<Number, Number>of(i, accelerometerDataListCopy.get(i).getAccX()));
+			originalY.add(Pair.<Number, Number>of(i, accelerometerDataListCopy.get(i).getAccY()));
+			originalZ.add(Pair.<Number, Number>of(i, accelerometerDataListCopy.get(i).getAccZ()));
+		}
+
+		List<Pair<Number, Number>> resultX = FilteringUtils.calculateFilter(originalX, slidingWindow, false);
+		List<Pair<Number, Number>> resultY = FilteringUtils.calculateFilter(originalY, slidingWindow, false);
+		List<Pair<Number, Number>> resultZ = FilteringUtils.calculateFilter(originalZ, slidingWindow, false);
+
+		for(int i = 0; i < accelerometerDataListCopy.size(); i++)
+		{
+			AccelerometerData entry = accelerometerDataListCopy.get(i);
+			accelerometerDataList.add(new AccelerometerData(entry.getTripId(), entry.getTimestamp(),
+					resultX.get(i).getRight().doubleValue(),
+					resultY.get(i).getRight().doubleValue(),
+					resultZ.get(i).getRight().doubleValue()
+			));
+		}
 	}
 
 	@Override

@@ -12,14 +12,11 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 
-import org.apache.commons.lang3.tuple.Pair;
-
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Locale;
 
 import javax.inject.Inject;
 
@@ -35,7 +32,6 @@ import eu.vmpay.drivestyle.data.source.local.MotionTripViewPersistenceContract;
 import eu.vmpay.drivestyle.data.source.local.TripLocalDataSource;
 import eu.vmpay.drivestyle.data.source.local.TripPersistenceContract;
 import eu.vmpay.drivestyle.utils.ExportUtils;
-import eu.vmpay.drivestyle.utils.FilteringUtils;
 import io.reactivex.subscribers.DisposableSubscriber;
 
 /**
@@ -371,46 +367,6 @@ final class TripDetailPresenter implements TripDetailContract.Presenter
 	@Override
 	public void editTrip()
 	{
-		List<Double> originalDoubleValues = new ArrayList<>();
-		List<Pair<Number, Number>> originalValues = new ArrayList<>();
-
-		for(int i = 0; i < accelerometerDataList.size(); i++)
-		{
-			originalValues.add(Pair.<Number, Number>of(i, accelerometerDataList.get(i).getAccZ()));
-			originalDoubleValues.add(accelerometerDataList.get(i).getAccZ());
-		}
-
-		List<Pair<Number, Number>> result = FilteringUtils.calculateFilter(originalValues, 30, false);
-		List<String[]> exportList = new ArrayList<>();
-		for(int i = 0; i < result.size(); i++)
-		{
-			Log.d(TAG, String.format(Locale.US, "%d.\t%s\t%s",
-					i,
-					result.get(i).getLeft().toString(),
-					result.get(i).getRight().toString()
-			));
-			String[] export = new String[1];
-			export[0] = result.get(i).getRight().toString();
-			exportList.add(export);
-		}
-
-		List<Double> resultDouble = FilteringUtils.movMedian(originalDoubleValues, 30);
-		List<String[]> exportDoubleList = new ArrayList<>();
-		for(int i = 0; i < resultDouble.size(); i++)
-		{
-			String[] tmp = new String[1];
-			tmp[0] = resultDouble.get(i).toString();
-			exportDoubleList.add(tmp);
-		}
-
-		try
-		{
-			ExportUtils.exportToCsv(actualTrip.getmTitle() + "_filtered", exportList);
-			ExportUtils.exportToCsv(actualTrip.getmTitle() + "_filtered_median", exportDoubleList);
-		} catch(IOException e)
-		{
-			e.printStackTrace();
-		}
 	}
 
 	@Override
