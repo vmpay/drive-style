@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.location.Location;
 import android.os.Handler;
 import android.support.annotation.Nullable;
+import android.util.Log;
 
 import org.apache.commons.lang3.tuple.Pair;
 
@@ -26,6 +27,13 @@ import eu.vmpay.drivestyle.sensors.location.FusedLocationProviderContract;
 import eu.vmpay.drivestyle.sensors.motion.AccelerometerSensorContract;
 import eu.vmpay.drivestyle.tripList.TripListFilterType;
 import eu.vmpay.drivestyle.utils.FilteringUtils;
+import eu.vmpay.drivestyle.utils.dtw.EtalonModel;
+import eu.vmpay.drivestyle.utils.dtw.core.FastDTW;
+import eu.vmpay.drivestyle.utils.dtw.core.TimeWarpInfo;
+import eu.vmpay.drivestyle.utils.dtw.distance.DistanceFunction;
+import eu.vmpay.drivestyle.utils.dtw.distance.DistanceFunctionFactory;
+import eu.vmpay.drivestyle.utils.dtw.timeSeries.TimeSeries;
+import io.reactivex.schedulers.Schedulers;
 import io.reactivex.subscribers.DisposableSubscriber;
 
 /**
@@ -178,13 +186,12 @@ final class AddTripPresenter implements AddTripContract.Presenter, Accelerometer
 		}
 
 		final Trip trip = new Trip("Trip " + new Date(startTimestamp).toString(), startTimestamp, stopTimestamp, "", TripListFilterType.ALL);
-		tripsRepository.insertDataModelRx(trip).subscribeWith(new DisposableSubscriber<Long>()
+		tripsRepository.insertDataModelRx(trip).observeOn(Schedulers.io()).subscribeWith(new DisposableSubscriber<Long>()
 		{
 			@Override
 			public void onNext(Long aLong)
 			{
 				final long tripId = aLong;
-				actualTrip = new Trip(tripId, trip.getmTitle(), trip.getmStartTime(), trip.getmFinishTime(), trip.getmMark(), trip.getmType(), trip.getmScenario());
 
 				List<AccelerometerData> accelerometerDataList = new ArrayList<>();
 				for(Map.Entry<Long, Double[]> entry : motionDataMapCopy.entrySet())
@@ -202,6 +209,8 @@ final class AddTripPresenter implements AddTripContract.Presenter, Accelerometer
 				});
 
 				filterData(accelerometerDataList);
+				double distance = applyFastDtw(accelerometerDataList);
+				actualTrip = new Trip(tripId, trip.getmTitle(), trip.getmStartTime(), trip.getmFinishTime(), distance, trip.getmType(), trip.getmScenario());
 
 				tripsRepository.insertDataModelListRx(accelerometerDataList).subscribeWith(new DisposableSubscriber<Long>()
 				{
@@ -280,6 +289,7 @@ final class AddTripPresenter implements AddTripContract.Presenter, Accelerometer
 
 	private void filterData(List<AccelerometerData> accelerometerDataList)
 	{
+		Log.d(TAG, "filterData start");
 		final int slidingWindow = accelerometerDataList.size() / 6;
 		List<AccelerometerData> accelerometerDataListCopy = new ArrayList<>();
 		accelerometerDataListCopy.addAll(accelerometerDataList);
@@ -308,6 +318,7 @@ final class AddTripPresenter implements AddTripContract.Presenter, Accelerometer
 					resultZ.get(i).getRight().doubleValue()
 			));
 		}
+		Log.d(TAG, "filterData finished");
 	}
 
 	@Override
@@ -416,5 +427,38 @@ final class AddTripPresenter implements AddTripContract.Presenter, Accelerometer
 				it.remove();
 			}
 		}
+	}
+
+	private double applyFastDtw(List<AccelerometerData> accelerometerDataList)
+	{
+		Log.d(TAG, "applyFastDtw start");
+		// Create two series : one from the etalon model and other from real data
+		TimeSeries tsI = new TimeSeries(extractDataFromList(accelerometerDataList));
+		TimeSeries tsJ = new TimeSeries(EtalonModel.BRAKING_SHARP_3);
+
+		// Create Euclidean Distance
+		final DistanceFunction distFn = DistanceFunctionFactory.getDistFnByName("EuclideanDistance");
+
+		// Perform Fast DTW
+		final TimeWarpInfo info = FastDTW.getWarpInfoBetween(tsI, tsJ, 3, distFn);
+
+		Log.d(TAG, "DTW distance = " + info.getDistance());
+		return info.getDistance();
+	}
+
+	private double[] extractDataFromList(List<AccelerometerData> accelerometerDataList)
+	{
+		if(accelerometerDataList == null)
+		{
+			return null;
+		}
+		double[] result = new double[accelerometerDataList.size()];
+
+		for(int i = 0; i < result.length; i++)
+		{
+			result[i] = accelerometerDataList.get(i).getAccZ();
+		}
+
+		return result;
 	}
 }

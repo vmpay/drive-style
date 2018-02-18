@@ -3,6 +3,7 @@ package eu.vmpay.drivestyle;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
+import eu.vmpay.drivestyle.utils.dtw.EtalonModel;
 import eu.vmpay.drivestyle.utils.dtw.core.FastDTW;
 import eu.vmpay.drivestyle.utils.dtw.core.TimeWarpInfo;
 import eu.vmpay.drivestyle.utils.dtw.distance.DistanceFunction;
@@ -250,5 +251,23 @@ public class FastDtwTest extends TestCase
 
 		// Assert
 		assertEquals(info.getDistance(), 0.0);
+	}
+
+	public void testTimeSeriesFromEtalonModel() throws Exception
+	{
+		TimeSeries tsJ = new TimeSeries(EtalonModel.BRAKING_SHARP_2);
+
+		TimeSeries tsI = new TimeSeries(EtalonModel.BRAKING_SHARP_3);
+
+		// Create Euclidean Distance
+		final DistanceFunction distFn = DistanceFunctionFactory.getDistFnByName("EuclideanDistance");
+
+		// Perform Fast DTW
+		final TimeWarpInfo info = FastDTW.getWarpInfoBetween(tsI, tsJ, 3, distFn);
+
+		// Assert
+//		assertEquals(info.getDistance(), 0.0);
+		System.out.println("dtw distance = " + info.getDistance());
+		assertTrue(info.getDistance() < 150);
 	}
 }
